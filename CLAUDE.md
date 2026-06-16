@@ -4,11 +4,11 @@
 
 Before writing any documentation for this design system, read the relevant reference file(s) from `docs/writing-guides/`:
 
-| Sytuacja | Plik |
+| Situation | File |
 |---|---|
-| Dowolna dokumentacja (fundamenty) | `docs/writing-guides/tech-writing-one.md` |
-| Długie dokumenty / złożona struktura | `docs/writing-guides/tech-writing-two.md` |
-| Komunikaty o błędach / walidacja | `docs/writing-guides/tech-writing-error-messages.md` |
-| Diagramy, obrazki, alt text | `docs/writing-guides/tech-writing-accessibility.md` |
-| Język inkluzywny (zawsze) | `docs/writing-guides/tech-writing-accessibility.md` |
-| Przegląd wszystkich plików | `docs/writing-guides/tech-writing-overview.md` |
+| Any documentation (fundamentals) | `docs/writing-guides/tech-writing-one.md` |
+| Long docs / complex structure | `docs/writing-guides/tech-writing-two.md` |
+| Error messages / validation | `docs/writing-guides/tech-writing-error-messages.md` |
+| Diagrams, images, alt text | `docs/writing-guides/tech-writing-accessibility.md` |
+| Inclusive language (always) | `docs/writing-guides/tech-writing-accessibility.md` |
+| Overview of all files | `docs/writing-guides/tech-writing-overview.md` |

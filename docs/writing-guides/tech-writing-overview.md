@@ -2,18 +2,18 @@
 
 Source: https://developers.google.com/tech-writing/overview
 
-## Co obejmuje kurs
+## What the course covers
 
-Google oferuje 4 moduły:
-- **Technical Writing One** — podstawy (słowa, zdania, listy, akapity, dokumenty)
-- **Technical Writing Two** — poziom średni (edycja, duże dokumenty, ilustracje, kod przykładowy, LLM)
-- **Tech Writing for Accessibility** — dokumentacja dostępna dla osób z niepełnosprawnościami
-- **Writing Helpful Error Messages** — pisanie komunikatów o błędach
+Google offers 4 modules:
+- **Technical Writing One** — fundamentals (words, sentences, lists, paragraphs, documents)
+- **Technical Writing Two** — intermediate (editing, large documents, illustrations, sample code, LLM)
+- **Tech Writing for Accessibility** — documentation accessible to people with disabilities
+- **Writing Helpful Error Messages** — writing error messages
 
-## Jak używać tych plików
+## How to use these files
 
-Przed pisaniem dokumentacji DS, przeczytaj odpowiedni plik z tego katalogu:
-- Dokumentacja komponentu / tokenu → `tech-writing-one.md` + `tech-writing-two.md`
-- Komunikaty o błędach w komponentach → `tech-writing-error-messages.md`
-- Opisy obrazków, diagramów → `tech-writing-accessibility.md`
-- Każda dokumentacja → `tech-writing-accessibility.md` (sekcja języka inkluzywnego)
+Before writing DS documentation, read the relevant file from this directory:
+- Component / token documentation → `tech-writing-one.md` + `tech-writing-two.md`
+- Error messages in components → `tech-writing-error-messages.md`
+- Image and diagram descriptions → `tech-writing-accessibility.md`
+- Any documentation → `tech-writing-accessibility.md` (inclusive language section)

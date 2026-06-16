@@ -2,52 +2,52 @@
 
 Source: https://developers.google.com/tech-writing/error-messages
 
-## Kluczowe zasady
+## Key principles
 
-### Fundamentalna zasada
-Dobry komunikat o błędzie odpowiada na dwa pytania:
-1. **Co poszło nie tak?** (przyczyna)
-2. **Jak użytkownik to naprawia?** (rozwiązanie)
+### The fundamental rule
+A good error message answers two questions:
+1. **What went wrong?** (cause)
+2. **How does the user fix it?** (solution)
 
-Komunikat który nie odpowiada na oba pytania → zły komunikat.
+A message that doesn't answer both questions → bad message.
 
-### Wyjaśnianie problemu
-- Identyfikuj konkretną przyczynę błędu, nie tylko symptom
-  - "Error occurred" ❌ — nie mówi co się stało
+### Explaining the problem
+- Identify the specific cause of the error, not just the symptom
+  - "Error occurred" ❌ — doesn't say what happened
   - "The `color` token value `#ZZZ` is not a valid hex color." ✅
-- Wskazuj nieprawidłowe wejście użytkownika gdy to ono jest przyczyną
-  - Podaj co zostało podane i dlaczego jest nieprawidłowe
-- Określaj wymagania i ograniczenia
+- Point to the invalid user input when that is the cause
+  - State what was provided and why it is invalid
+- Specify requirements and constraints
   - "Token names must start with a letter and contain only letters, numbers, and hyphens."
 
-### Wyjaśnianie rozwiązania
-- Powiedz użytkownikowi co konkretnie zrobić
+### Explaining the solution
+- Tell the user exactly what to do
   - "Check the API documentation" ❌
   - "Set `variant` to one of: primary, secondary, ghost, danger." ✅
-- Podaj przykład poprawnej wartości gdy to możliwe
-- Nie zmuszaj użytkownika do domyślania się rozwiązania
+- Provide an example of a valid value when possible
+- Don't make the user guess the solution
 
-### Pisanie jasno
-- **Zwięzłość**: usuń wszystkie słowa które nie wnoszą informacji
+### Writing clearly
+- **Conciseness**: remove all words that carry no information
   - "An error has occurred in the system" → "The token value is invalid."
-- **Brak podwójnych negatywów**: "not invalid" → "valid"; "not disabled" → "enabled"
-- **Spójność terminologii**: używaj tych samych nazw co w dokumentacji i UI
-- **Format**: dla złożonych błędów używaj list; jedna linia dla prostych błędów
-- **Ton**: pomocowy, nie oskarżycielski
+- **No double negatives**: "not invalid" → "valid"; "not disabled" → "enabled"
+- **Consistent terminology**: use the same names as in the documentation and UI
+- **Format**: use lists for complex errors; one line for simple errors
+- **Tone**: helpful, not accusatory
   - "You forgot to specify..." ❌
   - "Specify the required `name` prop." ✅
-- **Brak żargonu technicznego** (o ile nie piszesz dla deweloperów)
+- **No technical jargon** (unless writing for developers)
 
-### Złe komunikaty o błędach — wzorce do rozpoznania
-- Nieokreślona przyczyna: "Something went wrong", "Invalid value", "Error"
-- Brak wskazówki jak naprawić: "Authentication failed" (co zrobić?)
-- Nieprecyzyjne informacje: "The value is too long" (jaki limit?)
-- Mylący język lub podwójne negatywy
-- Nieznane następne kroki: komunikat który nie mówi co dalej
+### Bad error messages — patterns to recognize
+- Unspecified cause: "Something went wrong", "Invalid value", "Error"
+- No guidance on how to fix: "Authentication failed" (what to do?)
+- Imprecise information: "The value is too long" (what is the limit?)
+- Confusing language or double negatives
+- Unknown next steps: a message that doesn't say what to do next
 
-## Wzorce do stosowania (before → after)
+## Patterns to apply (before → after)
 
-| Przed | Po |
+| Before | After |
 |---|---|
 | "Invalid token value." | "The token `brand.color.primary` has an invalid value `#ZZZ`. Use a valid hex color (e.g., `#0057FF`)." |
 | "Error in configuration." | "The `borderRadius` token is missing. Add it to your `tokens.json` file." |
@@ -55,20 +55,20 @@ Komunikat który nie odpowiada na oba pytania → zły komunikat.
 | "The value is not valid." | "The `spacing` value must be a number in pixels (e.g., `16`). Received: `medium`." |
 | "You provided wrong input." | "The `size` prop accepts: `sm`, `md`, `lg`. Received: `large`." |
 
-## Wzorce do unikania
+## Patterns to avoid
 
-- Generyczne: "Error", "Something went wrong", "Invalid input"
-- Oskarżycielskie: "You forgot to...", "You provided..."
-- Bez rozwiązania: błąd bez wskazówki co zrobić
-- Nieprecyzyjne: brak wartości którą podano, brak oczekiwanej wartości
-- Podwójne negatywy: "not an invalid value"
-- Żargon nieznany odbiorcy
+- Generic: "Error", "Something went wrong", "Invalid input"
+- Accusatory: "You forgot to...", "You provided..."
+- No solution: error with no guidance on what to do
+- Imprecise: missing the value that was provided, missing the expected value
+- Double negatives: "not an invalid value"
+- Jargon unknown to the reader
 
-## Zastosowanie w DS
+## Application in DS
 
-- **Walidacja tokenów**: "Token `{name}` has value `{value}` which is not a valid {type}. Expected: {format}."
-- **Brakujące props**: "The `{component}` component requires the `{prop}` prop. Add `{prop}=\"{example}\"` to your usage."
-- **Nieprawidłowe warianty**: "`{value}` is not a valid variant for `{component}`. Use one of: {list}."
-- **Błędy TypeScript**: komunikaty w typach powinny wyjaśniać przyczynę i podawać poprawną strukturę
+- **Token validation**: "Token `{name}` has value `{value}` which is not a valid {type}. Expected: {format}."
+- **Missing props**: "The `{component}` component requires the `{prop}` prop. Add `{prop}=\"{example}\"` to your usage."
+- **Invalid variants**: "`{value}` is not a valid variant for `{component}`. Use one of: {list}."
+- **TypeScript errors**: type messages should explain the cause and provide the correct structure
 - **Deprecated API**: "The `{prop}` prop is deprecated and will be removed in v{version}. Use `{replacement}` instead."
-- **Błędy build-time (np. Style Dictionary)**: podaj plik, linię, token i konkretny problem
+- **Build-time errors (e.g., Style Dictionary)**: include the file, line, token name, and the specific problem

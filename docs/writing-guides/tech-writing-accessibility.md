@@ -2,48 +2,48 @@
 
 Source: https://developers.google.com/tech-writing/accessibility
 
-## Kluczowe zasady
+## Key principles
 
-### Projektowanie dla wszystkich
-- Dostępna dokumentacja = czytelna i zrozumiała dla wszystkich, w tym dla osób używających czytników ekranu
-- Zasady dostępności stosują się do: design docs, komentarzy w kodzie, UI tekstu, helpów CLI, komunikatów o błędach — nie tylko formalnej dokumentacji
-- Sprawdź: czy treść jest zrozumiała bez koloru? bez obrazków? za pomocą samego tekstu?
+### Design for everyone
+- Accessible documentation = readable and understandable by everyone, including people using screen readers
+- Accessibility principles apply to: design docs, code comments, UI text, CLI help, error messages — not just formal documentation
+- Check: is the content understandable without color? without images? using text alone?
 
-### Alt text dla obrazków i diagramów
-- Każdy obraz informacyjny wymaga alt tekstu
-- Alt text opisuje *treść i cel* obrazu, nie jego wygląd ("A diagram showing the token hierarchy from primitive to semantic to component-level" nie "A colorful diagram")
-- Dla złożonych diagramów technicznych: alt text + pełny opis tekstowy w treści dokumentu
-- Obrazy dekoracyjne: pusty alt (`alt=""`) lub pomiń — czytnik ekranu pominie je
-- Długość alt tekstu: tyle ile potrzeba, ale zwięźle; długie opisy → do treści strony
+### Alt text for images and diagrams
+- Every informational image requires alt text
+- Alt text describes the *content and purpose* of the image, not its appearance ("A diagram showing the token hierarchy from primitive to semantic to component-level" not "A colorful diagram")
+- For complex technical diagrams: alt text + full text description in the document body
+- Decorative images: empty alt (`alt=""`) or omit — screen readers will skip them
+- Alt text length: as long as needed, but concise; long descriptions → move to page body
 
-### Kontrast kolorów
-- Tekst na tle: min. 4.5:1 (normalna wielkość), 3:1 (duży tekst)
-- Nie przekazuj informacji wyłącznie przez kolor (np. "czerwony = błąd" bez ikony lub tekstu)
-- Diagramy: wybieraj kolory przyjazne dla daltonistów lub dodawaj wzory/kształty jako drugi kanał informacji
+### Color contrast
+- Text on background: min. 4.5:1 (normal size), 3:1 (large text)
+- Don't convey information through color alone (e.g., "red = error" without an icon or text label)
+- Diagrams: choose colorblind-friendly palettes or add patterns/shapes as a second information channel
 
-### Język inkluzywny
-- Unikaj terminów z historycznym ładunkiem wykluczenia (whitelist/blacklist → allowlist/denylist)
-- Unikaj terminów deprecjonujących zdolności ("simple", "easy", "just", "obviously")
-- Unikaj kulturowych założeń i idiomów
-- Pisz w drugiej osobie ("you") — neutralne płciowo i bezpośrednie
-- Przykłady kodu: używaj opisowych, neutralnych kulturowo nazw zmiennych
+### Inclusive language
+- Avoid terms with a history of exclusion (whitelist/blacklist → allowlist/denylist)
+- Avoid terms that demean ability ("simple", "easy", "just", "obviously")
+- Avoid cultural assumptions and idioms
+- Write in second person ("you") — gender-neutral and direct
+- Code examples: use descriptive, culturally neutral variable names
 
-### Dostępne wizualizacje
-- Diagramy: dodawaj tekstowy opis alternatywny w treści (nie tylko alt text)
-- Struktura tabeli: zawsze używaj nagłówków kolumn (`<th>`); unikaj tabel do layoutu
-- Nie polegaj wyłącznie na pozycji/układzie przestrzennym do przekazania znaczenia
-- Zapewnij tekstową wersję treści diagramu (np. jako lista lub tekst opisowy pod diagramem)
+### Accessible visuals
+- Diagrams: add a text alternative in the document body (not just alt text)
+- Table structure: always use column headers (`<th>`); avoid tables for layout
+- Don't rely solely on position/spatial layout to convey meaning
+- Provide a text version of diagram content (e.g., as a list or descriptive text below the diagram)
 
-### Edycja pod kątem dostępności
-- Sprawdź: czy każdy obraz ma alt text?
-- Sprawdź: czy informacja przekazana kolorem ma też tekstowy odpowiednik?
-- Sprawdź: czy język jest inkluzywny (brak "simple", "easy", "obviously")?
-- Sprawdź: czy nagłówki tworzą logiczną hierarchię (H1 → H2 → H3)?
-- Sprawdź: czy linki mają opisowy tekst ("See the Button API" nie "Click here")?
+### Editing for accessibility
+- Check: does every image have alt text?
+- Check: does information conveyed by color also have a text equivalent?
+- Check: is the language inclusive (no "simple", "easy", "obviously")?
+- Check: do headings form a logical hierarchy (H1 → H2 → H3)?
+- Check: do links have descriptive text ("See the Button API" not "Click here")?
 
-## Wzorce do stosowania (before → after)
+## Patterns to apply (before → after)
 
-| Przed | Po |
+| Before | After |
 |---|---|
 | "whitelist / blacklist" | "allowlist / denylist" |
 | "simple configuration" | "configuration" |
@@ -52,20 +52,20 @@ Source: https://developers.google.com/tech-writing/accessibility
 | Link: "Click here" | Link: "See Button component API" |
 | Alt: "image.png" | Alt: "Diagram showing Button variants: primary, secondary, ghost" |
 
-## Wzorce do unikania
+## Patterns to avoid
 
-- Obrazy bez alt tekstu
-- Informacja przekazana tylko przez kolor
-- "simple", "easy", "just", "obviously" — zakładają że odbiorca już wie
-- "Click here", "Read more" — nieinformacyjne teksty linków
-- Tabele używane do layoutu zamiast danych
-- Idiomy i metafory kulturowe
+- Images without alt text
+- Information conveyed by color alone
+- "simple", "easy", "just", "obviously" — assume the reader already knows
+- "Click here", "Read more" — non-descriptive link text
+- Tables used for layout instead of data
+- Idioms and cultural metaphors
 
-## Zastosowanie w DS
+## Application in DS
 
-- **Każdy diagram tokenów/komponentów**: alt text + tekstowy odpowiednik pod diagramem
-- **Przykłady kolorów**: zawsze podawaj wartość hex/token obok próbki koloru
-- **Status tokenu (deprecated, experimental)**: oznaczaj tekstem, nie tylko kolorem
-- **Linki do Storybook/sandbox**: opisowe teksty ("Open Button in Storybook") nie "here"
-- **Sekcja dostępności komponentu**: opisz jak komponent zachowuje się z czytnikiem ekranu, jakie role/atrybuty ARIA eksponuje
-- **Unikaj w opisach**: "easy to use", "simply pass", "obviously", "just set"
+- **Every token/component diagram**: alt text + text equivalent below the diagram
+- **Color examples**: always include the hex/token value alongside the color swatch
+- **Token status (deprecated, experimental)**: mark with text, not color alone
+- **Links to Storybook/sandbox**: descriptive text ("Open Button in Storybook") not "here"
+- **Component accessibility section**: describe how the component behaves with a screen reader, which ARIA roles/attributes it exposes
+- **Avoid in descriptions**: "easy to use", "simply pass", "obviously", "just set"

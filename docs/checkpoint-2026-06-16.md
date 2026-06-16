@@ -35,12 +35,14 @@ Harbor Design System/
         ├── vite.config.ts
         ├── .storybook/
         │   ├── main.ts       ← konfiguracja Storybook, globs na stories
-        │   ├── preview.ts    ← import tokenów zakomentowany (odblokować po build)
+        │   ├── preview.ts    ← import tokenów zakomentowany; storySort: Foundations → Components → Pages
         │   ├── themes.scss   ← import CSS tokenów zakomentowany
         │   └── components/
-        │       ├── tier-1-tokens/tier-1-tokens.stories.tsx   ← placeholder
-        │       ├── tier-2-tokens/tier-2-tokens.stories.tsx   ← placeholder
-        │       └── tier-3-tokens/tier-3-tokens.stories.tsx   ← placeholder
+        │       ├── tier-1-tokens/tier-1-tokens.stories.tsx          ← placeholder (Foundations/Design Tokens)
+        │       ├── tier-2-tokens/tier-2-tokens.stories.tsx          ← placeholder (Foundations/Design Tokens)
+        │       ├── tier-3-tokens/tier-3-tokens.stories.tsx          ← placeholder (Foundations/Design Tokens)
+        │       ├── components-placeholder/components-placeholder.stories.tsx  ← placeholder (Components)
+        │       └── pages-placeholder/pages-placeholder.stories.tsx           ← placeholder (Pages)
         └── src/
             └── components/   ← puste, tu trafią komponenty React
 ```
@@ -73,6 +75,22 @@ Tokeny globalne (niezależne od motywu) trafiają do `core/tier-1-definitions/`.
 - Tier wykrywany przez `filePath` — jeśli ścieżka zawiera `tier-2-usage` lub `tier-3-components` → prefix `--ds-theme-`
 - Output do `light/build/css/tokens.css` (`:root {}`), `light/build/css/light.css` (`.light {}`), `light/build/json/tokens.json`, `light/build/js/tokens.js`
 
+## Sidebar Storybook
+
+Trzy sekcje w ustalonej kolejności (wymuszane przez `storySort` w `preview.ts`):
+
+```
+FOUNDATIONS
+  └── Design Tokens
+       ├── Tier 1: Primitive Tokens   (placeholder)
+       ├── Tier 2: Semantic Tokens    (placeholder)
+       └── Tier 3: Component Tokens   (placeholder)
+COMPONENTS
+  └── Introduction                   (placeholder — usunąć gdy pojawi się pierwszy komponent)
+PAGES
+  └── Introduction                   (placeholder — usunąć gdy pojawią się pierwsze strony)
+```
+
 ## Co zostało do zrobienia (kolejność)
 
 1. **Dodać tokeny tier-1** — pliki JSON do `packages/harbor-tokens/light/tier-1-definitions/`
@@ -80,7 +98,7 @@ Tokeny globalne (niezależne od motywu) trafiają do `core/tier-1-definitions/`.
 3. **Odblokować import CSS** w `.storybook/preview.ts` (`import './themes.scss'`) i `themes.scss`
 4. **Zastąpić placeholder stories** prawdziwą wizualizacją tokenów
 5. **Dodać tokeny tier-2 i tier-3**
-6. **Dodać pierwsze komponenty React** do `src/components/`
+6. **Dodać pierwsze komponenty React** do `src/components/`; usunąć `components-placeholder` story
 7. **Deploy na GitHub Pages** (kiedy będzie co pokazać)
 
 ## Decyzje podjęte wcześniej
@@ -94,5 +112,5 @@ Tokeny globalne (niezależne od motywu) trafiają do `core/tier-1-definitions/`.
 ## Ostatni commit
 
 ```
-ba02378 docs: update README with monorepo structure
+616b071 feat: add storySort to enforce Foundations > Components > Pages order
 ```

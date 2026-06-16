@@ -1,7 +1,6 @@
 import type { Preview } from '@storybook/react';
 
-// Uncomment after running npm run build:tokens from the root:
-// import './themes.scss';
+import './themes.scss';
 
 const preview: Preview = {
   parameters: {

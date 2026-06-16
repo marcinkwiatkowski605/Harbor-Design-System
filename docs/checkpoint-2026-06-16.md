@@ -2,7 +2,7 @@
 
 ## Co zrobiliśmy
 
-Zbudowaliśmy kompletny scaffold monorepo dla Harbor Design System. Storybook startuje, wszystko jest skonfigurowane — brakuje tylko treści (tokeny, komponenty).
+Zbudowaliśmy kompletny scaffold monorepo dla Harbor Design System. Storybook startuje, tokeny z Figmy są zbuildowane i załadowane do Storybooka.
 
 ## Obecna struktura projektu
 
@@ -12,6 +12,7 @@ Harbor Design System/
 ├── package-lock.json
 ├── CLAUDE.md                 ← instrukcje dla Claude Code
 ├── README.md
+├── design_tokens.json        ← W3C DTCG export z Figmy (385 tokenów, 4 kolekcje)
 ├── docs/
 │   ├── writing-guides/       ← 5 plików referencyjnych (Google Tech Writing)
 │   └── checkpoint-2026-06-16.md  ← ten plik
@@ -19,65 +20,76 @@ Harbor Design System/
 └── packages/
     ├── harbor-tokens/
     │   ├── package.json      ← @harbor/tokens, devDeps: style-dictionary, minimist
-    │   ├── config.js         ← Style Dictionary 4 config (transforms, formatters)
-    │   ├── index.ts          ← placeholder, wypełniony po build:tokens
+    │   ├── config.js         ← Style Dictionary 4 config (transforms, formatters, DTCG)
+    │   ├── index.ts          ← placeholder
     │   ├── core/
-    │   │   └── tier-1-definitions/   ← puste, tu trafią globalne prymitywy
+    │   │   └── tier-1-definitions/   ← puste
     │   └── light/
-    │       ├── tier-1-definitions/   ← puste, tu trafią tokeny tier-1 dla light
-    │       ├── tier-2-usage/         ← puste, tu trafią tokeny tier-2
-    │       ├── tier-3-components/    ← puste, tu trafią tokeny tier-3
-    │       ├── scss/                 ← puste, na własnoręcznie pisane SCSS helpery
+    │       ├── tier-1-definitions/   ← puste (tokeny czytane z design_tokens.json)
+    │       ├── tier-2-usage/         ← puste (j.w.)
+    │       ├── tier-3-components/    ← puste (j.w.)
+    │       ├── scss/                 ← puste
     │       └── build/                ← gitignored, generowany przez build:tokens
+    │           ├── css/tokens.css    ← :root {} z 377 tokenami primitives
+    │           ├── css/light.css     ← .light {} z tokenami semantic + component
+    │           ├── json/tokens.json  ← flat JSON 377 kluczy
+    │           └── js/tokens.js      ← ES6 exports
     └── harbor-storybook/
         ├── package.json      ← @harbor/storybook, React 18 + Storybook 8
         ├── tsconfig.json
         ├── vite.config.ts
         ├── .storybook/
         │   ├── main.ts       ← konfiguracja Storybook, globs na stories
-        │   ├── preview.ts    ← import tokenów zakomentowany; storySort: Foundations → Components → Pages
-        │   ├── themes.scss   ← import CSS tokenów zakomentowany
+        │   ├── preview.ts    ← import './themes.scss' (aktywny)
+        │   ├── themes.scss   ← importuje tokens.css + light.css (aktywny)
         │   └── components/
-        │       ├── tier-1-tokens/tier-1-tokens.stories.tsx          ← placeholder (Foundations/Design Tokens)
-        │       ├── tier-2-tokens/tier-2-tokens.stories.tsx          ← placeholder (Foundations/Design Tokens)
-        │       ├── tier-3-tokens/tier-3-tokens.stories.tsx          ← placeholder (Foundations/Design Tokens)
-        │       ├── components-placeholder/components-placeholder.stories.tsx  ← placeholder (Components)
-        │       └── pages-placeholder/pages-placeholder.stories.tsx           ← placeholder (Pages)
+        │       ├── tier-1-tokens/tier-1-tokens.stories.tsx          ← placeholder
+        │       ├── tier-2-tokens/tier-2-tokens.stories.tsx          ← placeholder
+        │       ├── tier-3-tokens/tier-3-tokens.stories.tsx          ← placeholder
+        │       ├── components-placeholder/components-placeholder.stories.tsx
+        │       └── pages-placeholder/pages-placeholder.stories.tsx
         └── src/
-            └── components/   ← puste, tu trafią komponenty React
+            └── components/   ← puste
 ```
 
 ## Jak uruchomić
 
 ```bash
 npm install          # (już zrobione — node_modules istnieje)
+npm run build:tokens # Buduje tokeny: design_tokens.json → light/build/{css,json,js}
 npm start            # Storybook na http://localhost:6006
-npm run build:tokens # Buduje tokeny przez Style Dictionary (na razie brak plików JSON → błąd "no source files" jest oczekiwany)
 ```
 
-## Architektura tokenów
+## Architektura tokenów (jak działa build)
 
-Trzy poziomy (tiers), każdy ma swój folder JSON i osobną story w Storybook:
+Źródło: `design_tokens.json` — export W3C DTCG z Figmy (4 kolekcje):
+- `primitive-brand-a` — kolory marki, border-radius, typography, shadow
+- `primitive-global` — kolory neutralne, spacing
+- `semantic-modes` — tokeny semantyczne (color-background-default, itp.)
+- `component-modes` — tokeny per-komponent (button-*, text-input-*)
 
-| Tier | Folder | CSS prefix | Opis |
-|---|---|---|---|
-| 1 — Primitive | `light/tier-1-definitions/` | `--ds-` | Surowe wartości (kolory, spacing, typografia) |
-| 2 — Semantic | `light/tier-2-usage/` | `--ds-theme-` | Znaczenie (color-background-primary, itp.) |
-| 3 — Component | `light/tier-3-components/` | `--ds-theme-` | Per-komponent (button-color-background, itp.) |
+`config.js` (Style Dictionary 4):
+1. `buildTokens()` — czyta DTCG JSON, stripuje klucze kolekcji (deep merge!), taguje tier w `$extensions['harbor-tier']`
+2. `usesDtcgTokens: true` — SD4 DTCG mode (wartości w `token.$value`, typy w `token.$type`)
+3. Custom transform `size/px-to-rem` — Figma exports wymiary jako liczby (np. `4`), konwertuje na `0.25rem`
+4. Custom formatters — oddzielają primitives (`--ds-`) od semantic/component (`--ds-theme-`)
 
-Tokeny globalne (niezależne od motywu) trafiają do `core/tier-1-definitions/`.
+Output do `light/build/`:
+- `css/tokens.css` — `:root {}` z 377 zmiennymi (wszystkie tiers, resolved values)
+- `css/light.css` — `.light {}` z tokenami semantic + component (do theme-switchingu)
+- `json/tokens.json` — flat JSON
+- `js/tokens.js` + `js/tokens.d.ts` — ES6 exports z prefixem `Ds` / `DsTheme`
 
-## Jak działa build tokenów
+## CSS prefix convention
 
-`config.js` używa Style Dictionary 4:
-- Custom transform `size/px-to-rem` → konwertuje `px` na `rem` (base 16)
-- Custom transform `name/theme-prefix` → generuje nazwy JS (`DsColorBlue500`)
-- Tier wykrywany przez `filePath` — jeśli ścieżka zawiera `tier-2-usage` lub `tier-3-components` → prefix `--ds-theme-`
-- Output do `light/build/css/tokens.css` (`:root {}`), `light/build/css/light.css` (`.light {}`), `light/build/json/tokens.json`, `light/build/js/tokens.js`
+| Kolekcja Figma | CSS prefix | Przykład |
+|---|---|---|
+| primitive-brand-a, primitive-global | `--ds-` | `--ds-color-neutral-white` |
+| semantic-modes, component-modes | `--ds-theme-` | `--ds-theme-color-background-default` |
 
 ## Sidebar Storybook
 
-Trzy sekcje w ustalonej kolejności (wymuszane przez `storySort` w `preview.ts`):
+Trzy sekcje w ustalonej kolejności (`storySort` w `preview.ts`):
 
 ```
 FOUNDATIONS
@@ -86,31 +98,32 @@ FOUNDATIONS
        ├── Tier 2: Semantic Tokens    (placeholder)
        └── Tier 3: Component Tokens   (placeholder)
 COMPONENTS
-  └── Introduction                   (placeholder — usunąć gdy pojawi się pierwszy komponent)
+  └── Introduction                   (placeholder)
 PAGES
-  └── Introduction                   (placeholder — usunąć gdy pojawią się pierwsze strony)
+  └── Introduction                   (placeholder)
 ```
+
+## Znane warningi (nie-blokujące)
+
+- `shadow-spread-4` collision: tokeny `shadow.spread.4` i `shadow.spread.-4` generują tę samą nazwę CSS. Figma exportuje obie jako dimension. Można naprawić w Figmie lub custom namerem.
+- Storybook 8.6.18 vs addon-essentials 8.6.14: drobna niezgodność wersji, nie wpływa na działanie.
 
 ## Co zostało do zrobienia (kolejność)
 
-1. **Dodać tokeny tier-1** — pliki JSON do `packages/harbor-tokens/light/tier-1-definitions/`
-2. **Uruchomić `npm run build:tokens`** i sprawdzić output w `light/build/`
-3. **Odblokować import CSS** w `.storybook/preview.ts` (`import './themes.scss'`) i `themes.scss`
-4. **Zastąpić placeholder stories** prawdziwą wizualizacją tokenów
-5. **Dodać tokeny tier-2 i tier-3**
-6. **Dodać pierwsze komponenty React** do `src/components/`; usunąć `components-placeholder` story
-7. **Deploy na GitHub Pages** (kiedy będzie co pokazać)
+1. **Wizualizacja tokenów w Storybook** — zastąpić placeholdery w story (tier-1, tier-2, tier-3) prawdziwymi siatkami kolorów, typografii, spacing itp. CSS zmienne są już załadowane.
+2. **Dodać pierwsze komponenty React** do `src/components/`; usunąć `components-placeholder` story
+3. **Deploy na GitHub Pages** (kiedy będzie co pokazać)
 
 ## Decyzje podjęte wcześniej
 
 - React (nie Lit/Web Components jak w kursie Subatomic)
 - Monorepo npm workspaces (nie Lerna, nie Turbo)
 - Jeden motyw `light` na start; `dark` jako sibling folder gdy będzie potrzebny
-- Brak przykładowego przycisku — komponenty dodawane gdy tokeny będą gotowe
-- GitHub Pages deploy — później, po pierwszych tokenach
+- Tokeny importowane z Figmy przez design_tokens.json (nie ręcznie pisane JSON)
+- GitHub Pages deploy — później, po pierwszych komponentach
 
-## Ostatni commit
+## Ostatnie commity
 
 ```
-616b071 feat: add storySort to enforce Foundations > Components > Pages order
+(do dodania po commitcie z dzisiejszą sesją)
 ```

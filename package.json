@@ -1,0 +1,13 @@
+{
+  "name": "harbor-design-system",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "start": "cd ./packages/harbor-storybook && npm run storybook",
+    "build:tokens": "cd ./packages/harbor-tokens && npm run build:tokens",
+    "build:storybook": "cd ./packages/harbor-storybook && npm run build-storybook"
+  }
+}

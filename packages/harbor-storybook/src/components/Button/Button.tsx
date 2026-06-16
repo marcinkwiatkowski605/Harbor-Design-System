@@ -6,7 +6,7 @@ export type ButtonVariant = 'primary' | 'secondary' | 'outline';
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /** Visual style. Maps to the Figma `Type` variant axis. */
   variant?: ButtonVariant;
-  /** Shows a spinner, marks the button busy, and blocks interaction. */
+  /** Applies the loading state colors, marks the button busy, and blocks interaction. */
   loading?: boolean;
   /** Button label. */
   children: React.ReactNode;
@@ -37,8 +37,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled}
         {...rest}
       >
-        {loading && <span className="harbor-button__spinner" aria-hidden="true" />}
-        <span className="harbor-button__label">{children}</span>
+        {children}
       </button>
     );
   }

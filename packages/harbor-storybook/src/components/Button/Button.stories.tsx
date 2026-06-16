@@ -13,7 +13,7 @@ const meta: Meta<typeof Button> = {
       options: ['primary', 'secondary', 'outline'],
       description: 'Visual style (Figma `Type` axis).',
     },
-    loading: { control: 'boolean', description: 'Shows a spinner and marks the button busy.' },
+    loading: { control: 'boolean', description: 'Applies the loading state colors and marks the button busy.' },
     disabled: { control: 'boolean' },
     children: { control: 'text', description: 'Button label.' },
     onClick: { action: 'clicked' },

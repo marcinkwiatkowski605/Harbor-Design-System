@@ -14,11 +14,11 @@
   border-radius: var(--ds-theme-button-border-radius);
   border: var(--ds-theme-button-border-width) solid transparent;
 
-  font-family: var(--ds-theme-typography-body-lg-font-family);
-  font-size: var(--ds-theme-typography-body-lg-font-size);
-  line-height: var(--ds-theme-typography-body-lg-line-height);
-  letter-spacing: var(--ds-theme-typography-body-lg-letter-spacing);
-  font-weight: var(--ds-typography-font-weight-bold);
+  font-family: var(--ds-theme-typography-label-lg-font-family);
+  font-size: var(--ds-theme-typography-label-lg-font-size);
+  line-height: var(--ds-theme-typography-label-lg-line-height);
+  letter-spacing: var(--ds-theme-typography-label-lg-letter-spacing);
+  font-weight: var(--ds-theme-typography-label-lg-font-weight);
 
   cursor: pointer;
   outline: none;

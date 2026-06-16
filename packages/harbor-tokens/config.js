@@ -87,86 +87,86 @@ const formatVariables = (dictionary) => {
   return [...new Set([...tier1Tokens, ...themeTokens])].join('\n');
 };
 
-const getStyleDictionaryConfig = (theme) => {
-  StyleDictionary.registerFormat({
-    name: 'json/flat/custom',
-    format: function (dictionary) {
-      const transformedTokens = {};
-      const shadowTokens = dictionary.allTokens.filter(
-        (p) => isHigherTierToken(p.filePath) && p.path[0] === 'box-shadow'
+StyleDictionary.registerFormat({
+  name: 'json/flat/custom',
+  format: function ({ dictionary }) {
+    const transformedTokens = {};
+    const shadowTokens = dictionary.allTokens.filter(
+      (p) => isHigherTierToken(p.filePath) && p.path[0] === 'box-shadow'
+    );
+    const shadowSizes = [...new Set(shadowTokens.map((p) => p.path[1]).filter(Boolean))];
+
+    dictionary.allTokens.forEach((token) => {
+      if (token.path[0] === 'box-shadow' && token.path.length > 2) return;
+      const prefix = isHigherTierToken(token.filePath) ? 'ds-theme-' : 'ds-';
+      transformedTokens[`${prefix}${token.path.join('-')}`] = token.value;
+    });
+
+    shadowSizes.forEach((size) => {
+      const props = dictionary.allTokens.filter(
+        (p) => isHigherTierToken(p.filePath) && p.path[0] === 'box-shadow' && p.path[1] === size
       );
-      const shadowSizes = [...new Set(shadowTokens.map((p) => p.path[1]).filter(Boolean))];
+      const x = props.find((p) => p.path[2] === 'x')?.value || '0px';
+      const y = props.find((p) => p.path[2] === 'y')?.value || '0px';
+      const blur = props.find((p) => p.path[2] === 'blur')?.value || '0px';
+      const spread = props.find((p) => p.path[2] === 'spread')?.value || '0px';
+      const color = props.find((p) => p.path[2] === 'color')?.value || 'transparent';
+      transformedTokens[`ds-theme-box-shadow-${size}`] = `${x} ${y} ${blur} ${spread} ${color}`;
+    });
 
-      dictionary.allTokens.forEach((token) => {
-        if (token.path[0] === 'box-shadow' && token.path.length > 2) return;
-        const prefix = isHigherTierToken(token.filePath) ? 'ds-theme-' : 'ds-';
-        transformedTokens[`${prefix}${token.path.join('-')}`] = token.value;
-      });
+    return JSON.stringify(transformedTokens, null, 2);
+  }
+});
 
-      shadowSizes.forEach((size) => {
-        const props = dictionary.allTokens.filter(
-          (p) => isHigherTierToken(p.filePath) && p.path[0] === 'box-shadow' && p.path[1] === size
-        );
-        const x = props.find((p) => p.path[2] === 'x')?.value || '0px';
-        const y = props.find((p) => p.path[2] === 'y')?.value || '0px';
-        const blur = props.find((p) => p.path[2] === 'blur')?.value || '0px';
-        const spread = props.find((p) => p.path[2] === 'spread')?.value || '0px';
-        const color = props.find((p) => p.path[2] === 'color')?.value || 'transparent';
-        transformedTokens[`ds-theme-box-shadow-${size}`] = `${x} ${y} ${blur} ${spread} ${color}`;
-      });
+StyleDictionary.registerFormat({
+  name: 'css/variables-themed',
+  format: function ({ dictionary, options }) {
+    return `.${options.theme} {\n${formatVariables(dictionary)}\n}\n`;
+  }
+});
 
-      return JSON.stringify(transformedTokens, null, 2);
-    }
-  });
+StyleDictionary.registerFormat({
+  name: 'css/custom-variables',
+  format: function ({ dictionary }) {
+    return `:root {\n${formatVariables(dictionary)}\n}`;
+  }
+});
 
-  StyleDictionary.registerFormat({
-    name: 'css/variables-themed',
-    format: function (dictionary) {
-      return `.${theme} {\n${formatVariables(dictionary)}\n}\n`;
-    }
-  });
+StyleDictionary.registerTransform({
+  name: 'size/px-to-rem',
+  type: 'value',
+  matcher: (prop) => prop?.value && typeof prop.value === 'string' && prop.value.endsWith('px'),
+  transform: (prop) => {
+    const pixels = parseFloat(prop.value);
+    if (isNaN(pixels)) return prop.value;
+    return `${Number((pixels / 16).toFixed(4))}rem`;
+  }
+});
 
-  StyleDictionary.registerFormat({
-    name: 'css/custom-variables',
-    format: function (dictionary) {
-      return `:root {\n${formatVariables(dictionary)}\n}`;
-    }
-  });
+StyleDictionary.registerTransform({
+  name: 'name/theme-prefix',
+  type: 'name',
+  transform: (token) => {
+    const cleanPath = token.path
+      .map((segment) => (segment.startsWith('@') ? segment.substring(1) : segment))
+      .filter((segment) => segment !== '')
+      .join('-');
+    const prefix = isHigherTierToken(token.filePath) ? 'DsTheme' : 'Ds';
+    return `${prefix}${cleanPath.split('-').map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join('')}`;
+  }
+});
 
-  StyleDictionary.registerTransform({
-    name: 'size/px-to-rem',
-    type: 'value',
-    matcher: (prop) => prop?.value && typeof prop.value === 'string' && prop.value.endsWith('px'),
-    transform: (prop) => {
-      const pixels = parseFloat(prop.value);
-      if (isNaN(pixels)) return prop.value;
-      return `${Number((pixels / 16).toFixed(4))}rem`;
-    }
-  });
+StyleDictionary.registerTransformGroup({
+  name: 'custom/css',
+  transforms: ['attribute/cti', 'name/kebab', 'size/px-to-rem']
+});
 
-  StyleDictionary.registerTransform({
-    name: 'name/theme-prefix',
-    type: 'name',
-    transform: (token) => {
-      const cleanPath = token.path
-        .map((segment) => (segment.startsWith('@') ? segment.substring(1) : segment))
-        .filter((segment) => segment !== '')
-        .join('-');
-      const prefix = isHigherTierToken(token.filePath) ? 'DsTheme' : 'Ds';
-      return `${prefix}${cleanPath.split('-').map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join('')}`;
-    }
-  });
+StyleDictionary.registerTransformGroup({
+  name: 'custom/js',
+  transforms: ['attribute/cti', 'name/theme-prefix', 'size/px-to-rem']
+});
 
-  StyleDictionary.registerTransformGroup({
-    name: 'custom/css',
-    transforms: ['attribute/cti', 'name/kebab', 'size/px-to-rem']
-  });
-
-  StyleDictionary.registerTransformGroup({
-    name: 'custom/js',
-    transforms: ['attribute/cti', 'name/theme-prefix', 'size/px-to-rem']
-  });
-
+const getStyleDictionaryConfig = (theme) => {
   return {
     source: [`./core/**/*.json`, `./${theme}/**/*.json`],
     log: { verbosity: 'verbose' },
@@ -182,6 +182,7 @@ const getStyleDictionaryConfig = (theme) => {
       css: {
         transformGroup: 'custom/css',
         buildPath: './',
+        options: { theme },
         files: [
           { destination: `./${theme}/build/css/tokens.css`, format: 'css/custom-variables' },
           { destination: `./${theme}/build/css/${theme}.css`, format: 'css/variables-themed' }
@@ -199,12 +200,12 @@ const getStyleDictionaryConfig = (theme) => {
 };
 
 if (!theme) {
-  AVAILABLE_THEMES.forEach((themeName) => {
+  for (const themeName of AVAILABLE_THEMES) {
     console.log(`\nBuilding ${themeName} theme`);
     const sd = new StyleDictionary(getStyleDictionaryConfig(themeName));
-    sd.buildAllPlatforms();
-  });
+    await sd.buildAllPlatforms();
+  }
 } else {
   const sd = new StyleDictionary(getStyleDictionaryConfig(theme));
-  sd.buildAllPlatforms();
+  await sd.buildAllPlatforms();
 }

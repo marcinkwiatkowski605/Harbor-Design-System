@@ -11,9 +11,13 @@ const AVAILABLE_THEMES = ['light'];
 const args = minimist(process.argv.slice(2));
 const theme = args.theme;
 
-// Tokens from 'semantic-modes' and 'component-modes' Figma collections get --ds-theme- prefix.
-const isHigherTierToken = (token) =>
-  token.original?.$extensions?.['harbor-tier'] === 'semantic';
+// Tier comes from the Figma collection each token belongs to. CSS prefixes:
+//   primitive → --ds-primitive-   semantic → --ds-semantic-   component → --ds-component-
+const tierOf = (token) =>
+  token.original?.$extensions?.['harbor-tier'] ?? 'primitive';
+const isHigherTierToken = (token) => tierOf(token) !== 'primitive';
+const cssPrefixOf = (token) => `--ds-${tierOf(token)}-`;
+const jsonPrefixOf = (token) => `ds-${tierOf(token)}-`;
 
 // Reads design_tokens.json (W3C DTCG, exported from Figma), strips collection-level wrapper
 // keys so aliases like {color.background.default} resolve correctly, and tags each token
@@ -22,12 +26,17 @@ const buildTokens = () => {
   const raw = JSON.parse(
     readFileSync(join(__dirname, '../../design_tokens.json'), 'utf-8')
   );
-  const HIGHER_TIER = new Set(['semantic-modes', 'component-modes']);
+  const TIER_BY_COLLECTION = {
+    'primitive-brand-a': 'primitive',
+    'primitive-global': 'primitive',
+    'semantic-modes': 'semantic',
+    'component-modes': 'component',
+  };
 
   const isLeaf = (val) =>
     val !== null && typeof val === 'object' && '$value' in val;
 
-  const tagTokens = (obj, isHigher) => {
+  const tagTokens = (obj, tier) => {
     const out = {};
     for (const [key, val] of Object.entries(obj)) {
       if (key.startsWith('$')) {
@@ -36,10 +45,10 @@ const buildTokens = () => {
         out[key] = {
           $type: val.$type,
           $value: val.$value,
-          $extensions: { 'harbor-tier': isHigher ? 'semantic' : 'primitive' },
+          $extensions: { 'harbor-tier': tier },
         };
       } else if (val !== null && typeof val === 'object') {
-        out[key] = tagTokens(val, isHigher);
+        out[key] = tagTokens(val, tier);
       } else {
         out[key] = val;
       }
@@ -65,7 +74,8 @@ const buildTokens = () => {
     if (collectionName === '$extensions') continue;
     if (typeof collection !== 'object' || collection === null) continue;
     const { $extensions: _skip, ...tokens } = collection;
-    deepMerge(result, tagTokens(tokens, HIGHER_TIER.has(collectionName)));
+    const tier = TIER_BY_COLLECTION[collectionName] ?? 'primitive';
+    deepMerge(result, tagTokens(tokens, tier));
   }
   return result;
 };
@@ -79,11 +89,13 @@ const transformShadowTokens = (dictionary, size, themeTokens) => {
   const blur = props.find((p) => p.path[2] === 'blur')?.$value ?? '0';
   const spread = props.find((p) => p.path[2] === 'spread')?.$value ?? '0';
   const color = props.find((p) => p.path[2] === 'color')?.$value ?? 'transparent';
-  themeTokens.push(`  --ds-theme-shadow-${size}: ${x} ${y} ${blur} ${spread} ${color};`);
+  const prefix = props.length ? cssPrefixOf(props[0]) : '--ds-semantic-';
+  themeTokens.push(`  ${prefix}shadow-${size}: ${x} ${y} ${blur} ${spread} ${color};`);
 };
 
 const transformLineHeight = (dictionary, prop, themeTokens) => {
   const cleanPath = prop.path.join('-');
+  const prefix = cssPrefixOf(prop);
   const fontSizePath = [...prop.path.slice(0, -1), 'font-size'];
   const fontSizeProp = dictionary.allTokens.find(
     (p) => p.path.join('.') === fontSizePath.join('.')
@@ -91,15 +103,15 @@ const transformLineHeight = (dictionary, prop, themeTokens) => {
   if (fontSizeProp) {
     const lhPx = parseFloat(String(prop.$value).replace('rem', '')) * 16;
     const fsPx = parseFloat(String(fontSizeProp.$value).replace('rem', '')) * 16;
-    themeTokens.push(`  --ds-theme-${cleanPath}: ${(lhPx / fsPx).toFixed(2)};`);
+    themeTokens.push(`  ${prefix}${cleanPath}: ${(lhPx / fsPx).toFixed(2)};`);
   } else {
-    themeTokens.push(`  --ds-theme-${cleanPath}: ${prop.$value};`);
+    themeTokens.push(`  ${prefix}${cleanPath}: ${prop.$value};`);
   }
 };
 
 const formatVariables = (dictionary) => {
   const processedShadows = new Set();
-  const tier1Tokens = [];
+  const primitiveTokens = [];
   const themeTokens = [];
 
   const shadowSizes = [
@@ -114,7 +126,7 @@ const formatVariables = (dictionary) => {
   dictionary.allTokens.forEach((prop) => {
     const isHigher = isHigherTierToken(prop);
     const cleanPath = prop.path.join('-');
-    const prefix = isHigher ? '--ds-theme-' : '--ds-';
+    const prefix = cssPrefixOf(prop);
 
     if (isHigher && prop.path[0] === 'shadow' && shadowSizes.includes(prop.path[1])) {
       const size = prop.path[1];
@@ -125,11 +137,11 @@ const formatVariables = (dictionary) => {
       transformLineHeight(dictionary, prop, themeTokens);
     } else {
       const line = `  ${prefix}${cleanPath}: ${prop.$value};`;
-      (isHigher ? themeTokens : tier1Tokens).push(line);
+      (isHigher ? themeTokens : primitiveTokens).push(line);
     }
   });
 
-  return [...new Set([...tier1Tokens, ...themeTokens])].join('\n');
+  return [...new Set([...primitiveTokens, ...themeTokens])].join('\n');
 };
 
 StyleDictionary.registerFormat({
@@ -149,8 +161,7 @@ StyleDictionary.registerFormat({
 
     dictionary.allTokens.forEach((token) => {
       if (isHigherTierToken(token) && token.path[0] === 'shadow' && token.path.length === 3) return;
-      const prefix = isHigherTierToken(token) ? 'ds-theme-' : 'ds-';
-      out[`${prefix}${token.path.join('-')}`] = token.$value;
+      out[`${jsonPrefixOf(token)}${token.path.join('-')}`] = token.$value;
     });
 
     shadowSizes.forEach((size) => {
@@ -164,7 +175,8 @@ StyleDictionary.registerFormat({
       const blur = props.find((p) => p.path[2] === 'blur')?.$value ?? '0';
       const spread = props.find((p) => p.path[2] === 'spread')?.$value ?? '0';
       const color = props.find((p) => p.path[2] === 'color')?.$value ?? 'transparent';
-      out[`ds-theme-shadow-${size}`] = `${x} ${y} ${blur} ${spread} ${color}`;
+      const prefix = props.length ? jsonPrefixOf(props[0]) : 'ds-semantic-';
+      out[`${prefix}shadow-${size}`] = `${x} ${y} ${blur} ${spread} ${color}`;
     });
 
     return JSON.stringify(out, null, 2);
@@ -197,13 +209,13 @@ StyleDictionary.registerTransform({
 });
 
 StyleDictionary.registerTransform({
-  name: 'name/theme-prefix',
+  name: 'name/tier-prefix',
   type: 'name',
   transform: (token) => {
-    const prefix = isHigherTierToken(token) ? 'DsTheme' : 'Ds';
     const toPascal = (s) =>
       s.replace(/-([a-zA-Z0-9])/g, (_, c) => c.toUpperCase())
        .replace(/^(.)/, (c) => c.toUpperCase());
+    const prefix = 'Ds' + toPascal(tierOf(token));
     return prefix + token.path.map(toPascal).join('');
   },
 });
@@ -215,7 +227,7 @@ StyleDictionary.registerTransformGroup({
 
 StyleDictionary.registerTransformGroup({
   name: 'custom/js',
-  transforms: ['attribute/cti', 'name/theme-prefix', 'size/px-to-rem'],
+  transforms: ['attribute/cti', 'name/tier-prefix', 'size/px-to-rem'],
 });
 
 const getStyleDictionaryConfig = (theme) => ({

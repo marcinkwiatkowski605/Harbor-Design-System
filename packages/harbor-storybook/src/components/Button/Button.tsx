@@ -16,7 +16,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
  * Button — Harbor Design System.
  *
  * Token-driven: every color, size, radius, and type value comes from the
- * `--ds-theme-button-*` / `--ds-theme-typography-label-lg-*` CSS variables built
+ * `--ds-component-button-*` / `--ds-semantic-typography-label-lg-*` CSS variables built
  * from the Figma `Button` component set. Interaction states are CSS-driven
  * (`:hover`, `:active`, `:focus-visible`), `disabled` via the native attribute,
  * and `loading` via `aria-busy`.

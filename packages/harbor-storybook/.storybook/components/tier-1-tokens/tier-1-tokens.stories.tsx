@@ -28,14 +28,14 @@ const Label = ({ children }: { children: React.ReactNode }) => (
 // ─── Colors ──────────────────────────────────────────────────────────────────
 
 const palettes = [
-  { name: 'Pale Plum', base: '--ds-color-brand-pale-plum', steps: ['50','100','200','300','400','500','600','700','800','900','950'] },
-  { name: 'Soft Orange', base: '--ds-color-brand-soft-orange', steps: ['50','100','200','300','400','500','600','700','800','900','950'] },
-  { name: 'Neutral', base: '--ds-color-neutral', steps: ['50','100','200','300','400','500','600','700','800','900','950','black','white'] },
-  { name: 'Utility Blue', base: '--ds-color-utility-blue', steps: ['50','100','200','300','400','500','600','700','800','900','950'] },
-  { name: 'Utility Green', base: '--ds-color-utility-green', steps: ['50','100','200','300','400','500','600','700','800','900','950'] },
-  { name: 'Utility Red', base: '--ds-color-utility-red', steps: ['50','100','200','300','400','500','600','700','800','900','950'] },
-  { name: 'Utility Yellow', base: '--ds-color-utility-yellow', steps: ['50','100','200','300','400','500','600','700','800','900','950'] },
-  { name: 'Black Alpha', base: '--ds-color-black-alpha', steps: ['25','90'] },
+  { name: 'Pale Plum', base: '--ds-primitive-color-brand-pale-plum', steps: ['50','100','200','300','400','500','600','700','800','900','950'] },
+  { name: 'Soft Orange', base: '--ds-primitive-color-brand-soft-orange', steps: ['50','100','200','300','400','500','600','700','800','900','950'] },
+  { name: 'Neutral', base: '--ds-primitive-color-neutral', steps: ['50','100','200','300','400','500','600','700','800','900','950','black','white'] },
+  { name: 'Utility Blue', base: '--ds-primitive-color-utility-blue', steps: ['50','100','200','300','400','500','600','700','800','900','950'] },
+  { name: 'Utility Green', base: '--ds-primitive-color-utility-green', steps: ['50','100','200','300','400','500','600','700','800','900','950'] },
+  { name: 'Utility Red', base: '--ds-primitive-color-utility-red', steps: ['50','100','200','300','400','500','600','700','800','900','950'] },
+  { name: 'Utility Yellow', base: '--ds-primitive-color-utility-yellow', steps: ['50','100','200','300','400','500','600','700','800','900','950'] },
+  { name: 'Black Alpha', base: '--ds-primitive-color-black-alpha', steps: ['25','90'] },
 ];
 
 export const Colors: StoryObj = {
@@ -87,21 +87,21 @@ export const Typography: StoryObj = {
   render: () => (
     <div style={{ padding: 24, ...tokens }}>
       <Section title="Font Family">
-        <div style={{ fontSize: 24, fontFamily: 'var(--ds-typography-font-family-sans, sans-serif)', marginBottom: 4 }}>
+        <div style={{ fontSize: 24, fontFamily: 'var(--ds-primitive-typography-font-family-sans, sans-serif)', marginBottom: 4 }}>
           Harbor Design System Aa Bb Cc
         </div>
-        <Label>--ds-typography-font-family-sans</Label>
+        <Label>--ds-primitive-typography-font-family-sans</Label>
       </Section>
 
       <Section title="Font Size Scale">
         {fontSizeSteps.map(step => (
           <div key={step} style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginBottom: 10, paddingBottom: 10, borderBottom: '1px solid #f0f0f0' }}>
             <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#bbb', width: 30, flexShrink: 0 }}>{step}</span>
-            <span style={{ fontSize: `var(--ds-typography-font-size-${step})`, lineHeight: 1.1, color: '#111', whiteSpace: 'nowrap', overflow: 'hidden' }}>
+            <span style={{ fontSize: `var(--ds-primitive-typography-font-size-${step})`, lineHeight: 1.1, color: '#111', whiteSpace: 'nowrap', overflow: 'hidden' }}>
               Harbor
             </span>
             <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#ccc', marginLeft: 'auto', flexShrink: 0 }}>
-              --ds-typography-font-size-{step}
+              --ds-primitive-typography-font-size-{step}
             </span>
           </div>
         ))}
@@ -114,7 +114,7 @@ export const Typography: StoryObj = {
             <span style={{ fontSize: 24, fontWeight: w === 'bold' ? 700 : 400, color: '#111' }}>
               Harbor Design System
             </span>
-            <Label>--ds-typography-font-weight-{w}</Label>
+            <Label>--ds-primitive-typography-font-weight-{w}</Label>
           </div>
         ))}
       </Section>
@@ -122,10 +122,10 @@ export const Typography: StoryObj = {
       <Section title="Letter Spacing">
         {letterSpacingSteps.map(({ key, label }) => (
           <div key={key} style={{ marginBottom: 10, paddingBottom: 10, borderBottom: '1px solid #f0f0f0' }}>
-            <span style={{ fontSize: 20, letterSpacing: `var(--ds-typography-letter-spacing-${key})`, color: '#111', display: 'block' }}>
+            <span style={{ fontSize: 20, letterSpacing: `var(--ds-primitive-typography-letter-spacing-${key})`, color: '#111', display: 'block' }}>
               Harbor Design System
             </span>
-            <Label>--ds-typography-letter-spacing-{key} ({label}%)</Label>
+            <Label>--ds-primitive-typography-letter-spacing-{key} ({label}%)</Label>
           </div>
         ))}
       </Section>
@@ -135,16 +135,16 @@ export const Typography: StoryObj = {
           <div key={step} style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginBottom: 8 }}>
             <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#bbb', width: 30, flexShrink: 0, paddingTop: 4 }}>{step}</span>
             <div style={{
-              background: 'var(--ds-color-brand-pale-plum-100)',
-              borderLeft: '2px solid var(--ds-color-brand-pale-plum-400)',
+              background: 'var(--ds-primitive-color-brand-pale-plum-100)',
+              borderLeft: '2px solid var(--ds-primitive-color-brand-pale-plum-400)',
               paddingLeft: 8,
             }}>
-              <span style={{ fontSize: 16, lineHeight: `var(--ds-typography-line-height-${step})`, color: '#111', display: 'block' }}>
+              <span style={{ fontSize: 16, lineHeight: `var(--ds-primitive-typography-line-height-${step})`, color: '#111', display: 'block' }}>
                 Harbor Design System<br />two lines of text
               </span>
             </div>
             <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#ccc', marginLeft: 'auto', flexShrink: 0 }}>
-              --ds-typography-line-height-{step}
+              --ds-primitive-typography-line-height-{step}
             </span>
           </div>
         ))}
@@ -154,10 +154,10 @@ export const Typography: StoryObj = {
         {fontStyleSteps.map(s => (
           <div key={s} style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginBottom: 12 }}>
             <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#bbb', width: 70, flexShrink: 0 }}>{s}</span>
-            <span style={{ fontSize: 24, fontStyle: `var(--ds-typography-font-style-${s})` as any, color: '#111' }}>
+            <span style={{ fontSize: 24, fontStyle: `var(--ds-primitive-typography-font-style-${s})` as any, color: '#111' }}>
               Harbor Design System
             </span>
-            <Label>--ds-typography-font-style-{s}</Label>
+            <Label>--ds-primitive-typography-font-style-{s}</Label>
           </div>
         ))}
       </Section>
@@ -166,10 +166,10 @@ export const Typography: StoryObj = {
         {textDecorationSteps.map(s => (
           <div key={s} style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginBottom: 12 }}>
             <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#bbb', width: 70, flexShrink: 0 }}>{s}</span>
-            <span style={{ fontSize: 24, textDecoration: `var(--ds-typography-text-decoration-${s})` as any, color: '#111' }}>
+            <span style={{ fontSize: 24, textDecoration: `var(--ds-primitive-typography-text-decoration-${s})` as any, color: '#111' }}>
               Harbor Design System
             </span>
-            <Label>--ds-typography-text-decoration-{s}</Label>
+            <Label>--ds-primitive-typography-text-decoration-{s}</Label>
           </div>
         ))}
       </Section>
@@ -178,10 +178,10 @@ export const Typography: StoryObj = {
         {textTransformSteps.map(s => (
           <div key={s} style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginBottom: 12 }}>
             <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#bbb', width: 70, flexShrink: 0 }}>{s}</span>
-            <span style={{ fontSize: 24, textTransform: `var(--ds-typography-text-transform-${s})` as any, color: '#111' }}>
+            <span style={{ fontSize: 24, textTransform: `var(--ds-primitive-typography-text-transform-${s})` as any, color: '#111' }}>
               Harbor Design System
             </span>
-            <Label>--ds-typography-text-transform-{s}</Label>
+            <Label>--ds-primitive-typography-text-transform-{s}</Label>
           </div>
         ))}
       </Section>
@@ -204,14 +204,14 @@ export const Spacing: StoryObj = {
             </span>
             <div style={{
               height: 20,
-              width: `var(--ds-spacing-${step})`,
-              background: 'var(--ds-color-brand-pale-plum-400)',
+              width: `var(--ds-primitive-spacing-${step})`,
+              background: 'var(--ds-primitive-color-brand-pale-plum-400)',
               borderRadius: 2,
               minWidth: 2,
               flexShrink: 0,
             }} />
             <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#ccc' }}>
-              --ds-spacing-{step}
+              --ds-primitive-spacing-{step}
             </span>
           </div>
         ))}
@@ -234,9 +234,9 @@ export const Borders: StoryObj = {
             <div key={step} style={{ textAlign: 'center' as const }}>
               <div style={{
                 width: 64, height: 64,
-                background: 'var(--ds-color-brand-pale-plum-100)',
-                border: '1px solid var(--ds-color-brand-pale-plum-300)',
-                borderRadius: `var(--ds-border-radius-${step})`,
+                background: 'var(--ds-primitive-color-brand-pale-plum-100)',
+                border: '1px solid var(--ds-primitive-color-brand-pale-plum-300)',
+                borderRadius: `var(--ds-primitive-border-radius-${step})`,
               }} />
               <Label>{step}</Label>
             </div>
@@ -244,9 +244,9 @@ export const Borders: StoryObj = {
           <div style={{ textAlign: 'center' as const }}>
             <div style={{
               width: 64, height: 64,
-              background: 'var(--ds-color-brand-pale-plum-100)',
-              border: '1px solid var(--ds-color-brand-pale-plum-300)',
-              borderRadius: 'var(--ds-border-radius-9999)',
+              background: 'var(--ds-primitive-color-brand-pale-plum-100)',
+              border: '1px solid var(--ds-primitive-color-brand-pale-plum-300)',
+              borderRadius: 'var(--ds-primitive-border-radius-9999)',
             }} />
             <Label>full</Label>
           </div>
@@ -259,9 +259,9 @@ export const Borders: StoryObj = {
             <div key={step} style={{ textAlign: 'center' as const }}>
               <div style={{
                 width: 64, height: 64,
-                background: 'var(--ds-color-neutral-50)',
-                border: `solid var(--ds-color-brand-pale-plum-500)`,
-                borderWidth: `var(--ds-border-width-${step})`,
+                background: 'var(--ds-primitive-color-neutral-50)',
+                border: `solid var(--ds-primitive-color-brand-pale-plum-500)`,
+                borderWidth: `var(--ds-primitive-border-width-${step})`,
                 borderRadius: 4,
                 boxSizing: 'border-box' as const,
               }} />
@@ -281,10 +281,10 @@ export const Borders: StoryObj = {
 type ShadowDim = 'x' | 'y' | 'blur' | 'spread';
 
 const shadowGroups: { group: string; dim: ShadowDim; tokens: string[] }[] = [
-  { group: 'Offset X', dim: 'x', tokens: ['--ds-shadow-x-0'] },
-  { group: 'Offset Y', dim: 'y', tokens: ['--ds-shadow-y-0', '--ds-shadow-y-4', '--ds-shadow-y-8'] },
-  { group: 'Blur', dim: 'blur', tokens: ['--ds-shadow-blur-0', '--ds-shadow-blur-4', '--ds-shadow-blur-8'] },
-  { group: 'Spread', dim: 'spread', tokens: ['--ds-shadow-spread--4', '--ds-shadow-spread-0', '--ds-shadow-spread-2', '--ds-shadow-spread-4'] },
+  { group: 'Offset X', dim: 'x', tokens: ['--ds-primitive-shadow-x-0'] },
+  { group: 'Offset Y', dim: 'y', tokens: ['--ds-primitive-shadow-y-0', '--ds-primitive-shadow-y-4', '--ds-primitive-shadow-y-8'] },
+  { group: 'Blur', dim: 'blur', tokens: ['--ds-primitive-shadow-blur-0', '--ds-primitive-shadow-blur-4', '--ds-primitive-shadow-blur-8'] },
+  { group: 'Spread', dim: 'spread', tokens: ['--ds-primitive-shadow-spread--4', '--ds-primitive-shadow-spread-0', '--ds-primitive-shadow-spread-2', '--ds-primitive-shadow-spread-4'] },
 ];
 
 const shadowFor = (dim: ShadowDim, cssVar: string): string => {
@@ -304,7 +304,7 @@ export const Shadows: StoryObj = {
       <p style={{ ...tokens, color: '#666', margin: '0 0 24px', maxWidth: 540, lineHeight: 1.5 }}>
         Tier 1 shadow primitives are the raw offset, blur, and spread building blocks.
         Each is shown isolated in one box-shadow position; they are composed into the
-        ready-to-use <code>--ds-theme-shadow-*</code> tokens in Tier 2.
+        ready-to-use <code>--ds-semantic-shadow-*</code> tokens in Tier 2.
       </p>
       {shadowGroups.map(({ group, dim, tokens: list }) => (
         <Section key={group} title={group}>

@@ -76,13 +76,13 @@ export const Color: StoryObj = {
         <Section key={role} title={`Color · ${role}`}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 8 }}>
             {contexts.map(ctx => {
-              const cssVar = `--ds-theme-color-${role}-${ctx}`;
+              const cssVar = `--ds-semantic-color-${role}-${ctx}`;
               return (
                 <ColorSwatch key={ctx} cssVar={cssVar} label={ctx} />
               );
             })}
           </div>
-          <TokenLabel>--ds-theme-color-{role}-*</TokenLabel>
+          <TokenLabel>--ds-semantic-color-{role}-*</TokenLabel>
         </Section>
       ))}
     </div>
@@ -114,7 +114,7 @@ export const Typography: StoryObj = {
     <div style={{ padding: 24, ...baseStyle }}>
       <Section title="Type Scale">
         {typographyStyles.map(({ key, label }) => {
-          const prefix = `--ds-theme-typography-${key}`;
+          const prefix = `--ds-semantic-typography-${key}`;
           return (
             <div key={key} style={{ display: 'flex', alignItems: 'baseline', gap: 20, marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid #f5f5f5' }}>
               <span style={{ width: 96, fontFamily: 'monospace', fontSize: 9, color: '#bbb', flexShrink: 0, alignSelf: 'center' }}>
@@ -160,13 +160,13 @@ export const BorderAndShadow: StoryObj = {
             <div key={size} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' as const }}>
               <div style={{
                 width: 72, height: 72,
-                background: 'var(--ds-color-brand-pale-plum-100)',
-                border: '1px solid var(--ds-color-brand-pale-plum-300)',
-                borderRadius: `var(--ds-theme-border-radius-${size})`,
+                background: 'var(--ds-primitive-color-brand-pale-plum-100)',
+                border: '1px solid var(--ds-primitive-color-brand-pale-plum-300)',
+                borderRadius: `var(--ds-semantic-border-radius-${size})`,
                 marginBottom: 6,
               }} />
               <TokenLabel>{size}</TokenLabel>
-              <TokenLabel>--ds-theme-border-radius-{size}</TokenLabel>
+              <TokenLabel>--ds-semantic-border-radius-{size}</TokenLabel>
             </div>
           ))}
         </div>
@@ -178,15 +178,15 @@ export const BorderAndShadow: StoryObj = {
             <div key={size} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' as const }}>
               <div style={{
                 width: 72, height: 72,
-                background: 'var(--ds-color-neutral-50)',
-                border: `solid var(--ds-color-brand-pale-plum-500)`,
-                borderWidth: `var(--ds-theme-border-width-${size})`,
+                background: 'var(--ds-primitive-color-neutral-50)',
+                border: `solid var(--ds-primitive-color-brand-pale-plum-500)`,
+                borderWidth: `var(--ds-semantic-border-width-${size})`,
                 borderRadius: 4,
                 boxSizing: 'border-box' as const,
                 marginBottom: 6,
               }} />
               <TokenLabel>{size}</TokenLabel>
-              <TokenLabel>--ds-theme-border-width-{size}</TokenLabel>
+              <TokenLabel>--ds-semantic-border-width-{size}</TokenLabel>
             </div>
           ))}
         </div>
@@ -200,12 +200,12 @@ export const BorderAndShadow: StoryObj = {
                 width: 96, height: 80,
                 background: '#fff',
                 borderRadius: 8,
-                boxShadow: `var(--ds-theme-shadow-${size})`,
+                boxShadow: `var(--ds-semantic-shadow-${size})`,
                 border: '1px solid rgba(0,0,0,.04)',
                 margin: '8px 16px',
               }} />
               <TokenLabel>{size}</TokenLabel>
-              <TokenLabel>--ds-theme-shadow-{size}</TokenLabel>
+              <TokenLabel>--ds-semantic-shadow-{size}</TokenLabel>
             </div>
           ))}
         </div>
@@ -216,19 +216,19 @@ export const BorderAndShadow: StoryObj = {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' as const }}>
             <div style={{
               width: 120, height: 40,
-              background: 'var(--ds-theme-color-background-default)',
-              border: '1px solid var(--ds-theme-color-border-default)',
+              background: 'var(--ds-semantic-color-background-default)',
+              border: '1px solid var(--ds-semantic-color-border-default)',
               borderRadius: 4,
               margin: '8px 16px 14px',
               boxShadow: [
                 // gap layer: x y blur spread color
-                'var(--ds-theme-focus-gap-x) var(--ds-theme-focus-gap-y) var(--ds-theme-focus-gap-blur) var(--ds-theme-focus-gap-spread) var(--ds-theme-focus-gap-color)',
+                'var(--ds-semantic-focus-gap-x) var(--ds-semantic-focus-gap-y) var(--ds-semantic-focus-gap-blur) var(--ds-semantic-focus-gap-spread) var(--ds-semantic-focus-gap-color)',
                 // ring layer offset by the gap spread so both rings are visible
-                'var(--ds-theme-focus-ring-x) var(--ds-theme-focus-ring-y) var(--ds-theme-focus-ring-blur) calc(var(--ds-theme-focus-gap-spread) + var(--ds-theme-focus-ring-spread)) var(--ds-theme-focus-ring-color)',
+                'var(--ds-semantic-focus-ring-x) var(--ds-semantic-focus-ring-y) var(--ds-semantic-focus-ring-blur) calc(var(--ds-semantic-focus-gap-spread) + var(--ds-semantic-focus-ring-spread)) var(--ds-semantic-focus-ring-color)',
               ].join(', '),
             }} />
-            <TokenLabel>focus gap · --ds-theme-focus-gap-*</TokenLabel>
-            <TokenLabel>focus ring · --ds-theme-focus-ring-*</TokenLabel>
+            <TokenLabel>focus gap · --ds-semantic-focus-gap-*</TokenLabel>
+            <TokenLabel>focus ring · --ds-semantic-focus-ring-*</TokenLabel>
           </div>
         </div>
       </Section>

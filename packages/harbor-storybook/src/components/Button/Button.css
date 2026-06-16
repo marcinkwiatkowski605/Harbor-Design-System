@@ -1,7 +1,8 @@
 /*
  * Button styles — Harbor Design System.
  * All values resolve to design tokens built from the Figma "Button" component set.
- * Do not hardcode colors or sizes here; reference --ds-theme-* / --ds-* variables only.
+ * Do not hardcode colors or sizes here; reference --ds-component-*, --ds-semantic-*,
+ * and --ds-primitive-* variables only.
  */
 
 .harbor-button {
@@ -10,15 +11,15 @@
   justify-content: center;
   gap: 0.5rem;
   box-sizing: border-box;
-  padding: var(--ds-theme-button-padding-vertical) var(--ds-theme-button-padding-horizontal);
-  border-radius: var(--ds-theme-button-border-radius);
-  border: var(--ds-theme-button-border-width) solid transparent;
+  padding: var(--ds-component-button-padding-vertical) var(--ds-component-button-padding-horizontal);
+  border-radius: var(--ds-component-button-border-radius);
+  border: var(--ds-component-button-border-width) solid transparent;
 
-  font-family: var(--ds-theme-typography-label-lg-font-family);
-  font-size: var(--ds-theme-typography-label-lg-font-size);
-  line-height: var(--ds-theme-typography-label-lg-line-height);
-  letter-spacing: var(--ds-theme-typography-label-lg-letter-spacing);
-  font-weight: var(--ds-theme-typography-label-lg-font-weight);
+  font-family: var(--ds-semantic-typography-label-lg-font-family);
+  font-size: var(--ds-semantic-typography-label-lg-font-size);
+  line-height: var(--ds-semantic-typography-label-lg-line-height);
+  letter-spacing: var(--ds-semantic-typography-label-lg-letter-spacing);
+  font-weight: var(--ds-semantic-typography-label-lg-font-weight);
 
   cursor: pointer;
   outline: none;
@@ -36,85 +37,85 @@
 
 .harbor-button:focus-visible {
   box-shadow:
-    var(--ds-theme-focus-gap-x) var(--ds-theme-focus-gap-y) var(--ds-theme-focus-gap-blur)
-      var(--ds-theme-focus-gap-spread) var(--ds-theme-focus-gap-color),
-    var(--ds-theme-focus-ring-x) var(--ds-theme-focus-ring-y) var(--ds-theme-focus-ring-blur)
-      calc(var(--ds-theme-focus-gap-spread) + var(--ds-theme-focus-ring-spread))
-      var(--ds-theme-focus-ring-color);
+    var(--ds-semantic-focus-gap-x) var(--ds-semantic-focus-gap-y) var(--ds-semantic-focus-gap-blur)
+      var(--ds-semantic-focus-gap-spread) var(--ds-semantic-focus-gap-color),
+    var(--ds-semantic-focus-ring-x) var(--ds-semantic-focus-ring-y) var(--ds-semantic-focus-ring-blur)
+      calc(var(--ds-semantic-focus-gap-spread) + var(--ds-semantic-focus-ring-spread))
+      var(--ds-semantic-focus-ring-color);
 }
 
 /* ── Primary ─────────────────────────────────────────────────────────────── */
 
 .harbor-button[data-variant='primary'] {
-  background: var(--ds-theme-button-primary-color-background-enabled);
-  color: var(--ds-theme-button-primary-color-content-enabled);
+  background: var(--ds-component-button-primary-color-background-enabled);
+  color: var(--ds-component-button-primary-color-content-enabled);
 }
 .harbor-button[data-variant='primary']:hover:not(:disabled):not([aria-busy='true']) {
-  background: var(--ds-theme-button-primary-color-background-hover);
-  color: var(--ds-theme-button-primary-color-content-hover);
+  background: var(--ds-component-button-primary-color-background-hover);
+  color: var(--ds-component-button-primary-color-content-hover);
 }
 .harbor-button[data-variant='primary']:active:not(:disabled):not([aria-busy='true']) {
-  background: var(--ds-theme-button-primary-color-background-pressed);
-  color: var(--ds-theme-button-primary-color-content-pressed);
+  background: var(--ds-component-button-primary-color-background-pressed);
+  color: var(--ds-component-button-primary-color-content-pressed);
 }
 .harbor-button[data-variant='primary'][aria-busy='true'] {
-  background: var(--ds-theme-button-primary-color-background-loading);
-  color: var(--ds-theme-button-primary-color-content-loading);
+  background: var(--ds-component-button-primary-color-background-loading);
+  color: var(--ds-component-button-primary-color-content-loading);
 }
 .harbor-button[data-variant='primary']:disabled {
-  background: var(--ds-theme-button-primary-color-background-disabled);
-  color: var(--ds-theme-button-primary-color-content-disabled);
+  background: var(--ds-component-button-primary-color-background-disabled);
+  color: var(--ds-component-button-primary-color-content-disabled);
 }
 
 /* ── Secondary ───────────────────────────────────────────────────────────── */
 
 .harbor-button[data-variant='secondary'] {
-  background: var(--ds-theme-button-secondary-color-background-enabled);
-  color: var(--ds-theme-button-secondary-color-content-enabled);
+  background: var(--ds-component-button-secondary-color-background-enabled);
+  color: var(--ds-component-button-secondary-color-content-enabled);
 }
 .harbor-button[data-variant='secondary']:hover:not(:disabled):not([aria-busy='true']) {
-  background: var(--ds-theme-button-secondary-color-background-hover);
-  color: var(--ds-theme-button-secondary-color-content-hover);
+  background: var(--ds-component-button-secondary-color-background-hover);
+  color: var(--ds-component-button-secondary-color-content-hover);
 }
 .harbor-button[data-variant='secondary']:active:not(:disabled):not([aria-busy='true']) {
-  background: var(--ds-theme-button-secondary-color-background-pressed);
-  color: var(--ds-theme-button-secondary-color-content-pressed);
+  background: var(--ds-component-button-secondary-color-background-pressed);
+  color: var(--ds-component-button-secondary-color-content-pressed);
 }
 .harbor-button[data-variant='secondary'][aria-busy='true'] {
-  background: var(--ds-theme-button-secondary-color-background-loading);
-  color: var(--ds-theme-button-secondary-color-content-loading);
+  background: var(--ds-component-button-secondary-color-background-loading);
+  color: var(--ds-component-button-secondary-color-content-loading);
 }
 .harbor-button[data-variant='secondary']:disabled {
-  background: var(--ds-theme-button-secondary-color-background-disabled);
-  color: var(--ds-theme-button-secondary-color-content-disabled);
+  background: var(--ds-component-button-secondary-color-background-disabled);
+  color: var(--ds-component-button-secondary-color-content-disabled);
 }
 
 /* ── Outline (also has a border token per state) ─────────────────────────── */
 
 .harbor-button[data-variant='outline'] {
-  background: var(--ds-theme-button-outline-color-background-enabled);
-  color: var(--ds-theme-button-outline-color-content-enabled);
-  border-color: var(--ds-theme-button-outline-color-border-enabled);
+  background: var(--ds-component-button-outline-color-background-enabled);
+  color: var(--ds-component-button-outline-color-content-enabled);
+  border-color: var(--ds-component-button-outline-color-border-enabled);
 }
 .harbor-button[data-variant='outline']:hover:not(:disabled):not([aria-busy='true']) {
-  background: var(--ds-theme-button-outline-color-background-hover);
-  color: var(--ds-theme-button-outline-color-content-hover);
-  border-color: var(--ds-theme-button-outline-color-border-hover);
+  background: var(--ds-component-button-outline-color-background-hover);
+  color: var(--ds-component-button-outline-color-content-hover);
+  border-color: var(--ds-component-button-outline-color-border-hover);
 }
 .harbor-button[data-variant='outline']:active:not(:disabled):not([aria-busy='true']) {
-  background: var(--ds-theme-button-outline-color-background-pressed);
-  color: var(--ds-theme-button-outline-color-content-pressed);
-  border-color: var(--ds-theme-button-outline-color-border-pressed);
+  background: var(--ds-component-button-outline-color-background-pressed);
+  color: var(--ds-component-button-outline-color-content-pressed);
+  border-color: var(--ds-component-button-outline-color-border-pressed);
 }
 .harbor-button[data-variant='outline'][aria-busy='true'] {
-  background: var(--ds-theme-button-outline-color-background-loading);
-  color: var(--ds-theme-button-outline-color-content-loading);
-  border-color: var(--ds-theme-button-outline-color-border-loading);
+  background: var(--ds-component-button-outline-color-background-loading);
+  color: var(--ds-component-button-outline-color-content-loading);
+  border-color: var(--ds-component-button-outline-color-border-loading);
 }
 .harbor-button[data-variant='outline']:disabled {
-  background: var(--ds-theme-button-outline-color-background-disabled);
-  color: var(--ds-theme-button-outline-color-content-disabled);
-  border-color: var(--ds-theme-button-outline-color-border-disabled);
+  background: var(--ds-component-button-outline-color-background-disabled);
+  color: var(--ds-component-button-outline-color-content-disabled);
+  border-color: var(--ds-component-button-outline-color-border-disabled);
 }
 
 /* ── Disabled / loading interaction ──────────────────────────────────────── */
@@ -135,7 +136,7 @@
   height: 1em;
   border: 2px solid currentColor;
   border-right-color: transparent;
-  border-radius: var(--ds-border-radius-9999);
+  border-radius: var(--ds-primitive-border-radius-9999);
   animation: harbor-button-spin 0.6s linear infinite;
 }
 

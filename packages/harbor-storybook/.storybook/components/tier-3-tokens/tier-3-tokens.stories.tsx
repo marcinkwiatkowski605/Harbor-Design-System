@@ -42,11 +42,11 @@ const variantLabel: Record<ButtonVariant, string> = {
 
 const ButtonPreview = ({ variant, state }: { variant: ButtonVariant; state: ButtonState }) => {
   const bgVar = variant === 'outline'
-    ? `var(--ds-theme-button-${variant}-color-background-${state})`
-    : `var(--ds-theme-button-${variant}-color-background-${state})`;
-  const contentVar = `var(--ds-theme-button-${variant}-color-content-${state})`;
+    ? `var(--ds-component-button-${variant}-color-background-${state})`
+    : `var(--ds-component-button-${variant}-color-background-${state})`;
+  const contentVar = `var(--ds-component-button-${variant}-color-content-${state})`;
   const borderVar = variant === 'outline'
-    ? `var(--ds-theme-button-${variant}-color-border-${state})`
+    ? `var(--ds-component-button-${variant}-color-border-${state})`
     : 'transparent';
 
   return (
@@ -54,11 +54,11 @@ const ButtonPreview = ({ variant, state }: { variant: ButtonVariant; state: Butt
       display: 'inline-flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: 'var(--ds-theme-button-padding-vertical) var(--ds-theme-button-padding-horizontal)',
+      padding: 'var(--ds-component-button-padding-vertical) var(--ds-component-button-padding-horizontal)',
       background: bgVar,
       color: contentVar,
-      border: `var(--ds-theme-button-border-width) solid ${borderVar}`,
-      borderRadius: 'var(--ds-theme-button-border-radius)',
+      border: `var(--ds-component-button-border-width) solid ${borderVar}`,
+      borderRadius: 'var(--ds-component-button-border-radius)',
       fontSize: 14,
       fontFamily: 'system-ui, sans-serif',
       fontWeight: 500,
@@ -106,10 +106,10 @@ export const Button: StoryObj = {
       </Section>
 
       <Section title="Shared button tokens">
-        <TokenRow name="border-radius" cssVar="--ds-theme-button-border-radius" />
-        <TokenRow name="border-width" cssVar="--ds-theme-button-border-width" />
-        <TokenRow name="padding-horizontal" cssVar="--ds-theme-button-padding-horizontal" />
-        <TokenRow name="padding-vertical" cssVar="--ds-theme-button-padding-vertical" />
+        <TokenRow name="border-radius" cssVar="--ds-component-button-border-radius" />
+        <TokenRow name="border-width" cssVar="--ds-component-button-border-width" />
+        <TokenRow name="padding-horizontal" cssVar="--ds-component-button-padding-horizontal" />
+        <TokenRow name="padding-vertical" cssVar="--ds-component-button-padding-vertical" />
       </Section>
 
       {variants.map(variant => (
@@ -117,7 +117,7 @@ export const Button: StoryObj = {
           {states.map(state => (
             <div key={state}>
               {(['background', 'content', ...(variant === 'outline' ? ['border'] : [])] as string[]).map(role => {
-                const cssVar = `--ds-theme-button-${variant}-color-${role}-${state}`;
+                const cssVar = `--ds-component-button-${variant}-color-${role}-${state}`;
                 return <TokenRow key={role} name={`${state} · ${role}`} cssVar={cssVar} />;
               })}
             </div>
@@ -140,13 +140,13 @@ export const TextInput: StoryObj = {
           placeholder="Placeholder text"
           style={{
             display: 'block',
-            padding: 'var(--ds-theme-text-input-padding-vertical, 0.75rem) var(--ds-theme-text-input-padding-horizontal, 1rem)',
-            background: 'var(--ds-theme-text-input-color-background-default)',
-            border: `var(--ds-theme-text-input-border-width, 1px) solid var(--ds-theme-color-border-default)`,
-            borderRadius: 'var(--ds-theme-border-radius-sm)',
+            padding: 'var(--ds-component-text-input-padding-vertical, 0.75rem) var(--ds-component-text-input-padding-horizontal, 1rem)',
+            background: 'var(--ds-component-text-input-color-background-default)',
+            border: `var(--ds-component-text-input-border-width, 1px) solid var(--ds-semantic-color-border-default)`,
+            borderRadius: 'var(--ds-semantic-border-radius-sm)',
             fontFamily: 'system-ui, sans-serif',
             fontSize: 14,
-            color: 'var(--ds-theme-color-content-default)',
+            color: 'var(--ds-semantic-color-content-default)',
             width: 280,
             outline: 'none',
           }}
@@ -161,7 +161,7 @@ export const TextInput: StoryObj = {
           'padding-horizontal',
           'padding-vertical',
         ].map(name => (
-          <TokenRow key={name} name={name} cssVar={`--ds-theme-text-input-${name}`} />
+          <TokenRow key={name} name={name} cssVar={`--ds-component-text-input-${name}`} />
         ))}
       </Section>
     </div>

@@ -78,6 +78,10 @@ const letterSpacingSteps = [
   { key: 'half', label: '+0.5' },
   { key: '2', label: '+2' },
 ];
+const lineHeightSteps = ['16','20','24','28','32','36','40','48','56','64','72','110'];
+const fontStyleSteps = ['normal', 'italic'];
+const textDecorationSteps = ['none', 'underline'];
+const textTransformSteps = ['none', 'uppercase'];
 
 export const Typography: StoryObj = {
   render: () => (
@@ -122,6 +126,62 @@ export const Typography: StoryObj = {
               Harbor Design System
             </span>
             <Label>--ds-typography-letter-spacing-{key} ({label}%)</Label>
+          </div>
+        ))}
+      </Section>
+
+      <Section title="Line Height">
+        {lineHeightSteps.map(step => (
+          <div key={step} style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginBottom: 8 }}>
+            <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#bbb', width: 30, flexShrink: 0, paddingTop: 4 }}>{step}</span>
+            <div style={{
+              background: 'var(--ds-color-brand-pale-plum-100)',
+              borderLeft: '2px solid var(--ds-color-brand-pale-plum-400)',
+              paddingLeft: 8,
+            }}>
+              <span style={{ fontSize: 16, lineHeight: `var(--ds-typography-line-height-${step})`, color: '#111', display: 'block' }}>
+                Harbor Design System<br />two lines of text
+              </span>
+            </div>
+            <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#ccc', marginLeft: 'auto', flexShrink: 0 }}>
+              --ds-typography-line-height-{step}
+            </span>
+          </div>
+        ))}
+      </Section>
+
+      <Section title="Font Style">
+        {fontStyleSteps.map(s => (
+          <div key={s} style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginBottom: 12 }}>
+            <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#bbb', width: 70, flexShrink: 0 }}>{s}</span>
+            <span style={{ fontSize: 24, fontStyle: `var(--ds-typography-font-style-${s})` as any, color: '#111' }}>
+              Harbor Design System
+            </span>
+            <Label>--ds-typography-font-style-{s}</Label>
+          </div>
+        ))}
+      </Section>
+
+      <Section title="Text Decoration">
+        {textDecorationSteps.map(s => (
+          <div key={s} style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginBottom: 12 }}>
+            <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#bbb', width: 70, flexShrink: 0 }}>{s}</span>
+            <span style={{ fontSize: 24, textDecoration: `var(--ds-typography-text-decoration-${s})` as any, color: '#111' }}>
+              Harbor Design System
+            </span>
+            <Label>--ds-typography-text-decoration-{s}</Label>
+          </div>
+        ))}
+      </Section>
+
+      <Section title="Text Transform">
+        {textTransformSteps.map(s => (
+          <div key={s} style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginBottom: 12 }}>
+            <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#bbb', width: 70, flexShrink: 0 }}>{s}</span>
+            <span style={{ fontSize: 24, textTransform: `var(--ds-typography-text-transform-${s})` as any, color: '#111' }}>
+              Harbor Design System
+            </span>
+            <Label>--ds-typography-text-transform-{s}</Label>
           </div>
         ))}
       </Section>
@@ -210,6 +270,60 @@ export const Borders: StoryObj = {
           ))}
         </div>
       </Section>
+    </div>
+  ),
+};
+
+// ─── Shadow primitives ─────────────────────────────────────────────────────────
+
+// Raw building blocks (offset / blur / spread) composed into Tier 2 shadow tokens.
+// Each primitive is isolated in one position of a box-shadow so its effect is visible.
+type ShadowDim = 'x' | 'y' | 'blur' | 'spread';
+
+const shadowGroups: { group: string; dim: ShadowDim; tokens: string[] }[] = [
+  { group: 'Offset X', dim: 'x', tokens: ['--ds-shadow-x-0'] },
+  { group: 'Offset Y', dim: 'y', tokens: ['--ds-shadow-y-0', '--ds-shadow-y-4', '--ds-shadow-y-8'] },
+  { group: 'Blur', dim: 'blur', tokens: ['--ds-shadow-blur-0', '--ds-shadow-blur-4', '--ds-shadow-blur-8'] },
+  { group: 'Spread', dim: 'spread', tokens: ['--ds-shadow-spread--4', '--ds-shadow-spread-0', '--ds-shadow-spread-2', '--ds-shadow-spread-4'] },
+];
+
+const shadowFor = (dim: ShadowDim, cssVar: string): string => {
+  const v = `var(${cssVar})`;
+  const c = 'rgba(0,0,0,.35)';
+  switch (dim) {
+    case 'x': return `${v} 4px 8px 0 ${c}`;
+    case 'y': return `0 ${v} 8px 0 ${c}`;
+    case 'blur': return `0 4px ${v} 0 ${c}`;
+    case 'spread': return `0 4px 6px ${v} ${c}`;
+  }
+};
+
+export const Shadows: StoryObj = {
+  render: () => (
+    <div style={{ padding: 24, ...tokens }}>
+      <p style={{ ...tokens, color: '#666', margin: '0 0 24px', maxWidth: 540, lineHeight: 1.5 }}>
+        Tier 1 shadow primitives are the raw offset, blur, and spread building blocks.
+        Each is shown isolated in one box-shadow position; they are composed into the
+        ready-to-use <code>--ds-theme-shadow-*</code> tokens in Tier 2.
+      </p>
+      {shadowGroups.map(({ group, dim, tokens: list }) => (
+        <Section key={group} title={group}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 32 }}>
+            {list.map(cssVar => (
+              <div key={cssVar} style={{ textAlign: 'center' as const }}>
+                <div style={{
+                  width: 72, height: 56,
+                  background: '#fff',
+                  borderRadius: 6,
+                  boxShadow: shadowFor(dim, cssVar),
+                  margin: '6px 12px',
+                }} />
+                <Label>{cssVar}</Label>
+              </div>
+            ))}
+          </div>
+        </Section>
+      ))}
     </div>
   ),
 };

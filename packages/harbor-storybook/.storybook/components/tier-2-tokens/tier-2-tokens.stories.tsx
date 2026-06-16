@@ -34,7 +34,7 @@ const colorGroups: ColorGroup[] = [
     role: 'background',
     contexts: [
       'default','hover','pressed','disabled','subtle',
-      'accent-default','accent-hover','accent-presed','accent-subtle',
+      'accent-default','accent-hover','accent-pressed','accent-subtle',
       'brand-default','brand-hover','brand-pressed','brand-subtle',
       'support-error-strong','support-error-subtle',
       'support-info-strong','support-info-subtle',
@@ -121,10 +121,13 @@ export const Typography: StoryObj = {
                 {label}
               </span>
               <span style={{
+                fontFamily: `var(${prefix}-font-family)`,
                 fontSize: `var(${prefix}-font-size)`,
                 fontWeight: `var(${prefix}-font-weight)` as any,
+                fontStyle: `var(${prefix}-font-style)` as any,
                 letterSpacing: `var(${prefix}-letter-spacing)`,
                 lineHeight: `var(${prefix}-line-height)`,
+                textTransform: `var(${prefix}-text-transform)` as any,
                 color: '#111',
                 overflow: 'hidden',
                 whiteSpace: 'nowrap',
@@ -214,8 +217,14 @@ export const BorderAndShadow: StoryObj = {
               background: 'var(--ds-theme-color-background-default)',
               border: '1px solid var(--ds-theme-color-border-default)',
               borderRadius: 4,
-              boxShadow: `0 0 0 var(--ds-theme-focus-gap-spread) var(--ds-theme-focus-gap-color), 0 0 0 calc(var(--ds-theme-focus-gap-spread) + var(--ds-theme-focus-ring-spread)) var(--ds-theme-focus-ring-color)`,
+              boxShadow: [
+                // gap layer: x y blur spread color
+                'var(--ds-theme-focus-gap-x) var(--ds-theme-focus-gap-y) var(--ds-theme-focus-gap-blur) var(--ds-theme-focus-gap-spread) var(--ds-theme-focus-gap-color)',
+                // ring layer offset by the gap spread so both rings are visible
+                'var(--ds-theme-focus-ring-x) var(--ds-theme-focus-ring-y) var(--ds-theme-focus-ring-blur) calc(var(--ds-theme-focus-gap-spread) + var(--ds-theme-focus-ring-spread)) var(--ds-theme-focus-ring-color)',
+              ].join(', '),
             }} />
+            <TokenLabel>focus gap · --ds-theme-focus-gap-*</TokenLabel>
             <TokenLabel>focus ring · --ds-theme-focus-ring-*</TokenLabel>
           </div>
         </div>

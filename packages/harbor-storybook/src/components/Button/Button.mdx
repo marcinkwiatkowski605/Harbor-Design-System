@@ -1,0 +1,98 @@
+import { Meta, Primary, Controls } from '@storybook/blocks';
+import * as ButtonStories from './Button.stories';
+
+<Meta of={ButtonStories} />
+
+# Button
+
+Buttons let people take an action, confirm a choice, or move forward in a flow.
+They're the primary way of triggering something to happen on screen.
+
+<Primary />
+
+<Controls />
+
+## Anatomy
+
+A button has two parts: a **container** (background, border, corner radius, focus
+ring) and a **label** (one line of centered text). There's no icon slot and no size
+property yet — every button renders at the same padding scale (24px horizontal,
+12px vertical, 8px corner radius).
+
+## Types
+
+`variant` sets visual weight, not just color.
+
+- **Primary** — highest emphasis. Reserve for the one action that matters most in a
+  given context: submitting a form, confirming a purchase, completing a step. Solid fill.
+- **Secondary** — medium emphasis. For actions that matter but shouldn't outrank the
+  primary one, like "Add another" next to "Save."
+- **Outline** — lowest emphasis. For optional or reversible actions like "Cancel" or
+  "Back," or when several actions sit side by side and none should dominate.
+
+Rule of thumb: one Primary button per view. If two actions feel equally important, the
+flow needs rethinking before the button hierarchy does.
+
+## States
+
+All three types share the same six states: Enabled, Hover, Pressed, Focus, Disabled, Loading.
+
+- **Hover / Pressed** darken the fill (or border, for Outline) to confirm interactivity.
+  Outline gives Hover and Pressed two distinct border shades, so the states read differently
+  instead of looking identical.
+- **Focus** adds a two-layer ring — a white gap plus a colored outer ring — shared across all
+  three types via one token pair, so focus looks the same regardless of button type.
+- **Disabled** flattens background and text to neutral gray. Outline keeps its white
+  background and only dims border and label; the dimmed label color matches how Disabled
+  reads on Primary and Secondary.
+- **Loading** keeps the type's fill and marks the button busy. There is no spinner — pass a
+  "Loading…" label yourself; the component only handles the state, not the text.
+
+In code, Hover/Pressed/Focus are driven by `:hover` / `:active` / `:focus-visible`,
+Disabled by the native `disabled` attribute, and Loading by the `loading` prop
+(which sets `aria-busy` and blocks interaction).
+
+## Usage guidelines
+
+- Choose type by hierarchy, not by which one looks better in the moment.
+- Outline needs a visible border in every state, including Disabled — don't let it disappear
+  just because the background is white.
+- Keep labels short and verb-led ("Save changes," not "Changes will be saved").
+
+## Accessibility
+
+- The focus ring is mandatory and shared across types — restyle it, don't suppress it.
+- Disabled buttons stay in the layout so people know the action exists, just not right now.
+- Loading is announced to assistive tech: the component sets `aria-busy="true"`, not only a
+  visual change.
+
+## Tokens used
+
+Every value resolves to a design token built from the Figma `Button` component set — no
+hardcoded colors or sizes.
+
+**Color — component tier**
+
+- `--ds-component-button-primary-color-background-{enabled, hover, pressed, disabled, loading}`
+- `--ds-component-button-primary-color-content-{enabled, hover, pressed, disabled, loading}`
+- `--ds-component-button-secondary-color-background-{enabled, hover, pressed, disabled, loading}`
+- `--ds-component-button-secondary-color-content-{enabled, hover, pressed, disabled, loading}`
+- `--ds-component-button-outline-color-background-{enabled, hover, pressed, loading}` — focus and disabled resolve through `enabled`
+- `--ds-component-button-outline-color-content-{enabled, hover, pressed, disabled, loading}`
+- `--ds-component-button-outline-color-border-{enabled, hover, pressed, disabled, loading}`
+
+**Spacing & shape — component tier**
+
+- `--ds-component-button-padding-horizontal` (24px)
+- `--ds-component-button-padding-vertical` (12px)
+- `--ds-component-button-border-radius` (8px)
+- `--ds-component-button-border-width` (1px)
+
+**Typography — semantic tier (`label/lg`)**
+
+- `--ds-semantic-typography-label-lg-{font-family, font-size, line-height, letter-spacing, font-weight}` — Helvetica Bold, 16/24px
+
+**Focus — semantic tier**
+
+- `--ds-semantic-focus-ring-{color, x, y, blur, spread}`
+- `--ds-semantic-focus-gap-{color, x, y, blur, spread}`

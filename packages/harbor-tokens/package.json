@@ -1,0 +1,13 @@
+{
+  "name": "@harbor/tokens",
+  "version": "0.1.0",
+  "description": "Harbor Design System tokens package",
+  "type": "module",
+  "scripts": {
+    "build:tokens": "node config.js"
+  },
+  "devDependencies": {
+    "minimist": "^1.2.8",
+    "style-dictionary": "^4.3.3"
+  }
+}

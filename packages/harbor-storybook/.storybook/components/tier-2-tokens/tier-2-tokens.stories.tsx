@@ -213,12 +213,13 @@ export const BorderAndShadow: StoryObj = {
 
       <Section title="Focus Ring">
         <div style={{ display: 'flex', gap: 24 }}>
-          <div style={{ position: 'relative' as const, display: 'inline-block' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' as const }}>
             <div style={{
               width: 120, height: 40,
               background: 'var(--ds-theme-color-background-default)',
               border: '1px solid var(--ds-theme-color-border-default)',
               borderRadius: 4,
+              margin: '8px 16px 14px',
               boxShadow: [
                 // gap layer: x y blur spread color
                 'var(--ds-theme-focus-gap-x) var(--ds-theme-focus-gap-y) var(--ds-theme-focus-gap-blur) var(--ds-theme-focus-gap-spread) var(--ds-theme-focus-gap-color)',

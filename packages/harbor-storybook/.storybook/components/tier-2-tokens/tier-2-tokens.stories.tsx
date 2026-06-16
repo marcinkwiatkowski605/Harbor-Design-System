@@ -32,7 +32,15 @@ type ColorGroup = { role: string; contexts: string[] };
 const colorGroups: ColorGroup[] = [
   {
     role: 'background',
-    contexts: ['default','hover','disabled','accent-default','accent-hover','accent-pressed','brand-default','brand-hover','brand-pressed','support-error','support-info','support-success','support-warning','overlay-default','overlay-hover','overlay-pressed','overlay-strong','positive-default','positive-hover','positive-pressed','positive-subtle-default','positive-subtle-hover'],
+    contexts: [
+      'default','hover','pressed','disabled','subtle',
+      'accent-default','accent-hover','accent-presed','accent-subtle',
+      'brand-default','brand-hover','brand-pressed','brand-subtle',
+      'support-error-strong','support-error-subtle',
+      'support-info-strong','support-info-subtle',
+      'support-success-strong','support-success-subtle',
+      'support-warning-strong','support-warning-subtle',
+    ],
   },
   {
     role: 'border',
@@ -40,12 +48,11 @@ const colorGroups: ColorGroup[] = [
   },
   {
     role: 'content',
-    contexts: ['default','hover','pressed','disabled','accent','brand','error','info','success','warning','on-color','inverse','placeholder'],
-    // some names truncated but covers the key ones
+    contexts: ['default','hover','disabled','subtle','inverse','accent','brand','error','info','success','warning','on-error-subtle','on-info-subtle','on-success-subtle','on-warning-subtle'],
   },
   {
     role: 'icon',
-    contexts: ['default','hover','pressed','disabled','accent','brand','error','info','success','warning','on-color','inverse','placeholder'],
+    contexts: ['default','hover','disabled','subtle','inverse','accent','brand','error','info','success','warning','on-error','on-info','on-success','on-warning'],
   },
 ];
 

@@ -113,7 +113,9 @@
   border-color: var(--ds-component-button-outline-color-border-loading);
 }
 .harbor-button[data-variant='outline']:disabled {
-  background: var(--ds-component-button-outline-color-background-disabled);
+  /* Figma binds the outline disabled state to the *enabled* background (white),
+     not background-disabled — only border + content go to their disabled tokens. */
+  background: var(--ds-component-button-outline-color-background-enabled);
   color: var(--ds-component-button-outline-color-content-disabled);
   border-color: var(--ds-component-button-outline-color-border-disabled);
 }

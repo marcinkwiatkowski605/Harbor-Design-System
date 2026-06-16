@@ -40,12 +40,12 @@ Harbor Design System/
         ├── vite.config.ts
         ├── .storybook/
         │   ├── main.ts       ← konfiguracja Storybook, globs na stories
-        │   ├── preview.ts    ← import './themes.scss' (aktywny)
-        │   ├── themes.scss   ← importuje tokens.css + light.css (aktywny)
+        │   ├── preview.ts    ← importuje bezpośrednio tokens.css + light.css (aktywne)
+        │   ├── themes.scss   ← tylko na przyszłe SCSS helpery (token CSS idzie przez preview.ts)
         │   └── components/
-        │       ├── tier-1-tokens/tier-1-tokens.stories.tsx          ← placeholder
-        │       ├── tier-2-tokens/tier-2-tokens.stories.tsx          ← placeholder
-        │       ├── tier-3-tokens/tier-3-tokens.stories.tsx          ← placeholder
+        │       ├── tier-1-tokens/tier-1-tokens.stories.tsx          ← Colors, Typography, Spacing, Borders, Shadows
+        │       ├── tier-2-tokens/tier-2-tokens.stories.tsx          ← Color, Typography, Border & Shadow
+        │       ├── tier-3-tokens/tier-3-tokens.stories.tsx          ← Button, Text Input
         │       ├── components-placeholder/components-placeholder.stories.tsx
         │       └── pages-placeholder/pages-placeholder.stories.tsx
         └── src/
@@ -94,14 +94,20 @@ Trzy sekcje w ustalonej kolejności (`storySort` w `preview.ts`):
 ```
 FOUNDATIONS
   └── Design Tokens
-       ├── Tier 1: Primitive Tokens   (placeholder)
-       ├── Tier 2: Semantic Tokens    (placeholder)
-       └── Tier 3: Component Tokens   (placeholder)
+       ├── Tier 1: Primitive Tokens   (Colors, Typography, Spacing, Borders, Shadows)
+       ├── Tier 2: Semantic Tokens    (Color, Typography, Border & Shadow)
+       └── Tier 3: Component Tokens   (Button, Text Input)
 COMPONENTS
   └── Introduction                   (placeholder)
 PAGES
   └── Introduction                   (placeholder)
 ```
+
+## Stan wizualizacji tokenów
+
+Wszystkie 377 tokenów z buildu jest pokazane w którejś story (zweryfikowane skryptem cross-check ze źródłem — 0 wymyślonych, 0 niepokazanych). Każda story czyta wartości z CSS variables, więc po `npm run build:tokens` zmiany z Figmy są od razu widoczne.
+
+**Zasada krytyczna:** nazwy tokenów NIGDY nie są pisane z głowy. Tablice w story odpowiadają dokładnie nazwom z `design_tokens.json` / `build/json/tokens.json`. Przy każdej zmianie tokenów trzeba zsynchronizować tablice (lub uruchomić cross-check) — patrz pamięć `feedback_token_source_of_truth`.
 
 ## Znane warningi (nie-blokujące)
 
@@ -110,9 +116,10 @@ PAGES
 
 ## Co zostało do zrobienia (kolejność)
 
-1. **Wizualizacja tokenów w Storybook** — zastąpić placeholdery w story (tier-1, tier-2, tier-3) prawdziwymi siatkami kolorów, typografii, spacing itp. CSS zmienne są już załadowane.
-2. **Dodać pierwsze komponenty React** do `src/components/`; usunąć `components-placeholder` story
-3. **Deploy na GitHub Pages** (kiedy będzie co pokazać)
+1. **Dodać pierwsze komponenty React** do `src/components/`; usunąć `components-placeholder` story
+2. **Deploy na GitHub Pages** (kiedy będzie co pokazać)
+
+(Wizualizacja tokenów tier-1/2/3 — ✅ zrobione w tej sesji)
 
 ## Decyzje podjęte wcześniej
 
@@ -125,5 +132,12 @@ PAGES
 ## Ostatnie commity
 
 ```
-(do dodania po commitcie z dzisiejszą sesją)
+570180b style: center Focus Ring swatch under its labels
+c7dffb0 style: center Tier 2 border radius/width swatches under their labels
+a9aab9f fix: correct accent-presed→pressed typo; add full token coverage to stories
+c545f31 fix: sync Tier 2 color contexts with actual design_tokens.json
+d36bf49 fix: import token CSS directly in preview.ts instead of via SCSS
+82eb3a1 feat: replace token placeholder stories with real visualizations
+6270552 feat: wire design_tokens.json to Style Dictionary 4 (DTCG)
+dccdfcd feat: export Figma design tokens in W3C DTCG format
 ```

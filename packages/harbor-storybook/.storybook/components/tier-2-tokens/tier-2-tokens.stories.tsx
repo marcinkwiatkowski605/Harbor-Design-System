@@ -157,12 +157,13 @@ export const BorderAndShadow: StoryObj = {
       <Section title="Border Radius">
         <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'flex-end' }}>
           {borderRadiusSizes.map(size => (
-            <div key={size} style={{ textAlign: 'center' as const }}>
+            <div key={size} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' as const }}>
               <div style={{
                 width: 72, height: 72,
                 background: 'var(--ds-color-brand-pale-plum-100)',
                 border: '1px solid var(--ds-color-brand-pale-plum-300)',
                 borderRadius: `var(--ds-theme-border-radius-${size})`,
+                marginBottom: 6,
               }} />
               <TokenLabel>{size}</TokenLabel>
               <TokenLabel>--ds-theme-border-radius-{size}</TokenLabel>
@@ -174,7 +175,7 @@ export const BorderAndShadow: StoryObj = {
       <Section title="Border Width">
         <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'flex-end' }}>
           {borderWidthSizes.map(size => (
-            <div key={size} style={{ textAlign: 'center' as const }}>
+            <div key={size} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' as const }}>
               <div style={{
                 width: 72, height: 72,
                 background: 'var(--ds-color-neutral-50)',
@@ -182,6 +183,7 @@ export const BorderAndShadow: StoryObj = {
                 borderWidth: `var(--ds-theme-border-width-${size})`,
                 borderRadius: 4,
                 boxSizing: 'border-box' as const,
+                marginBottom: 6,
               }} />
               <TokenLabel>{size}</TokenLabel>
               <TokenLabel>--ds-theme-border-width-{size}</TokenLabel>

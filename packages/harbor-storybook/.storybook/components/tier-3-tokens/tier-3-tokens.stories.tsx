@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta: Meta = {
-  title: 'Design Tokens/Tier 3: Component Tokens'
+  title: 'Foundations/Design Tokens/Tier 3: Component Tokens'
 };
 
 export default meta;

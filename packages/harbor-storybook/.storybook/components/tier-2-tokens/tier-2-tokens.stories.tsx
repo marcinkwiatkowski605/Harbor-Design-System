@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta: Meta = {
-  title: 'Design Tokens/Tier 2: Semantic Tokens'
+  title: 'Foundations/Design Tokens/Tier 2: Semantic Tokens'
 };
 
 export default meta;

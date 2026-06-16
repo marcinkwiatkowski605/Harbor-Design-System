@@ -1,15 +1,218 @@
+import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta: Meta = {
-  title: 'Foundations/Design Tokens/Tier 2: Semantic Tokens'
+  title: 'Foundations/Design Tokens/Tier 2: Semantic Tokens',
 };
-
 export default meta;
 
-export const Placeholder: StoryObj = {
+// ─── Shared helpers ───────────────────────────────────────────────────────────
+
+const baseStyle = { fontFamily: 'system-ui, sans-serif', fontSize: 12, color: '#111' };
+
+const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <div style={{ marginBottom: 40 }}>
+    <h2 style={{ ...baseStyle, fontWeight: 600, fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.06em', color: '#888', margin: '0 0 14px' }}>
+      {title}
+    </h2>
+    {children}
+  </div>
+);
+
+const TokenLabel = ({ children }: { children: React.ReactNode }) => (
+  <span style={{ fontFamily: 'monospace', fontSize: 9, color: '#bbb', display: 'block', lineHeight: 1.4 }}>
+    {children}
+  </span>
+);
+
+// ─── Color ───────────────────────────────────────────────────────────────────
+
+type ColorGroup = { role: string; contexts: string[] };
+
+const colorGroups: ColorGroup[] = [
+  {
+    role: 'background',
+    contexts: ['default','hover','disabled','accent-default','accent-hover','accent-pressed','brand-default','brand-hover','brand-pressed','support-error','support-info','support-success','support-warning','overlay-default','overlay-hover','overlay-pressed','overlay-strong','positive-default','positive-hover','positive-pressed','positive-subtle-default','positive-subtle-hover'],
+  },
+  {
+    role: 'border',
+    contexts: ['default','hover','pressed','disabled','accent','brand','error','info','success','warning','focus'],
+  },
+  {
+    role: 'content',
+    contexts: ['default','hover','pressed','disabled','accent','brand','error','info','success','warning','on-color','inverse','placeholder'],
+    // some names truncated but covers the key ones
+  },
+  {
+    role: 'icon',
+    contexts: ['default','hover','pressed','disabled','accent','brand','error','info','success','warning','on-color','inverse','placeholder'],
+  },
+];
+
+const ColorSwatch = ({ cssVar, label }: { cssVar: string; label: string }) => (
+  <div style={{ minWidth: 80 }}>
+    <div style={{
+      height: 40,
+      background: `var(${cssVar})`,
+      borderRadius: 4,
+      border: '1px solid rgba(0,0,0,.07)',
+      boxShadow: 'inset 0 0 0 1px rgba(0,0,0,.04)',
+    }} />
+    <TokenLabel>{label}</TokenLabel>
+  </div>
+);
+
+export const Color: StoryObj = {
   render: () => (
-    <p style={{ fontFamily: 'sans-serif', color: '#666' }}>
-      Tier 2 token visualization will be added when tokens are defined.
-    </p>
-  )
+    <div style={{ padding: 24, ...baseStyle }}>
+      {colorGroups.map(({ role, contexts }) => (
+        <Section key={role} title={`Color · ${role}`}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 8 }}>
+            {contexts.map(ctx => {
+              const cssVar = `--ds-theme-color-${role}-${ctx}`;
+              return (
+                <ColorSwatch key={ctx} cssVar={cssVar} label={ctx} />
+              );
+            })}
+          </div>
+          <TokenLabel>--ds-theme-color-{role}-*</TokenLabel>
+        </Section>
+      ))}
+    </div>
+  ),
+};
+
+// ─── Typography ───────────────────────────────────────────────────────────────
+
+type TypographyStyle = { key: string; label: string };
+
+const typographyStyles: TypographyStyle[] = [
+  { key: 'display-default', label: 'Display' },
+  { key: 'heading-2xl', label: 'Heading 2XL' },
+  { key: 'heading-xl', label: 'Heading XL' },
+  { key: 'heading-lg', label: 'Heading LG' },
+  { key: 'heading-md', label: 'Heading MD' },
+  { key: 'heading-sm', label: 'Heading SM' },
+  { key: 'heading-xs', label: 'Heading XS' },
+  { key: 'body-lg', label: 'Body LG' },
+  { key: 'body-md', label: 'Body MD' },
+  { key: 'body-sm', label: 'Body SM' },
+  { key: 'label-lg', label: 'Label LG' },
+  { key: 'label-md', label: 'Label MD' },
+  { key: 'label-sm', label: 'Label SM' },
+];
+
+export const Typography: StoryObj = {
+  render: () => (
+    <div style={{ padding: 24, ...baseStyle }}>
+      <Section title="Type Scale">
+        {typographyStyles.map(({ key, label }) => {
+          const prefix = `--ds-theme-typography-${key}`;
+          return (
+            <div key={key} style={{ display: 'flex', alignItems: 'baseline', gap: 20, marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid #f5f5f5' }}>
+              <span style={{ width: 96, fontFamily: 'monospace', fontSize: 9, color: '#bbb', flexShrink: 0, alignSelf: 'center' }}>
+                {label}
+              </span>
+              <span style={{
+                fontSize: `var(${prefix}-font-size)`,
+                fontWeight: `var(${prefix}-font-weight)` as any,
+                letterSpacing: `var(${prefix}-letter-spacing)`,
+                lineHeight: `var(${prefix}-line-height)`,
+                color: '#111',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+              }}>
+                Harbor Design System
+              </span>
+              <span style={{ fontFamily: 'monospace', fontSize: 9, color: '#ccc', marginLeft: 'auto', flexShrink: 0 }}>
+                {prefix}-*
+              </span>
+            </div>
+          );
+        })}
+      </Section>
+    </div>
+  ),
+};
+
+// ─── Border & Shadow ─────────────────────────────────────────────────────────
+
+const borderRadiusSizes = ['sharp', 'sm', 'md', 'lg'];
+const borderWidthSizes = ['none', 'sm', 'md', 'lg'];
+
+export const BorderAndShadow: StoryObj = {
+  name: 'Border & Shadow',
+  render: () => (
+    <div style={{ padding: 24, ...baseStyle }}>
+      <Section title="Border Radius">
+        <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+          {borderRadiusSizes.map(size => (
+            <div key={size} style={{ textAlign: 'center' as const }}>
+              <div style={{
+                width: 72, height: 72,
+                background: 'var(--ds-color-brand-pale-plum-100)',
+                border: '1px solid var(--ds-color-brand-pale-plum-300)',
+                borderRadius: `var(--ds-theme-border-radius-${size})`,
+              }} />
+              <TokenLabel>{size}</TokenLabel>
+              <TokenLabel>--ds-theme-border-radius-{size}</TokenLabel>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Border Width">
+        <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+          {borderWidthSizes.map(size => (
+            <div key={size} style={{ textAlign: 'center' as const }}>
+              <div style={{
+                width: 72, height: 72,
+                background: 'var(--ds-color-neutral-50)',
+                border: `solid var(--ds-color-brand-pale-plum-500)`,
+                borderWidth: `var(--ds-theme-border-width-${size})`,
+                borderRadius: 4,
+                boxSizing: 'border-box' as const,
+              }} />
+              <TokenLabel>{size}</TokenLabel>
+              <TokenLabel>--ds-theme-border-width-{size}</TokenLabel>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Shadow">
+        <div style={{ display: 'flex', gap: 40, flexWrap: 'wrap' }}>
+          {(['sm', 'md'] as const).map(size => (
+            <div key={size} style={{ textAlign: 'center' as const }}>
+              <div style={{
+                width: 96, height: 80,
+                background: '#fff',
+                borderRadius: 8,
+                boxShadow: `var(--ds-theme-shadow-${size})`,
+                border: '1px solid rgba(0,0,0,.04)',
+                margin: '8px 16px',
+              }} />
+              <TokenLabel>{size}</TokenLabel>
+              <TokenLabel>--ds-theme-shadow-{size}</TokenLabel>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Focus Ring">
+        <div style={{ display: 'flex', gap: 24 }}>
+          <div style={{ position: 'relative' as const, display: 'inline-block' }}>
+            <div style={{
+              width: 120, height: 40,
+              background: 'var(--ds-theme-color-background-default)',
+              border: '1px solid var(--ds-theme-color-border-default)',
+              borderRadius: 4,
+              boxShadow: `0 0 0 var(--ds-theme-focus-gap-spread) var(--ds-theme-focus-gap-color), 0 0 0 calc(var(--ds-theme-focus-gap-spread) + var(--ds-theme-focus-ring-spread)) var(--ds-theme-focus-ring-color)`,
+            }} />
+            <TokenLabel>focus ring · --ds-theme-focus-ring-*</TokenLabel>
+          </div>
+        </div>
+      </Section>
+    </div>
+  ),
 };

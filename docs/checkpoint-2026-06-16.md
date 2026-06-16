@@ -72,20 +72,25 @@ npm start            # Storybook na http://localhost:6006
 1. `buildTokens()` — czyta DTCG JSON, stripuje klucze kolekcji (deep merge!), taguje tier w `$extensions['harbor-tier']`
 2. `usesDtcgTokens: true` — SD4 DTCG mode (wartości w `token.$value`, typy w `token.$type`)
 3. Custom transform `size/px-to-rem` — Figma exports wymiary jako liczby (np. `4`), konwertuje na `0.25rem`
-4. Custom formatters — oddzielają primitives (`--ds-`) od semantic/component (`--ds-theme-`)
+4. Custom formatters — prefix CSS/JSON/JS wyliczany z tieru tokenu (patrz niżej)
 
 Output do `light/build/`:
 - `css/tokens.css` — `:root {}` z 377 zmiennymi (wszystkie tiers, resolved values)
-- `css/light.css` — `.light {}` z tokenami semantic + component (do theme-switchingu)
+- `css/light.css` — `.light {}` z tymi samymi zmiennymi (NIE ma i nie będzie theme-switchingu — plik to relikt, do ewentualnego usunięcia)
 - `json/tokens.json` — flat JSON
-- `js/tokens.js` + `js/tokens.d.ts` — ES6 exports z prefixem `Ds` / `DsTheme`
+- `js/tokens.js` + `js/tokens.d.ts` — ES6 exports z prefixem `DsPrimitive` / `DsSemantic` / `DsComponent`
 
-## CSS prefix convention
+## CSS prefix convention (trzy tiery)
 
-| Kolekcja Figma | CSS prefix | Przykład |
-|---|---|---|
-| primitive-brand-a, primitive-global | `--ds-` | `--ds-color-neutral-white` |
-| semantic-modes, component-modes | `--ds-theme-` | `--ds-theme-color-background-default` |
+Nie ma i nie będzie theme-switchingu — prefix jednoznacznie oznacza tier (kolekcję Figma):
+
+| Kolekcja Figma | tier | CSS prefix | Przykład |
+|---|---|---|---|
+| primitive-brand-a, primitive-global | primitive | `--ds-primitive-` | `--ds-primitive-color-neutral-white` |
+| semantic-modes | semantic | `--ds-semantic-` | `--ds-semantic-color-background-default` |
+| component-modes | component | `--ds-component-` | `--ds-component-button-primary-color-background-enabled` |
+
+Mapowanie kolekcja→tier jest w `config.js` (`TIER_BY_COLLECTION`); prefix wyliczany przez `cssPrefixOf` / `jsonPrefixOf` / transform `name/tier-prefix`.
 
 ## Sidebar Storybook
 

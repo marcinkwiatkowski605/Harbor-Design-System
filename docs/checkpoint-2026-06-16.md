@@ -102,7 +102,9 @@ FOUNDATIONS
        ├── Tier 2: Semantic Tokens    (Color, Typography, Border & Shadow)
        └── Tier 3: Component Tokens   (Button, Text Input)
 COMPONENTS
-  └── Button                         (Primary, Secondary, Outline, Loading, Disabled, AllVariants, StateMatrix)
+  └── Button
+       ├── Docs                      (strona MDX: overview, anatomy, types, states, a11y, tokens)
+       └── Default                   (jedna story sterowana panelem Controls)
 PAGES
   └── Introduction                   (placeholder)
 ```
@@ -117,17 +119,24 @@ Wszystkie 377 tokenów z buildu jest pokazane w którejś story (zweryfikowane s
 
 Pierwszy komponent: **Button** (`src/components/Button/`), skonwertowany z Figmy (component set `129:979`).
 
-- `Button.tsx` — propsy: `variant` (primary/secondary/outline), `loading`, `disabled`, `forwardRef`, pełne atrybuty `<button>`
-- `Button.css` — w pełni sterowany tokenami; stany przez `:hover`/`:active`/`:focus-visible`/`:disabled`/`[aria-busy]`; pierścień focus z `--ds-theme-focus-*`
-- Typografia etykiety: **`label/lg`** (`--ds-theme-typography-label-lg-*`) — NIE body/lg, mimo że Figma wiąże body/lg. To intencja designu (patrz pamięć `project_button_typography`). `label/lg/font-weight` jest już bold.
-- Weryfikacja: 55 zmiennych CSS, 0 wymyślonych tokenów, `tsc` czysty
-- 7 stories pod `Components/Button`
+Pliki: `Button.tsx`, `Button.css`, `Button.stories.tsx`, `Button.mdx`, `index.ts`.
+
+- `Button.tsx` — propsy: `variant` (primary/secondary/outline), `loading`, `disabled`, `forwardRef`, pełne atrybuty `<button>`. Renderuje samo `children` (bez wrapperów, bez spinnera).
+- `Button.css` — w pełni sterowany tokenami; stany przez `:hover`/`:active`/`:focus-visible`/`:disabled`/`[aria-busy]`; pierścień focus z `--ds-semantic-focus-*`
+- Typografia etykiety: **`label/lg`** (`--ds-semantic-typography-label-lg-*`) — NIE body/lg, mimo że Figma wiąże body/lg. To intencja designu (patrz pamięć `project_button_typography`). `label/lg/font-weight` jest już bold.
+- **Loading bez ikony** — stan loading zmienia tylko kolory na tokeny `loading` + ustawia `aria-busy` + blokuje interakcję; etykietę ("Loading…") podaje konsument. Żadnych dodanych elementów (patrz pamięć `feedback_no_unrequested_elements`).
+- **Outline/disabled** — tło bierze z `background-enabled` (białe), nie disabled — zgodnie z bindingiem w Figmie; border i tekst z tokenów disabled.
+- Stories: **jedna** `Default` sterowana Controls + strona `Docs` (MDX). Bez powielania wariantów per story (patrz pamięć `feedback_one_story_per_component`).
+- Weryfikacja: 0 wymyślonych tokenów (cross-check ze świeżym build JSON), `tsc` czysty.
+
+**Strona Docs (MDX):** `Button.mdx` z `<Meta of>`, `<Primary />`, `<Controls />` + proza (overview/anatomy/types/states/usage/a11y/tokens). `.mdx` jest w globie `main.ts` (`../src/**/*.mdx`); docs-blocks z `@storybook/blocks` (część addon-essentials 8.6.14).
 
 **Wzorzec konwersji z Figmy** (do powtórzenia dla kolejnych komponentów):
 1. `figma_analyze_component_set` — osie wariantów + mapowanie stanów na pseudo-klasy
-2. `figma_get_component_for_development_deep` na jednym wariancie — rozwiązuje powiązania zmiennych na NAZWY tokenów (nie zgadujemy)
-3. komponent w `src/components/<Name>/`, CSS oparty wyłącznie o `--ds-theme-*`
+2. `figma_get_component_for_development_deep` na każdym istotnym wariancie — rozwiązuje powiązania zmiennych na NAZWY tokenów (nie zgadujemy; uwaga na per-state binding, np. outline/disabled → enabled bg)
+3. komponent w `src/components/<Name>/`, CSS oparty wyłącznie o `--ds-primitive-` / `--ds-semantic-` / `--ds-component-`
 4. cross-check zmiennych CSS z `build/json/tokens.json` (0 wymyślonych)
+5. jedna story `Default` (Controls) + `<Name>.mdx` z opisem
 
 ## Znane warningi (nie-blokujące)
 
@@ -145,21 +154,22 @@ Pierwszy komponent: **Button** (`src/components/Button/`), skonwertowany z Figmy
 
 - React (nie Lit/Web Components jak w kursie Subatomic)
 - Monorepo npm workspaces (nie Lerna, nie Turbo)
-- Jeden motyw `light` na start; `dark` jako sibling folder gdy będzie potrzebny
+- **Brak theme-switchingu** (decyzja ostateczna) — prefiksy tokenów oznaczają tier (primitive/semantic/component), nie motyw; usunięto relikt `.light {}`. Katalog `light/build/` został jako nazwa ścieżki wyjściowej.
 - Tokeny importowane z Figmy przez design_tokens.json (nie ręcznie pisane JSON)
 - GitHub Pages deploy — później, po pierwszych komponentach
 
 ## Ostatnie commity
 
 ```
+8d3f898 docs: add Button MDX docs page
+9445abc fix: remove loading spinner from Button — not in Figma
+475eb2e refactor: collapse Button stories to a single Controls-driven Default
+fdefa86 fix: outline disabled keeps enabled (white) background, matching Figma
+6d4ff17 refactor: drop .light theme-output relic, keep single :root tokens.css
+712c6d6 refactor: split token prefix into three tiers (no theme-switching)
 94abc23 fix: use label/lg typography for Button label
 ccfa553 feat: add Button component (from Figma) with stories
 c23c6aa docs: update checkpoint — token visualizations complete
-570180b style: center Focus Ring swatch under its labels
-c7dffb0 style: center Tier 2 border radius/width swatches under their labels
-a9aab9f fix: correct accent-presed→pressed typo; add full token coverage to stories
-c545f31 fix: sync Tier 2 color contexts with actual design_tokens.json
-d36bf49 fix: import token CSS directly in preview.ts instead of via SCSS
 82eb3a1 feat: replace token placeholder stories with real visualizations
 6270552 feat: wire design_tokens.json to Style Dictionary 4 (DTCG)
 dccdfcd feat: export Figma design tokens in W3C DTCG format

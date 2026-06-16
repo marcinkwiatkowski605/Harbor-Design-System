@@ -46,10 +46,10 @@ Harbor Design System/
         │       ├── tier-1-tokens/tier-1-tokens.stories.tsx          ← Colors, Typography, Spacing, Borders, Shadows
         │       ├── tier-2-tokens/tier-2-tokens.stories.tsx          ← Color, Typography, Border & Shadow
         │       ├── tier-3-tokens/tier-3-tokens.stories.tsx          ← Button, Text Input
-        │       ├── components-placeholder/components-placeholder.stories.tsx
         │       └── pages-placeholder/pages-placeholder.stories.tsx
         └── src/
-            └── components/   ← puste
+            └── components/
+                └── Button/   ← pierwszy komponent React (Button.tsx, .css, .stories.tsx, index.ts)
 ```
 
 ## Jak uruchomić
@@ -98,7 +98,7 @@ FOUNDATIONS
        ├── Tier 2: Semantic Tokens    (Color, Typography, Border & Shadow)
        └── Tier 3: Component Tokens   (Button, Text Input)
 COMPONENTS
-  └── Introduction                   (placeholder)
+  └── Button                         (Primary, Secondary, Outline, Loading, Disabled, AllVariants, StateMatrix)
 PAGES
   └── Introduction                   (placeholder)
 ```
@@ -109,6 +109,22 @@ Wszystkie 377 tokenów z buildu jest pokazane w którejś story (zweryfikowane s
 
 **Zasada krytyczna:** nazwy tokenów NIGDY nie są pisane z głowy. Tablice w story odpowiadają dokładnie nazwom z `design_tokens.json` / `build/json/tokens.json`. Przy każdej zmianie tokenów trzeba zsynchronizować tablice (lub uruchomić cross-check) — patrz pamięć `feedback_token_source_of_truth`.
 
+## Komponenty React
+
+Pierwszy komponent: **Button** (`src/components/Button/`), skonwertowany z Figmy (component set `129:979`).
+
+- `Button.tsx` — propsy: `variant` (primary/secondary/outline), `loading`, `disabled`, `forwardRef`, pełne atrybuty `<button>`
+- `Button.css` — w pełni sterowany tokenami; stany przez `:hover`/`:active`/`:focus-visible`/`:disabled`/`[aria-busy]`; pierścień focus z `--ds-theme-focus-*`
+- Typografia etykiety: **`label/lg`** (`--ds-theme-typography-label-lg-*`) — NIE body/lg, mimo że Figma wiąże body/lg. To intencja designu (patrz pamięć `project_button_typography`). `label/lg/font-weight` jest już bold.
+- Weryfikacja: 55 zmiennych CSS, 0 wymyślonych tokenów, `tsc` czysty
+- 7 stories pod `Components/Button`
+
+**Wzorzec konwersji z Figmy** (do powtórzenia dla kolejnych komponentów):
+1. `figma_analyze_component_set` — osie wariantów + mapowanie stanów na pseudo-klasy
+2. `figma_get_component_for_development_deep` na jednym wariancie — rozwiązuje powiązania zmiennych na NAZWY tokenów (nie zgadujemy)
+3. komponent w `src/components/<Name>/`, CSS oparty wyłącznie o `--ds-theme-*`
+4. cross-check zmiennych CSS z `build/json/tokens.json` (0 wymyślonych)
+
 ## Znane warningi (nie-blokujące)
 
 - `shadow-spread-4` collision: tokeny `shadow.spread.4` i `shadow.spread.-4` generują tę samą nazwę CSS. Figma exportuje obie jako dimension. Można naprawić w Figmie lub custom namerem.
@@ -116,10 +132,10 @@ Wszystkie 377 tokenów z buildu jest pokazane w którejś story (zweryfikowane s
 
 ## Co zostało do zrobienia (kolejność)
 
-1. **Dodać pierwsze komponenty React** do `src/components/`; usunąć `components-placeholder` story
+1. **Kolejne komponenty React** — np. Text Input (tokeny już są), wg wzorca konwersji z Figmy powyżej
 2. **Deploy na GitHub Pages** (kiedy będzie co pokazać)
 
-(Wizualizacja tokenów tier-1/2/3 — ✅ zrobione w tej sesji)
+(Wizualizacja tokenów tier-1/2/3 — ✅ | Pierwszy komponent Button — ✅)
 
 ## Decyzje podjęte wcześniej
 
@@ -132,6 +148,9 @@ Wszystkie 377 tokenów z buildu jest pokazane w którejś story (zweryfikowane s
 ## Ostatnie commity
 
 ```
+94abc23 fix: use label/lg typography for Button label
+ccfa553 feat: add Button component (from Figma) with stories
+c23c6aa docs: update checkpoint — token visualizations complete
 570180b style: center Focus Ring swatch under its labels
 c7dffb0 style: center Tier 2 border radius/width swatches under their labels
 a9aab9f fix: correct accent-presed→pressed typo; add full token coverage to stories

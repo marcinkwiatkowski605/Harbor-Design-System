@@ -38,6 +38,7 @@ Source: https://developers.google.com/tech-writing/one
 - **Which** (z przecinkiem) = klauzula dodatkowa: "Python, which Guido invented, ..."
 - Unikaj przymiotników i przysłówków subiektywnych; zastąp danymi liczbowymi:
   - "runs extremely fast" → "runs 225% faster"
+- *Uwaga: reguła that/which dotyczy angielskiego; przy pisaniu po polsku stosuj odpowiednik zdania względnego z "który/która" z odpowiednią przecinkową strukturą*
 
 ### Listy i tabele
 - **Lista punktowana** = elementy bez określonej kolejności; zmiana kolejności nie zmienia sensu
@@ -103,3 +104,6 @@ Source: https://developers.google.com/tech-writing/one
 - **Listy wariantów**: lista punktowana z równoległą strukturą
 - **Kroki użycia**: lista numerowana, każdy krok zaczyna się od trybu rozkazującego
 - **Przykłady**: "Użyj `Button` gdy..." zamiast "Można użyć `Button` gdy..."
+- **Stany wizualne (hover, active, disabled, focus)**: opisuj stanem, nie wyglądem — "The disabled state prevents user interaction" nie "The disabled state looks grayed out"
+- **Wzorce Do / Don't**: "Use `Button` for form submission. Don't use `Button` for navigation — use `Link` instead."
+- **Sekcja dostępności komponentu**: "The `Button` component uses `role="button"` and responds to keyboard events." (aktywny głos, konkretne atrybuty)

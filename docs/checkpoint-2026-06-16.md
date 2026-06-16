@@ -75,8 +75,7 @@ npm start            # Storybook na http://localhost:6006
 4. Custom formatters — prefix CSS/JSON/JS wyliczany z tieru tokenu (patrz niżej)
 
 Output do `light/build/`:
-- `css/tokens.css` — `:root {}` z 377 zmiennymi (wszystkie tiers, resolved values)
-- `css/light.css` — `.light {}` z tymi samymi zmiennymi (NIE ma i nie będzie theme-switchingu — plik to relikt, do ewentualnego usunięcia)
+- `css/tokens.css` — `:root {}` z 377 zmiennymi (wszystkie tiers, resolved values) — jedyny plik CSS, importowany w `preview.ts`
 - `json/tokens.json` — flat JSON
 - `js/tokens.js` + `js/tokens.d.ts` — ES6 exports z prefixem `DsPrimitive` / `DsSemantic` / `DsComponent`
 

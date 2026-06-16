@@ -184,12 +184,6 @@ StyleDictionary.registerFormat({
 });
 
 StyleDictionary.registerFormat({
-  name: 'css/variables-themed',
-  format: ({ dictionary, options }) =>
-    `.${options.theme} {\n${formatVariables(dictionary)}\n}\n`,
-});
-
-StyleDictionary.registerFormat({
   name: 'css/custom-variables',
   format: ({ dictionary }) => `:root {\n${formatVariables(dictionary)}\n}`,
 });
@@ -246,10 +240,8 @@ const getStyleDictionaryConfig = (theme) => ({
     css: {
       transformGroup: 'custom/css',
       buildPath: './',
-      options: { theme },
       files: [
         { destination: `./${theme}/build/css/tokens.css`, format: 'css/custom-variables' },
-        { destination: `./${theme}/build/css/${theme}.css`, format: 'css/variables-themed' },
       ],
     },
     json: {

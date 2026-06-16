@@ -1,7 +1,6 @@
 import type { Preview } from '@storybook/react';
 
 import '../../harbor-tokens/light/build/css/tokens.css';
-import '../../harbor-tokens/light/build/css/light.css';
 
 const preview: Preview = {
   parameters: {

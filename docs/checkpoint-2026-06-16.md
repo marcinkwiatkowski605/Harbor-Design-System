@@ -152,6 +152,7 @@ Pliki: `Button.tsx`, `Button.css`, `Button.stories.tsx`, `Button.mdx`, `index.ts
 
 - `shadow-spread-4` collision: tokeny `shadow.spread.4` i `shadow.spread.-4` generują tę samą nazwę CSS. Figma exportuje obie jako dimension. Można naprawić w Figmie lub custom namerem.
 - Storybook 8.6.18 vs addon-essentials 8.6.14: drobna niezgodność wersji, nie wpływa na działanie.
+- CI: adnotacja „Node.js 20 is deprecated" w runach Pages — dotyczy **runtime'u samych akcji** (`actions/checkout`, `setup-node`, `configure-pages`, `upload-artifact`, `deploy-pages`), nie naszego `node-version` (build leci na Node 22). GitHub i tak wymusza je na Node 24 — działa, czysto informacyjne. Zniknie, gdy autorzy akcji wydadzą wersje celujące w node24. NIE da się tego naprawić przez `node-version`.
 
 ## Co zostało do zrobienia (kolejność)
 

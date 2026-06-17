@@ -58,7 +58,17 @@ Harbor Design System/
 npm install          # (już zrobione — node_modules istnieje)
 npm run build:tokens # Buduje tokeny: design_tokens.json → light/build/{css,json,js}
 npm start            # Storybook na http://localhost:6006
+npm run build:storybook # Produkcyjny build → packages/harbor-storybook/storybook-static
 ```
+
+## Deploy (GitHub Pages)
+
+Storybook jest live: **https://marcinkwiatkowski605.github.io/Harbor-Design-System/**
+
+- Auto-deploy przy każdym `git push` na `main` — workflow `.github/workflows/deploy.yml`
+- Kroki workflow: `npm ci` → `build:tokens` (MUSI być przed Storybookiem, bo `preview.ts` importuje wygenerowany CSS) → `build:storybook` → publikacja `storybook-static` przez oficjalny flow Pages (`configure-pages` + `upload-pages-artifact` + `deploy-pages`)
+- Pages w repo: Settings → Pages → Source = **GitHub Actions** (już włączone)
+- Node 22 w CI; `storybook-static/` jest gitignored
 
 ## Architektura tokenów (jak działa build)
 
@@ -146,9 +156,9 @@ Pliki: `Button.tsx`, `Button.css`, `Button.stories.tsx`, `Button.mdx`, `index.ts
 ## Co zostało do zrobienia (kolejność)
 
 1. **Kolejne komponenty React** — np. Text Input (tokeny już są), wg wzorca konwersji z Figmy powyżej
-2. **Deploy na GitHub Pages** (kiedy będzie co pokazać)
+2. **Dostosowanie design systemu pod LLM** (z opisu projektu w README)
 
-(Wizualizacja tokenów tier-1/2/3 — ✅ | Pierwszy komponent Button — ✅)
+(Wizualizacja tokenów tier-1/2/3 — ✅ | Pierwszy komponent Button — ✅ | Deploy na GitHub Pages — ✅)
 
 ## Decyzje podjęte wcześniej
 
@@ -161,6 +171,11 @@ Pliki: `Button.tsx`, `Button.css`, `Button.stories.tsx`, `Button.mdx`, `index.ts
 ## Ostatnie commity
 
 ```
+2062177 ci: deploy Storybook to GitHub Pages via Actions
+b517c21 docs: note Figma components drive the Storybook React components
+648fadd docs: reframe README intro as a portfolio/demo project
+3a86d75 docs: update README — token flow, three-tier prefixes, Button, drop reference/
+7fb5a60 chore: remove vestigial empty token folders
 8d3f898 docs: add Button MDX docs page
 9445abc fix: remove loading spinner from Button — not in Figma
 475eb2e refactor: collapse Button stories to a single Controls-driven Default

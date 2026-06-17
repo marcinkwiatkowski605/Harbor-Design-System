@@ -1,36 +1,59 @@
 # Harbor Design System
 
-A design system for Harbor.
+A design system for Harbor — design tokens exported from Figma, built with Style
+Dictionary, and surfaced through Storybook.
 
 ## Getting started
 
 ```bash
 npm install          # Install all workspace dependencies
 npm start            # Start Storybook at http://localhost:6006
-npm run build:tokens # Build design tokens with Style Dictionary
+npm run build:tokens # Build design tokens (design_tokens.json → CSS / JSON / JS)
 ```
 
-## Project structure
+## Monorepo layout (npm workspaces)
 
 ```
+design_tokens.json       # Token source — W3C DTCG export from the Figma "HRDS" file
 packages/
-  harbor-tokens/        # Style Dictionary token build
-    core/               # Theme-agnostic (tier-1 primitives)
-    light/              # Light theme tokens
-      tier-1-definitions/
-      tier-2-usage/
-      tier-3-components/
-      build/            # Generated — run npm run build:tokens
-    config.js           # Style Dictionary config
-  harbor-storybook/     # React + Storybook
+  harbor-tokens/         # Style Dictionary token build
+    config.js            # Reads design_tokens.json, emits tiered CSS vars / JSON / JS
+    light/build/         # Generated output (gitignored) — run npm run build:tokens
+  harbor-storybook/      # React + Storybook 8 (Vite)
     .storybook/
-      components/       # Token visualization stories
-    src/components/     # React components (added when ready)
+      components/        # Token visualization stories (Foundations)
+      preview.ts         # Imports the built token CSS
+    src/components/      # React components — currently Button
 docs/
-  writing-guides/       # Writing reference files for documentation
-reference/              # External reference materials
-CLAUDE.md               # Instructions for Claude Code
+  writing-guides/        # Writing reference files for documentation
+CLAUDE.md                # Instructions for Claude Code
 ```
+
+## Design tokens
+
+Tokens live in Figma (file **HRDS**) and are exported to `design_tokens.json` in W3C
+DTCG format. `npm run build:tokens` runs Style Dictionary (`harbor-tokens/config.js`),
+which resolves aliases and emits CSS custom properties, flat JSON, and JS exports into
+`packages/harbor-tokens/light/build/`.
+
+There is **no theme switching** — a CSS variable's prefix marks its tier (the Figma
+collection it comes from):
+
+| Tier | Figma collection | CSS prefix | Example |
+|---|---|---|---|
+| Primitive | Primitive – Brand A / Global | `--ds-primitive-` | `--ds-primitive-color-neutral-white` |
+| Semantic | Semantic (modes) | `--ds-semantic-` | `--ds-semantic-color-background-default` |
+| Component | Component (modes) | `--ds-component-` | `--ds-component-button-primary-color-background-enabled` |
+
+Storybook imports the built CSS in `.storybook/preview.ts`, so after `npm run build:tokens`
+token changes from Figma appear immediately. Every token is visualized under
+**Foundations › Design Tokens** in Storybook.
+
+## Components
+
+React components live in `packages/harbor-storybook/src/components/`. Each one is
+token-driven (no hardcoded colors or sizes), ships a single Controls-driven story, and an
+MDX docs page. Current: **Button**.
 
 ## Writing guides
 
@@ -41,7 +64,7 @@ Before writing documentation, consult the relevant file in `docs/writing-guides/
 | Any documentation (fundamentals) | `tech-writing-one.md` |
 | Long docs / complex structure | `tech-writing-two.md` |
 | Error messages / validation | `tech-writing-error-messages.md` |
-| Diagrams, images, alt text | `tech-writing-accessibility.md` |
+| Diagrams, images, alt text, inclusive language | `tech-writing-accessibility.md` |
 | Overview of all files | `tech-writing-overview.md` |
 
 Based on Google's [Technical Writing Courses](https://developers.google.com/tech-writing/overview).

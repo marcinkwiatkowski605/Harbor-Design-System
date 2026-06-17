@@ -3,4 +3,5 @@ dist/
 packages/harbor-tokens/light/build/
 packages/harbor-tokens/dark/build/
 packages/harbor-storybook/storybook-static/
+docs/
 .DS_Store

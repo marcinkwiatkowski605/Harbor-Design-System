@@ -32,8 +32,6 @@ packages/
       components/        # Token visualization stories (Foundations)
       preview.ts         # Imports the built token CSS
     src/components/      # React components — currently Button
-docs/
-  writing-guides/        # Writing reference files for documentation
 CLAUDE.md                # Instructions for Claude Code
 ```
 
@@ -62,17 +60,3 @@ token changes from Figma appear immediately. Every token is visualized under
 React components live in `packages/harbor-storybook/src/components/`. Each one is
 token-driven (no hardcoded colors or sizes), ships a single Controls-driven story, and an
 MDX docs page. Current: **Button**.
-
-## Writing guides
-
-Before writing documentation, consult the relevant file in `docs/writing-guides/`:
-
-| Situation | File |
-|---|---|
-| Any documentation (fundamentals) | `tech-writing-one.md` |
-| Long docs / complex structure | `tech-writing-two.md` |
-| Error messages / validation | `tech-writing-error-messages.md` |
-| Diagrams, images, alt text, inclusive language | `tech-writing-accessibility.md` |
-| Overview of all files | `tech-writing-overview.md` |
-
-Based on Google's [Technical Writing Courses](https://developers.google.com/tech-writing/overview).

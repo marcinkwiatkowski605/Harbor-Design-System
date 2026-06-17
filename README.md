@@ -1,7 +1,14 @@
 # Harbor Design System
 
-A design system for Harbor — design tokens exported from Figma, built with Style
-Dictionary, and surfaced through Storybook.
+Harbor Design System is a demonstration project that showcases my skills in
+design-token architecture, tooling, and the design-to-code workflow.
+
+The project includes:
+
+- a Figma file that defines the design tokens and a set of components;
+- an export of those tokens from Figma to a JSON file in DTCG (Design Token Community Group) format for Style Dictionary;
+- a Storybook that visualizes the tokens and documents the components;
+- a planned adaptation of the design system for large language models (LLMs).
 
 ## Getting started
 

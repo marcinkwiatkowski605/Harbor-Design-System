@@ -7,6 +7,7 @@ The project includes:
 
 - a Figma file that defines the design tokens and a set of components;
 - an export of those tokens from Figma to a JSON file in DTCG (Design Token Community Group) format for Style Dictionary;
+- a conversion of the Figma components into token-driven React components in Storybook;
 - a Storybook that visualizes the tokens and documents the components;
 - a planned adaptation of the design system for large language models (LLMs).
 

@@ -32,7 +32,6 @@ packages/
       components/        # Token visualization stories (Foundations)
       preview.ts         # Imports the built token CSS
     src/components/      # React components — currently Button
-CLAUDE.md                # Instructions for Claude Code
 ```
 
 ## Design tokens

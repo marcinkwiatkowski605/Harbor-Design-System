@@ -1,4 +1,5 @@
 import type { StorybookConfig } from '@storybook/react-vite';
+import remarkGfm from 'remark-gfm';
 
 const config: StorybookConfig = {
   stories: [
@@ -8,6 +9,18 @@ const config: StorybookConfig = {
   ],
   addons: [
     '@storybook/addon-essentials',
+    {
+      // Registered explicitly so addon-essentials skips its bundled docs and uses
+      // this one — letting us enable GitHub-Flavored Markdown (tables, etc.) in MDX.
+      name: '@storybook/addon-docs',
+      options: {
+        mdxPluginOptions: {
+          mdxCompileOptions: {
+            remarkPlugins: [remarkGfm]
+          }
+        }
+      }
+    },
     '@storybook/addon-a11y'
   ],
   framework: {

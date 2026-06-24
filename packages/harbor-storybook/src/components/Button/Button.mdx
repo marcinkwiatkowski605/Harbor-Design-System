@@ -52,12 +52,101 @@ In code, Hover/Pressed/Focus are driven by `:hover` / `:active` / `:focus-visibl
 Disabled by the native `disabled` attribute, and Loading by the `loading` prop
 (which sets `aria-busy` and blocks interaction).
 
+## Color reference
+
+Resolved value **and the token assigned to it** for every type and state. Values come
+from the built component tokens; the state→token mapping is what `Button.css` actually
+references. Token names below drop the per-variant prefix shown above each table.
+
+**Focus** has no fill token of its own — it keeps the Enabled background/content and
+adds the shared ring (`--ds-semantic-focus-ring-*` / `--ds-semantic-focus-gap-*`).
+
+**Primary** — prefix `--ds-component-button-primary-color-`. Content is `#FFFFFF` in every state.
+
+| State    | Background                       | Content                       |
+|----------|----------------------------------|-------------------------------|
+| Enabled  | `#9B7FFF` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
+| Hover    | `#834DFF` · `background-hover`    | `#FFFFFF` · `content-hover`    |
+| Pressed  | `#6C31DB` · `background-pressed`  | `#FFFFFF` · `content-pressed`  |
+| Focus    | `#9B7FFF` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
+| Disabled | `#CFD5DA` · `background-disabled` | `#FFFFFF` · `content-disabled` |
+| Loading  | `#9B7FFF` · `background-loading`  | `#FFFFFF` · `content-loading`  |
+
+**Secondary** — prefix `--ds-component-button-secondary-color-`. Content is `#FFFFFF` in every state.
+
+| State    | Background                       | Content                       |
+|----------|----------------------------------|-------------------------------|
+| Enabled  | `#F36700` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
+| Hover    | `#C75300` · `background-hover`    | `#FFFFFF` · `content-hover`    |
+| Pressed  | `#A14200` · `background-pressed`  | `#FFFFFF` · `content-pressed`  |
+| Focus    | `#F36700` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
+| Disabled | `#CFD5DA` · `background-disabled` | `#FFFFFF` · `content-disabled` |
+| Loading  | `#F36700` · `background-loading`  | `#FFFFFF` · `content-loading`  |
+
+**Outline** — prefix `--ds-component-button-outline-color-`. White background, visible border in every state.
+
+| State    | Background                        | Content                       | Border                     |
+|----------|-----------------------------------|-------------------------------|----------------------------|
+| Enabled  | `#FFFFFF` · `background-enabled`   | `#484E53` · `content-enabled`  | `#B0B9BF` · `border-enabled`  |
+| Hover    | `#F2F4F5` · `background-hover`     | `#1B1D1F` · `content-hover`    | `#909AA1` · `border-hover`    |
+| Pressed  | `#E3E7E9` · `background-pressed`   | `#1B1D1F` · `content-pressed`  | `#747D84` · `border-pressed`  |
+| Focus    | `#FFFFFF` · `background-enabled`   | `#484E53` · `content-enabled`  | `#B0B9BF` · `border-enabled`  |
+| Disabled | `#FFFFFF` · `background-enabled` † | `#CFD5DA` · `content-disabled` | `#CFD5DA` · `border-disabled` |
+| Loading  | `#FFFFFF` · `background-loading`   | `#484E53` · `content-loading`  | `#B0B9BF` · `border-loading`  |
+
+† Outline keeps its **enabled** (white) background when disabled — only content and
+border drop to their disabled tokens. The `…-background-disabled` token (`#CFD5DA`) exists
+but is intentionally not used here.
+
+## Specs
+
+| Property        | Value | Token |
+|-----------------|-------|-------|
+| Padding (horizontal) | 24px | `--ds-component-button-padding-horizontal` |
+| Padding (vertical)   | 12px | `--ds-component-button-padding-vertical` |
+| Corner radius        | 8px  | `--ds-component-button-border-radius` |
+| Border width         | 1px  | `--ds-component-button-border-width` |
+
+**Typography** — semantic tier `label/lg`.
+
+| Font      | Weight    | Size | Line height | Letter spacing |
+|-----------|-----------|------|-------------|----------------|
+| Helvetica | Bold (700) | 16px | 24px        | 0              |
+
 ## Usage guidelines
 
 - Choose type by hierarchy, not by which one looks better in the moment.
 - Outline needs a visible border in every state, including Disabled — don't let it disappear
   just because the background is white.
 - Keep labels short and verb-led ("Save changes," not "Changes will be saved").
+
+## Examples
+
+```tsx
+// Primary action
+<Button variant="primary" onClick={handleSubmit}>Save changes</Button>
+
+// Secondary and outline side by side
+<Button variant="secondary">Add another</Button>
+<Button variant="outline">Cancel</Button>
+
+// Loading state — pass the busy label yourself
+<Button variant="primary" loading>Saving…</Button>
+```
+
+## Component API
+
+```tsx
+import { Button } from './components/Button';
+```
+
+| Prop       | Type                                        | Default     | Description |
+|------------|---------------------------------------------|-------------|-------------|
+| `variant`  | `'primary' \| 'secondary' \| 'outline'`     | `'primary'` | Visual style. Maps to the Figma `Type` axis. |
+| `loading`  | `boolean`                                   | `false`     | Applies the loading colors, sets `aria-busy`, and blocks interaction. |
+| `disabled` | `boolean`                                   | `false`     | Native disabled attribute. Removes the button from interaction and the tab order. |
+| `children` | `React.ReactNode`                           | —           | Button label. One line of centered text. **Required.** |
+| `...rest`  | `React.ButtonHTMLAttributes<HTMLButtonElement>` | —       | All native button attributes (`onClick`, `type`, `aria-*`, …) forward to the underlying `<button>`. |
 
 ## Accessibility
 

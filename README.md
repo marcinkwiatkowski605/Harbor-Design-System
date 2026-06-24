@@ -9,7 +9,7 @@ The project includes:
 - an export of those tokens from Figma to a JSON file in DTCG (Design Token Community Group) format for Style Dictionary;
 - a conversion of the Figma components into token-driven React components in Storybook;
 - a Storybook that visualizes the tokens and documents the components;
-- a planned adaptation of the design system for large language models (LLMs).
+- an adaptation of the component docs for large language models (LLMs), published as plain-text `llms.txt` files.
 
 ## Getting started
 
@@ -31,7 +31,10 @@ packages/
     .storybook/
       components/        # Token visualization stories (Foundations)
       preview.ts         # Imports the built token CSS
-    src/components/      # React components — currently Button
+    src/components/      # React components + MDX docs — currently Button
+scripts/
+  build-llms-docs.mjs    # Derives the LLM docs from the component MDX
+docs/                    # Generated LLM docs (llms.txt, llms-full.txt, components/*.md)
 ```
 
 ## Design tokens
@@ -59,3 +62,36 @@ token changes from Figma appear immediately. Every token is visualized under
 React components live in `packages/harbor-storybook/src/components/`. Each one is
 token-driven (no hardcoded colors or sizes), ships a single Controls-driven story, and an
 MDX docs page. Current: **Button**.
+
+## Documentation for LLMs
+
+Storybook renders its docs pages with JavaScript, so a language model or crawler that
+fetches the published site receives a script shell instead of the text. To make the
+component documentation readable, a build step derives plain Markdown from each MDX docs
+page and publishes it as static files.
+
+The build produces three outputs in `docs/`:
+
+| File | Purpose |
+|---|---|
+| `llms.txt` | Index of components, following the [llmstxt.org](https://llmstxt.org) convention |
+| `llms-full.txt` | Every component doc concatenated into one file for single-shot context |
+| `components/<name>.md` | One Markdown file per component |
+
+The GitHub Pages workflow publishes these at the site root, so each file is reachable as
+raw text:
+
+- `https://marcinkwiatkowski605.github.io/Harbor-Design-System/llms.txt`
+- `https://marcinkwiatkowski605.github.io/Harbor-Design-System/llms-full.txt`
+- `https://marcinkwiatkowski605.github.io/Harbor-Design-System/components/button.md`
+
+The MDX docs pages are the source of truth. `npm run build:llms` runs
+`scripts/build-llms-docs.mjs`, which strips MDX-only syntax (`import` statements, `<Meta>`,
+`<Controls>`, `<Primary>`) and writes the Markdown files plus `llms.txt` and `llms-full.txt`
+into `docs/`. The deploy workflow (`.github/workflows/deploy.yml`) runs the same command and
+copies the output into the published Storybook, so every push to `main` refreshes the files.
+Adding a new component's `.mdx` adds it to all three outputs automatically.
+
+```bash
+npm run build:llms   # Regenerate docs/ after editing any component .mdx
+```

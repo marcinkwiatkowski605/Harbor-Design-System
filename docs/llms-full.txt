@@ -1,0 +1,186 @@
+# Harbor Design System — full component documentation
+
+> A token-driven design system. Components are documented from their Figma source; every color, size, and type value resolves to a design token.
+
+---
+
+# Button
+
+Buttons let people take an action, confirm a choice, or move forward in a flow.
+They're the primary way of triggering something to happen on screen.
+
+> _Live, interactive example — see this component in Storybook._
+
+## Anatomy
+
+A button has two parts: a **container** (background, border, corner radius, focus
+ring) and a **label** (one line of centered text). There's no icon slot and no size
+property yet — every button renders at the same padding scale (24px horizontal,
+12px vertical, 8px corner radius).
+
+## Types
+
+`variant` sets visual weight, not just color.
+
+- **Primary** — highest emphasis. Reserve for the one action that matters most in a
+  given context: submitting a form, confirming a purchase, completing a step. Solid fill.
+- **Secondary** — medium emphasis. For actions that matter but shouldn't outrank the
+  primary one, like "Add another" next to "Save."
+- **Outline** — lowest emphasis. For optional or reversible actions like "Cancel" or
+  "Back," or when several actions sit side by side and none should dominate.
+
+Rule of thumb: one Primary button per view. If two actions feel equally important, the
+flow needs rethinking before the button hierarchy does.
+
+## States
+
+All three types share the same six states: Enabled, Hover, Pressed, Focus, Disabled, Loading.
+
+- **Hover / Pressed** darken the fill (or border, for Outline) to confirm interactivity.
+  Outline gives Hover and Pressed two distinct border shades, so the states read differently
+  instead of looking identical.
+- **Focus** adds a two-layer ring — a white gap plus a colored outer ring — shared across all
+  three types via one token pair, so focus looks the same regardless of button type.
+- **Disabled** flattens background and text to neutral gray. Outline keeps its white
+  background and only dims border and label; the dimmed label color matches how Disabled
+  reads on Primary and Secondary.
+- **Loading** keeps the type's fill and marks the button busy. There is no spinner — pass a
+  "Loading…" label yourself; the component only handles the state, not the text.
+
+In code, Hover/Pressed/Focus are driven by `:hover` / `:active` / `:focus-visible`,
+Disabled by the native `disabled` attribute, and Loading by the `loading` prop
+(which sets `aria-busy` and blocks interaction).
+
+## Color reference
+
+Resolved value **and the token assigned to it** for every type and state. Values come
+from the built component tokens; the state→token mapping is what `Button.css` actually
+references. Token names below drop the per-variant prefix shown above each table.
+
+**Focus** has no fill token of its own — it keeps the Enabled background/content and
+adds the shared ring (`--ds-semantic-focus-ring-*` / `--ds-semantic-focus-gap-*`).
+
+**Primary** — prefix `--ds-component-button-primary-color-`. Content is `#FFFFFF` in every state.
+
+| State    | Background                       | Content                       |
+|----------|----------------------------------|-------------------------------|
+| Enabled  | `#9B7FFF` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
+| Hover    | `#834DFF` · `background-hover`    | `#FFFFFF` · `content-hover`    |
+| Pressed  | `#6C31DB` · `background-pressed`  | `#FFFFFF` · `content-pressed`  |
+| Focus    | `#9B7FFF` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
+| Disabled | `#CFD5DA` · `background-disabled` | `#FFFFFF` · `content-disabled` |
+| Loading  | `#9B7FFF` · `background-loading`  | `#FFFFFF` · `content-loading`  |
+
+**Secondary** — prefix `--ds-component-button-secondary-color-`. Content is `#FFFFFF` in every state.
+
+| State    | Background                       | Content                       |
+|----------|----------------------------------|-------------------------------|
+| Enabled  | `#F36700` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
+| Hover    | `#C75300` · `background-hover`    | `#FFFFFF` · `content-hover`    |
+| Pressed  | `#A14200` · `background-pressed`  | `#FFFFFF` · `content-pressed`  |
+| Focus    | `#F36700` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
+| Disabled | `#CFD5DA` · `background-disabled` | `#FFFFFF` · `content-disabled` |
+| Loading  | `#F36700` · `background-loading`  | `#FFFFFF` · `content-loading`  |
+
+**Outline** — prefix `--ds-component-button-outline-color-`. White background, visible border in every state.
+
+| State    | Background                        | Content                       | Border                     |
+|----------|-----------------------------------|-------------------------------|----------------------------|
+| Enabled  | `#FFFFFF` · `background-enabled`   | `#484E53` · `content-enabled`  | `#B0B9BF` · `border-enabled`  |
+| Hover    | `#F2F4F5` · `background-hover`     | `#1B1D1F` · `content-hover`    | `#909AA1` · `border-hover`    |
+| Pressed  | `#E3E7E9` · `background-pressed`   | `#1B1D1F` · `content-pressed`  | `#747D84` · `border-pressed`  |
+| Focus    | `#FFFFFF` · `background-enabled`   | `#484E53` · `content-enabled`  | `#B0B9BF` · `border-enabled`  |
+| Disabled | `#FFFFFF` · `background-enabled` † | `#CFD5DA` · `content-disabled` | `#CFD5DA` · `border-disabled` |
+| Loading  | `#FFFFFF` · `background-loading`   | `#484E53` · `content-loading`  | `#B0B9BF` · `border-loading`  |
+
+† Outline keeps its **enabled** (white) background when disabled — only content and
+border drop to their disabled tokens. The `…-background-disabled` token (`#CFD5DA`) exists
+but is intentionally not used here.
+
+## Specs
+
+| Property        | Value | Token |
+|-----------------|-------|-------|
+| Padding (horizontal) | 24px | `--ds-component-button-padding-horizontal` |
+| Padding (vertical)   | 12px | `--ds-component-button-padding-vertical` |
+| Corner radius        | 8px  | `--ds-component-button-border-radius` |
+| Border width         | 1px  | `--ds-component-button-border-width` |
+
+**Typography** — semantic tier `label/lg`.
+
+| Font      | Weight    | Size | Line height | Letter spacing |
+|-----------|-----------|------|-------------|----------------|
+| Helvetica | Bold (700) | 16px | 24px        | 0              |
+
+## Usage guidelines
+
+- Choose type by hierarchy, not by which one looks better in the moment.
+- Outline needs a visible border in every state, including Disabled — don't let it disappear
+  just because the background is white.
+- Keep labels short and verb-led ("Save changes," not "Changes will be saved").
+
+## Examples
+
+```tsx
+// Primary action
+<Button variant="primary" onClick={handleSubmit}>Save changes</Button>
+
+// Secondary and outline side by side
+<Button variant="secondary">Add another</Button>
+<Button variant="outline">Cancel</Button>
+
+// Loading state — pass the busy label yourself
+<Button variant="primary" loading>Saving…</Button>
+```
+
+## Component API
+
+```tsx
+```
+
+| Prop       | Type                                        | Default     | Description |
+|------------|---------------------------------------------|-------------|-------------|
+| `variant`  | `'primary' \| 'secondary' \| 'outline'`     | `'primary'` | Visual style. Maps to the Figma `Type` axis. |
+| `loading`  | `boolean`                                   | `false`     | Applies the loading colors, sets `aria-busy`, and blocks interaction. |
+| `disabled` | `boolean`                                   | `false`     | Native disabled attribute. Removes the button from interaction and the tab order. |
+| `children` | `React.ReactNode`                           | —           | Button label. One line of centered text. **Required.** |
+| `...rest`  | `React.ButtonHTMLAttributes<HTMLButtonElement>` | —       | All native button attributes (`onClick`, `type`, `aria-*`, …) forward to the underlying `<button>`. |
+
+## Accessibility
+
+- The focus ring is mandatory and shared across types — restyle it, don't suppress it.
+- Disabled buttons stay in the layout so people know the action exists, just not right now.
+- Loading is announced to assistive tech: the component sets `aria-busy="true"`, not only a
+  visual change.
+
+## Tokens used
+
+Every value resolves to a design token built from the Figma `Button` component set — no
+hardcoded colors or sizes.
+
+**Color — component tier**
+
+- `--ds-component-button-primary-color-background-{enabled, hover, pressed, disabled, loading}`
+- `--ds-component-button-primary-color-content-{enabled, hover, pressed, disabled, loading}`
+- `--ds-component-button-secondary-color-background-{enabled, hover, pressed, disabled, loading}`
+- `--ds-component-button-secondary-color-content-{enabled, hover, pressed, disabled, loading}`
+- `--ds-component-button-outline-color-background-{enabled, hover, pressed, loading}` — focus and disabled resolve through `enabled`
+- `--ds-component-button-outline-color-content-{enabled, hover, pressed, disabled, loading}`
+- `--ds-component-button-outline-color-border-{enabled, hover, pressed, disabled, loading}`
+
+**Spacing & shape — component tier**
+
+- `--ds-component-button-padding-horizontal` (24px)
+- `--ds-component-button-padding-vertical` (12px)
+- `--ds-component-button-border-radius` (8px)
+- `--ds-component-button-border-width` (1px)
+
+**Typography — semantic tier (`label/lg`)**
+
+- `--ds-semantic-typography-label-lg-{font-family, font-size, line-height, letter-spacing, font-weight}` — Helvetica Bold, 16/24px
+
+**Focus — semantic tier**
+
+- `--ds-semantic-focus-ring-{color, x, y, blur, spread}`
+- `--ds-semantic-focus-gap-{color, x, y, blur, spread}`
+

@@ -8,6 +8,7 @@
   "scripts": {
     "start": "cd ./packages/harbor-storybook && npm run storybook",
     "build:tokens": "cd ./packages/harbor-tokens && npm run build:tokens",
-    "build:storybook": "cd ./packages/harbor-storybook && npm run build-storybook"
+    "build:storybook": "cd ./packages/harbor-storybook && npm run build-storybook",
+    "build:llms": "node scripts/build-llms-docs.mjs"
   }
 }

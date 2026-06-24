@@ -1,0 +1,7 @@
+# Harbor Design System
+
+> A token-driven design system. Components are documented from their Figma source; every color, size, and type value resolves to a design token.
+
+## Components
+
+- [Button](./components/button.md): Buttons let people take an action, confirm a choice, or move forward in a flow.

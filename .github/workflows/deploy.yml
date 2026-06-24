@@ -37,6 +37,14 @@ jobs:
       - name: Build Storybook
         run: npm run build:storybook
 
+      # Generate LLM-readable Markdown docs and publish them at the site root so
+      # crawlers/agents can read content the JS-rendered Storybook pages don't expose.
+      - name: Build LLM docs
+        run: |
+          npm run build:llms
+          cp -R docs/components docs/llms.txt docs/llms-full.txt \
+            packages/harbor-storybook/storybook-static/
+
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3

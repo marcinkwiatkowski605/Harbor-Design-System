@@ -8,15 +8,17 @@
  *
  *   docs/components/<slug>.md   one clean Markdown file per component
  *   docs/llms.txt               index following the llmstxt.org convention
- *   docs/llms-full.txt          every component doc concatenated into one file
+ *   docs/llms-full.txt          components + foundations concatenated into one file
  *
- * The MDX under packages/harbor-storybook/src is the single source of truth; these
- * outputs are generated. Run `npm run build:llms` after editing any .mdx.
+ * The MDX under packages/harbor-storybook/src is the single source of truth for
+ * components; these outputs are generated. Run `npm run build:llms` after editing any
+ * .mdx. Foundations docs (docs/foundations/*.md) are hand-authored Markdown — this
+ * script only reads them to build the index, it never writes or overwrites them.
  *
  * Usage: node scripts/build-llms-docs.mjs [--out <dir>]   (default: docs)
  */
 
-import { readFileSync, writeFileSync, mkdirSync, readdirSync, statSync, rmSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, readdirSync, statSync, rmSync, existsSync } from 'node:fs';
 import { join, dirname, basename, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -27,6 +29,9 @@ const SITE_TITLE = 'Harbor Design System';
 const SITE_SUMMARY =
   'A token-driven design system. Components are documented from their Figma source; ' +
   'every color, size, and type value resolves to a design token.';
+
+// Foundations are listed in this order; unknown files fall to the end, alphabetically.
+const FOUNDATION_ORDER = ['overview', 'color', 'typography', 'dimensions'];
 
 const argOut = (() => {
   const i = process.argv.indexOf('--out');
@@ -93,6 +98,29 @@ function extractSummary(md) {
   return '';
 }
 
+/** Remove HTML comments (author notes) and tidy blank lines — for hand-authored Markdown. */
+function normalizeMarkdown(md) {
+  return md
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/^\n+/, '')
+    .replace(/\n+$/, '') + '\n';
+}
+
+/** Sort foundation files by FOUNDATION_ORDER, then alphabetically for the rest. */
+function orderFoundations(files) {
+  return files.sort((a, b) => {
+    const sa = basename(a, '.md').toLowerCase();
+    const sb = basename(b, '.md').toLowerCase();
+    const ia = FOUNDATION_ORDER.indexOf(sa);
+    const ib = FOUNDATION_ORDER.indexOf(sb);
+    if (ia !== -1 && ib !== -1) return ia - ib;
+    if (ia !== -1) return -1;
+    if (ib !== -1) return 1;
+    return sa.localeCompare(sb);
+  });
+}
+
 const mdxFiles = findMdx(srcDir).sort();
 if (mdxFiles.length === 0) {
   console.error(`No .mdx files found under ${relative(repoRoot, srcDir)}`);
@@ -116,31 +144,51 @@ for (const file of mdxFiles) {
   entries.push({ slug, title, summary, relPath, md });
 }
 
-// llms.txt — index (https://llmstxt.org)
-const indexLines = [
-  `# ${SITE_TITLE}`,
-  '',
-  `> ${SITE_SUMMARY}`,
-  '',
-  '## Components',
-  '',
-  ...entries.map(
-    (e) => `- [${e.title}](./${e.relPath})${e.summary ? `: ${e.summary}` : ''}`
-  ),
-  '',
-];
+// Foundations — hand-authored Markdown in docs/foundations/. Read-only: indexed here,
+// never written, so an author's edits are never clobbered.
+const foundationsDir = join(outDir, 'foundations');
+const foundations = [];
+if (existsSync(foundationsDir)) {
+  const files = orderFoundations(
+    readdirSync(foundationsDir)
+      .filter((f) => f.endsWith('.md'))
+      .map((f) => join(foundationsDir, f))
+  );
+  for (const file of files) {
+    const md = normalizeMarkdown(readFileSync(file, 'utf8'));
+    const slug = basename(file, '.md').toLowerCase();
+    foundations.push({
+      slug,
+      title: extractTitle(md, slug),
+      summary: extractSummary(md),
+      relPath: `foundations/${slug}.md`,
+      md,
+    });
+  }
+}
+
+const linkLine = (e) =>
+  `- [${e.title}](./${e.relPath})${e.summary ? `: ${e.summary}` : ''}`;
+
+// llms.txt — index (https://llmstxt.org). Foundations first (prerequisite knowledge).
+const indexLines = [`# ${SITE_TITLE}`, '', `> ${SITE_SUMMARY}`, ''];
+if (foundations.length) {
+  indexLines.push('## Foundations', '', ...foundations.map(linkLine), '');
+}
+indexLines.push('## Components', '', ...entries.map(linkLine), '');
 writeFileSync(join(outDir, 'llms.txt'), indexLines.join('\n'));
 
-// llms-full.txt — everything inlined for one-shot context.
+// llms-full.txt — everything inlined for one-shot context, foundations before components.
 const fullParts = [
-  `# ${SITE_TITLE} — full component documentation`,
+  `# ${SITE_TITLE} — full documentation`,
   '',
   `> ${SITE_SUMMARY}`,
   '',
-  ...entries.map((e) => `---\n\n${e.md.trim()}\n`),
+  ...[...foundations, ...entries].map((e) => `---\n\n${e.md.trim()}\n`),
 ];
 writeFileSync(join(outDir, 'llms-full.txt'), fullParts.join('\n') + '\n');
 
 console.log(`Generated LLM docs in ${relative(repoRoot, outDir)}/`);
 console.log(`  ${entries.length} component file(s): ${entries.map((e) => e.slug).join(', ')}`);
+console.log(`  ${foundations.length} foundation file(s): ${foundations.map((e) => e.slug).join(', ') || '—'}`);
 console.log('  llms.txt, llms-full.txt');

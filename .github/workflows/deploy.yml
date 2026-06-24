@@ -42,7 +42,7 @@ jobs:
       - name: Build LLM docs
         run: |
           npm run build:llms
-          cp -R docs/components docs/llms.txt docs/llms-full.txt \
+          cp -R docs/components docs/foundations docs/llms.txt docs/llms-full.txt \
             packages/harbor-storybook/storybook-static/
 
       - uses: actions/configure-pages@v5

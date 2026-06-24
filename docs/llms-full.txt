@@ -1,6 +1,22 @@
-# Harbor Design System — full component documentation
+# Harbor Design System — full documentation
 
 > A token-driven design system. Components are documented from their Figma source; every color, size, and type value resolves to a design token.
+
+---
+
+# Token architecture
+
+---
+
+# Color
+
+---
+
+# Typography
+
+---
+
+# Dimensions
 
 ---
 

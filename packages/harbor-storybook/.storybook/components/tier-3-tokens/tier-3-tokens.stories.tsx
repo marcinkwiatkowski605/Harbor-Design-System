@@ -41,9 +41,10 @@ const variantLabel: Record<ButtonVariant, string> = {
 };
 
 const ButtonPreview = ({ variant, state }: { variant: ButtonVariant; state: ButtonState }) => {
-  const bgVar = variant === 'outline'
-    ? `var(--ds-component-button-${variant}-color-background-${state})`
-    : `var(--ds-component-button-${variant}-color-background-${state})`;
+  // Outline keeps its enabled (white) background when disabled — only border and
+  // content drop to their disabled tokens. Mirrors Button.css, not just the raw token name.
+  const bgState = variant === 'outline' && state === 'disabled' ? 'enabled' : state;
+  const bgVar = `var(--ds-component-button-${variant}-color-background-${bgState})`;
   const contentVar = `var(--ds-component-button-${variant}-color-content-${state})`;
   const borderVar = variant === 'outline'
     ? `var(--ds-component-button-${variant}-color-border-${state})`
@@ -117,7 +118,10 @@ export const Button: StoryObj = {
           {states.map(state => (
             <div key={state}>
               {(['background', 'content', ...(variant === 'outline' ? ['border'] : [])] as string[]).map(role => {
-                const cssVar = `--ds-component-button-${variant}-color-${role}-${state}`;
+                // Outline's disabled background resolves through the enabled token, not
+                // a dedicated disabled one — mirrors Button.css and Button.mdx.
+                const tokenState = variant === 'outline' && role === 'background' && state === 'disabled' ? 'enabled' : state;
+                const cssVar = `--ds-component-button-${variant}-color-${role}-${tokenState}`;
                 return <TokenRow key={role} name={`${state} · ${role}`} cssVar={cssVar} />;
               })}
             </div>

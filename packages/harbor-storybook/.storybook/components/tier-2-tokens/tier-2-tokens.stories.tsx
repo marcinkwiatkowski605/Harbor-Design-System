@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+// Requires `npm run build:tokens` to have run first — this file is gitignored build output.
 import tokensJson from '../../../../harbor-tokens/light/build/json/tokens.json';
 
 const meta: Meta = {

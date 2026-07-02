@@ -51,12 +51,99 @@ function findMdx(dir) {
   return out;
 }
 
+/** Extract the text of every <Button>…</Button> in a JSX fragment, in order. */
+function extractButtonLabels(jsx) {
+  const labels = [];
+  const re = /<Button[^>]*>([^<]*)<\/Button>/g;
+  let m;
+  while ((m = re.exec(jsx))) labels.push(m[1].trim());
+  return labels;
+}
+
+/**
+ * Render a buffered `<DoDontPair doNode={...} dontNode={...} />` block as one
+ * readable line instead of raw JSX. Assumes doNode is written before dontNode
+ * (true for every current usage) and that both props contain only <Button> JSX.
+ */
+function renderDoDontBlock(block) {
+  const splitAt = block.indexOf('dontNode=');
+  const doPart = splitAt === -1 ? block : block.slice(0, splitAt);
+  const dontPart = splitAt === -1 ? '' : block.slice(splitAt);
+  const doLabels = extractButtonLabels(doPart);
+  const dontLabels = extractButtonLabels(dontPart);
+  if (!doLabels.length && !dontLabels.length) {
+    return "> _Do/Don't comparison — see this example in Storybook._";
+  }
+  return `**Do:** ${doLabels.join(', ')} — **Don't:** ${dontLabels.join(', ')}`;
+}
+
 /** Strip MDX-only syntax, leaving portable Markdown. */
 function mdxToMarkdown(mdx) {
   const lines = mdx.split('\n');
   const kept = [];
+  let inFence = false; // ```-delimited code blocks — never touch their content
+  let skippingComponentDef = false; // `export const X = (...) => ( ... );` — implementation, not content
+  let skippingStyle = false; // <style>...</style> — implementation, not content
+  let insideFullWidthDiv = false; // layout-only <div className="full-width-table"> wrapper
+  let doDontBuffer = null; // lines of an in-progress <DoDontPair ... /> block
+
   for (const line of lines) {
     const t = line.trim();
+
+    if (/^```/.test(t)) {
+      inFence = !inFence;
+      kept.push(line);
+      continue;
+    }
+    if (inFence) {
+      kept.push(line);
+      continue;
+    }
+
+    if (!skippingComponentDef && /^export const \w+ = /.test(t)) {
+      skippingComponentDef = true;
+      continue;
+    }
+    if (skippingComponentDef) {
+      if (t === ');') skippingComponentDef = false;
+      continue;
+    }
+
+    if (!skippingStyle && /<style>/.test(t)) {
+      skippingStyle = !/<\/style>/.test(t); // handle single-line <style>...</style>
+      continue;
+    }
+    if (skippingStyle) {
+      if (/<\/style>/.test(t)) skippingStyle = false;
+      continue;
+    }
+
+    if (doDontBuffer === null && /^<DoDontPair\b/.test(t)) {
+      doDontBuffer = [line];
+      if (/\/>\s*$/.test(t)) {
+        kept.push(renderDoDontBlock(doDontBuffer.join('\n')));
+        doDontBuffer = null;
+      }
+      continue;
+    }
+    if (doDontBuffer !== null) {
+      doDontBuffer.push(line);
+      if (/\/>\s*$/.test(t)) {
+        kept.push(renderDoDontBlock(doDontBuffer.join('\n')));
+        doDontBuffer = null;
+      }
+      continue;
+    }
+
+    if (!insideFullWidthDiv && /^<div className="full-width-table">$/.test(t)) {
+      insideFullWidthDiv = true;
+      continue;
+    }
+    if (insideFullWidthDiv && t === '</div>') {
+      insideFullWidthDiv = false;
+      continue;
+    }
+
     if (/^import\s.+from\s.+;?$/.test(t)) continue; // import statements
     if (/^<Meta\b/.test(t)) continue; // <Meta of={...} />
     if (/^<Controls\s*\/?>$/.test(t)) continue; // props rendered by the API table below

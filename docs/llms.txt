@@ -12,3 +12,4 @@
 ## Components
 
 - [Button](./components/button.md): Buttons let people take an action, confirm a choice, or move forward in a flow.
+- [Design Tokens](./components/designtokens.md): Harbor's values — colors, spacing, type, radii, shadows — live as design tokens, not

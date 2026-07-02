@@ -124,18 +124,31 @@ but is intentionally not used here.
 
 **Typography** — semantic tier `label/lg`.
 
-| Font      | Weight    | Size | Line height | Letter spacing |
-|-----------|-----------|------|-------------|----------------|
-| Helvetica | Bold (700) | 16px | 24px        | 0              |
+| Property       | Value      | Token |
+|----------------|------------|-------|
+| Font family    | Helvetica  | `--ds-semantic-typography-label-lg-font-family` |
+| Font weight    | Bold (700) | `--ds-semantic-typography-label-lg-font-weight` |
+| Font size      | 16px       | `--ds-semantic-typography-label-lg-font-size` |
+| Line height    | 24px       | `--ds-semantic-typography-label-lg-line-height` |
+| Letter spacing | 0          | `--ds-semantic-typography-label-lg-letter-spacing` |
 
 ## Usage guidelines
 
-- Choose type by hierarchy, not by which one looks better in the moment.
-- Outline needs a visible border in every state, including Disabled — don't let it disappear
-  just because the background is white.
-- Keep labels short and verb-led ("Save changes," not "Changes will be saved").
+Choose type by hierarchy, not by which one looks better in the moment. One Primary
+button per view — pair it with Outline or Secondary for the rest, not a second Primary.
 
-## Examples
+**Do:** Save, Cancel — **Don't:** Save, Cancel
+
+Keep labels short and verb-led — a busy reader should know what happens before they
+finish reading the label.
+
+**Do:** Save changes — **Don't:** Changes will be saved
+
+Outline needs a visible border in every state, including Disabled — don't let it
+disappear just because the background is already white. (Harbor's Outline always renders
+a border by default; this matters if you're overriding its styles.)
+
+### Code example
 
 ```tsx
 // Primary action
@@ -152,6 +165,7 @@ but is intentionally not used here.
 ## Component API
 
 ```tsx
+import { Button } from './components/Button';
 ```
 
 | Prop       | Type                                        | Default     | Description |
@@ -164,39 +178,165 @@ but is intentionally not used here.
 
 ## Accessibility
 
-- The focus ring is mandatory and shared across types — restyle it, don't suppress it.
-- Disabled buttons stay in the layout so people know the action exists, just not right now.
-- Loading is announced to assistive tech: the component sets `aria-busy="true"`, not only a
-  visual change.
+Button renders a native `<button>` element, so it gets the browser's built-in `button`
+role and keyboard behavior — no custom ARIA role is needed.
 
-## Tokens used
+**Keyboard**
 
-Every value resolves to a design token built from the Figma `Button` component set — no
-hardcoded colors or sizes.
+| Key | Action |
+|-----|--------|
+| Tab | Moves focus to the button. Skips it if `disabled`. |
+| Shift+Tab | Moves focus away from the button. |
+| Enter / Space | Activates a focused button. |
 
-**Color — component tier**
+`disabled` uses the native attribute, so the button drops out of the tab order entirely.
+Disabled buttons stay in the layout so people know the action exists, just not right now.
 
-- `--ds-component-button-primary-color-background-{enabled, hover, pressed, disabled, loading}`
-- `--ds-component-button-primary-color-content-{enabled, hover, pressed, disabled, loading}`
-- `--ds-component-button-secondary-color-background-{enabled, hover, pressed, disabled, loading}`
-- `--ds-component-button-secondary-color-content-{enabled, hover, pressed, disabled, loading}`
-- `--ds-component-button-outline-color-background-{enabled, hover, pressed, loading}` — focus and disabled resolve through `enabled`
-- `--ds-component-button-outline-color-content-{enabled, hover, pressed, disabled, loading}`
-- `--ds-component-button-outline-color-border-{enabled, hover, pressed, disabled, loading}`
+`loading` keeps the button in the tab order (it sets `aria-busy`, not `disabled`) and
+applies `pointer-events: none`, which blocks mouse activation. CSS `pointer-events: none`
+is not guaranteed to block keyboard activation in every browser, so a loading button may
+still respond to Enter or Space. If a double submission during loading would cause a
+problem, guard the `onClick` handler against `loading` as well.
 
-**Spacing & shape — component tier**
+**Screen readers**
 
-- `--ds-component-button-padding-horizontal` (24px)
-- `--ds-component-button-padding-vertical` (12px)
-- `--ds-component-button-border-radius` (8px)
-- `--ds-component-button-border-width` (1px)
+- The label read aloud comes from `children` — pass descriptive text, not an icon alone.
+- `loading` sets `aria-busy="true"`, so screen readers announce the button as busy, not
+  only a visual change.
+- `disabled` uses the native attribute, so screen readers announce the button as
+  unavailable.
 
-**Typography — semantic tier (`label/lg`)**
+**Color contrast**
 
-- `--ds-semantic-typography-label-lg-{font-family, font-size, line-height, letter-spacing, font-weight}` — Helvetica Bold, 16/24px
+Checked against WCAG 2.2: 4.5:1 for text, 3:1 for large text and non-text UI components
+(borders, focus indicators). Most label and border combinations pass. Three don't:
 
-**Focus — semantic tier**
+- Primary and Secondary Enabled labels (3.06:1, 3.11:1) fall short of the 4.5:1 text
+  threshold. Fixing this means darkening `background-enabled` for both variants — a
+  token/design change outside this doc.
+- The Outline border in Enabled and Hover states (1.99:1, 2.87:1) falls short of the 3:1
+  non-text threshold.
+- The shared focus ring (2.80:1 against a white page background) falls short of the 3:1
+  non-text threshold.
 
-- `--ds-semantic-focus-ring-{color, x, y, blur, spread}`
-- `--ds-semantic-focus-gap-{color, x, y, blur, spread}`
+For current, live ratios on any state, check the **Accessibility** panel in the
+**Default** story's Controls tab — it recomputes contrast from the actual rendered
+colors, so it can't go stale the way a hand-written table can.
+
+**Target size**
+
+WCAG 2.2 adds Target Size (Minimum) (2.5.8, AA): interactive targets need to be at least
+24×24 CSS pixels. Button's height is `padding-vertical` (12px) × 2 plus the `label/lg`
+line height (24px) — 48px — regardless of variant or label length, well above the
+minimum. Width only grows with the label, so it never drops below the horizontal padding
+(24px × 2) alone.
+
+**Focus indicator**
+
+The focus ring is mandatory and shared across all three types — restyle it, don't
+suppress it. WCAG 2.2 adds Focus Not Obscured (Minimum) (2.4.11, AA): don't let a sticky
+header, footer, or overlay cover a focused button's ring.
+
+---
+
+# Design Tokens
+
+Harbor's values — colors, spacing, type, radii, shadows — live as design tokens, not
+hardcoded numbers. Every token belongs to one of three tiers, and each tier has a fixed
+naming pattern. This page explains that pattern: what each tier is for and how its name
+is built, so a new token can be named consistently instead of invented per component.
+
+It does not list every token value — see **Tier 1: Primitive Tokens**, **Tier 2: Semantic
+Tokens**, and **Tier 3: Component Tokens** in this same folder for the full tables.
+
+## Why three tiers
+
+- **Tier 1 (primitive)** defines the raw values available to the system — a color ramp
+  step, a spacing number, a font size. No meaning attached yet.
+- **Tier 2 (semantic)** maps a Tier 1 value to a role — "the brand background color,"
+  independent of any single component.
+- **Tier 3 (component)** targets one component's specific need, and only exists when that
+  component's value genuinely diverges from its Tier 2 role.
+
+A token should default to Tier 2. Reach for Tier 3 only when a component can't reuse a
+semantic value as-is.
+
+## Naming pattern per tier
+
+| Tier | Pattern | Example |
+|------|---------|---------|
+| 1 | `--ds-primitive-{category}-{value}` | `--ds-primitive-color-brand-pale-plum-500` |
+| 2 | `--ds-semantic-{category}-{property}-{variant}-{state}` | `--ds-semantic-color-background-brand-default` |
+| 3 | `--ds-component-{component}-{componentVariant}-{property}-{state}` | `--ds-component-button-primary-color-background-enabled` |
+
+Every tier starts with the global prefix `--ds`, which exists to avoid collisions with
+variables from outside the token system. Segments that don't apply to a given token are
+skipped rather than left blank — a token with no variant, for example, goes straight from
+property to state.
+
+### Tier 1: Primitive
+
+Categories currently built in Harbor: `color`, `typography`, `spacing`, `border`,
+`shadow`. (The model also supports `animation`, `viewport`, and `z-index` categories —
+Harbor hasn't populated those yet.)
+
+A primitive name is just the category plus the value's position in its scale:
+`--ds-primitive-color-brand-pale-plum-500`. It carries no information about where the
+color is used — that's Tier 2's job.
+
+### Tier 2: Semantic
+
+Anatomy: `category` → `property` → `variant` → `state`.
+
+- **Category** — `color`, `typography`, `spacing`, `border`, `shadow`, or (in Harbor)
+  `focus`.
+- **Property** — the surface a color applies to: `background`, `content`, `border`,
+  `icon`.
+- **Variant** — the intention: `brand`, `accent`, `subtle`, or a support color
+  (`support-error`, `support-warning`, `support-success`, `support-info`, each with a
+  `-strong` or `-subtle` intensity).
+- **State** — `default`, `hover`, `pressed`. `disabled` is modeled as its own token
+  (`--ds-semantic-color-background-disabled`) shared across every variant, rather than
+  duplicated per variant — a disabled brand button and a disabled accent button read the
+  same gray, so one token covers both instead of multiplying variant × state
+  combinations.
+
+### Tier 3: Component
+
+Anatomy: `component` → `componentVariant` → `property` → `state`.
+
+- **Component** — the component name, dashed for multi-word (`text-input`).
+- **Component variant** — only the values that component's API actually exposes
+  (Button: `primary`, `secondary`, `outline`).
+- **Property** — `color-background`, `color-content`, `color-border`, or any other CSS
+  property the component needs to override (`padding-horizontal`, `border-radius`).
+- **State** — `hover`, `pressed`, `disabled`, plus whatever states the component needs
+  that don't exist at Tier 2 (Button adds `loading`). Only add a Tier 3 `disabled` value
+  when a component's disabled look genuinely differs from the shared Tier 2 disabled
+  token — most components should just reference the Tier 2 one.
+
+## One value, three tiers
+
+The same purple traces through all three tiers when a component uses it as-is:
+
+| Tier | Token | Value |
+|------|-------|-------|
+| 1 — Primitive | `--ds-primitive-color-brand-pale-plum-500` | `#9B7FFF` |
+| 2 — Semantic | `--ds-semantic-color-background-brand-default` | `#9B7FFF` |
+| 3 — Component | `--ds-component-button-primary-color-background-enabled` | `#9B7FFF` |
+
+Tier 3 only needed to exist here because Button's enabled state has its own token slot to
+fill — its value still traces back to the same Tier 2 role.
+
+## Choosing a tier for a new token
+
+1. Does this value need to exist independent of any UI role (a raw color, a spacing
+   number)? → Tier 1.
+2. Does it express a role or intention shared across components (a background color for
+   "brand," a state color for "error")? → Tier 2. Default here.
+3. Does a specific component need a value that genuinely diverges from its Tier 2 role? →
+   Tier 3, scoped to that component only.
+
+Skipping a check and going straight to Tier 3 is the most common way naming drifts —
+check Tier 2 first.
 

@@ -14,9 +14,11 @@ The project includes:
 ## Getting started
 
 ```bash
-npm install          # Install all workspace dependencies
-npm start            # Start Storybook at http://localhost:6006
-npm run build:tokens # Build design tokens (design_tokens.json → CSS / JSON / JS)
+npm install            # Install all workspace dependencies
+npm start              # Start Storybook at http://localhost:6006
+npm run build:tokens   # Build design tokens (design_tokens.json → CSS / JSON / JS)
+npm run build:storybook # Build the static Storybook site
+npm run build:llms     # Regenerate docs/ from the component/foundations MDX
 ```
 
 ## Monorepo layout (npm workspaces)
@@ -31,10 +33,15 @@ packages/
     .storybook/
       components/        # Token visualization stories (Foundations)
       preview.ts         # Imports the built token CSS
-    src/components/      # React components + MDX docs — currently Button
+    src/
+      components/        # React components + MDX docs — currently Button
+      foundations/        # Hand-written Storybook pages (e.g. Design Tokens architecture)
 scripts/
-  build-llms-docs.mjs    # Derives the LLM docs from the component MDX
-docs/                    # Generated LLM docs (llms.txt, llms-full.txt, components/*.md)
+  build-llms-docs.mjs    # Derives the LLM docs from the component/foundations MDX
+docs/
+  components/*.md         # Generated from every src/**/*.mdx (component AND src/foundations pages)
+  foundations/*.md        # Hand-authored Markdown (color, typography, dimensions, overview) — separate from the above
+  llms.txt, llms-full.txt # Generated index / single-file dump
 ```
 
 ## Design tokens
@@ -63,6 +70,12 @@ React components live in `packages/harbor-storybook/src/components/`. Each one i
 token-driven (no hardcoded colors or sizes), ships a single Controls-driven story, and an
 MDX docs page. Current: **Button**.
 
+Each component's MDX docs page includes an accessibility section covering keyboard
+behavior, screen reader announcements, and a WCAG 2.2 contrast/target-size audit against
+its actual rendered token values — not just a compliance claim. Storybook's
+`@storybook/addon-a11y` runs the same kind of check live, per control state, in every
+story's Accessibility panel.
+
 ## Documentation for LLMs
 
 Storybook renders its docs pages with JavaScript, so a language model or crawler that
@@ -76,7 +89,7 @@ The build produces three outputs in `docs/`:
 |---|---|
 | `llms.txt` | Index of components, following the [llmstxt.org](https://llmstxt.org) convention |
 | `llms-full.txt` | Every component doc concatenated into one file for single-shot context |
-| `components/<name>.md` | One Markdown file per component |
+| `components/<name>.md` | One Markdown file per MDX doc page (components and hand-written `src/foundations` pages alike) |
 
 The GitHub Pages workflow publishes these at the site root, so each file is reachable as
 raw text:
@@ -86,11 +99,18 @@ raw text:
 - `https://marcinkwiatkowski605.github.io/Harbor-Design-System/components/button.md`
 
 The MDX docs pages are the source of truth. `npm run build:llms` runs
-`scripts/build-llms-docs.mjs`, which strips MDX-only syntax (`import` statements, `<Meta>`,
-`<Controls>`, `<Primary>`) and writes the Markdown files plus `llms.txt` and `llms-full.txt`
-into `docs/`. The deploy workflow (`.github/workflows/deploy.yml`) runs the same command and
-copies the output into the published Storybook, so every push to `main` refreshes the files.
-Adding a new component's `.mdx` adds it to all three outputs automatically.
+`scripts/build-llms-docs.mjs`, which converts every `.mdx` under `src/` to plain Markdown:
+top-of-file `import`/`<Meta>`/`<Controls>` are dropped, `<Primary>` becomes a one-line
+note pointing at Storybook, and local JSX helpers (component definitions, `<style>`
+blocks, layout-only wrapper `<div>`s) are stripped as implementation detail rather than
+leaking into the output. A component that renders JSX for a live visual comparison
+(Button's Do/Don't examples) is converted to a plain `**Do:** ... — **Don't:** ...` line
+instead of raw markup. Code fences are left untouched, so an `import` line inside a code
+example survives even though a real MDX import statement above the fold does not.
+
+The deploy workflow (`.github/workflows/deploy.yml`) runs the same command and copies the
+output into the published Storybook, so every push to `main` refreshes the files. Adding a
+new component's or foundation page's `.mdx` adds it to all three outputs automatically.
 
 ```bash
 npm run build:llms   # Regenerate docs/ after editing any component .mdx

@@ -109,16 +109,23 @@ but is intentionally not used here.
 
 **Typography** — semantic tier `label/lg`.
 
-| Font      | Weight    | Size | Line height | Letter spacing |
-|-----------|-----------|------|-------------|----------------|
-| Helvetica | Bold (700) | 16px | 24px        | 0              |
+| Property       | Value      | Token |
+|----------------|------------|-------|
+| Font family    | Helvetica  | `--ds-semantic-typography-label-lg-font-family` |
+| Font weight    | Bold (700) | `--ds-semantic-typography-label-lg-font-weight` |
+| Font size      | 16px       | `--ds-semantic-typography-label-lg-font-size` |
+| Line height    | 24px       | `--ds-semantic-typography-label-lg-line-height` |
+| Letter spacing | 0          | `--ds-semantic-typography-label-lg-letter-spacing` |
 
 ## Usage guidelines
 
-- Choose type by hierarchy, not by which one looks better in the moment.
-- Outline needs a visible border in every state, including Disabled — don't let it disappear
-  just because the background is white.
-- Keep labels short and verb-led ("Save changes," not "Changes will be saved").
+Choose type by hierarchy, not by which one looks better in the moment.
+
+| Do | Don't |
+|----|-------|
+| Use one Primary button for the single most important action in a view. | Use two Primary buttons competing for attention in the same view. |
+| Write short, verb-led labels: `<Button>Save changes</Button>` | Write long, passive labels: `<Button>Changes will be saved</Button>` |
+| Keep Outline's border visible in every state, including Disabled. | Let Outline's border disappear because the background is already white. |
 
 ## Examples
 
@@ -155,16 +162,20 @@ role and keyboard behavior — no custom ARIA role is needed.
 
 **Keyboard**
 
-- Tab moves focus to the button; Shift+Tab moves focus away.
-- Enter and Space activate a focused button.
-- `disabled` uses the native attribute, so the button drops out of the tab order — Tab
-  skips it entirely. Disabled buttons stay in the layout so people know the action exists,
-  just not right now.
-- `loading` keeps the button in the tab order (it sets `aria-busy`, not `disabled`) and
-  applies `pointer-events: none`, which blocks mouse activation. CSS `pointer-events: none`
-  is not guaranteed to block keyboard activation in every browser, so a loading button may
-  still respond to Enter or Space. If a double submission during loading would cause a
-  problem, guard the `onClick` handler against `loading` as well.
+| Key | Action |
+|-----|--------|
+| Tab | Moves focus to the button. Skips it if `disabled`. |
+| Shift+Tab | Moves focus away from the button. |
+| Enter / Space | Activates a focused button. |
+
+`disabled` uses the native attribute, so the button drops out of the tab order entirely.
+Disabled buttons stay in the layout so people know the action exists, just not right now.
+
+`loading` keeps the button in the tab order (it sets `aria-busy`, not `disabled`) and
+applies `pointer-events: none`, which blocks mouse activation. CSS `pointer-events: none`
+is not guaranteed to block keyboard activation in every browser, so a loading button may
+still respond to Enter or Space. If a double submission during loading would cause a
+problem, guard the `onClick` handler against `loading` as well.
 
 **Screen readers**
 
@@ -176,31 +187,8 @@ role and keyboard behavior — no custom ARIA role is needed.
 
 **Color contrast**
 
-Ratios below come from the hex values in [Color reference](#color-reference), checked
-against WCAG 2.1: 4.5:1 for text, 3:1 for large text and non-text UI components (borders,
-focus indicators). The label is 16px Bold, below the WCAG "large text" threshold
-(18.66px+ Bold), so it needs 4.5:1, not 3:1.
-
-| Element                    | Colors                    | Ratio   | Threshold | Meets it? |
-|-----------------------------|---------------------------|---------|-----------|-----------|
-| Primary label, Enabled      | `#FFFFFF` on `#9B7FFF`   | 3.06:1  | 4.5:1     | No        |
-| Primary label, Hover        | `#FFFFFF` on `#834DFF`   | 4.70:1  | 4.5:1     | Yes       |
-| Primary label, Pressed      | `#FFFFFF` on `#6C31DB`   | 6.77:1  | 4.5:1     | Yes       |
-| Secondary label, Enabled    | `#FFFFFF` on `#F36700`   | 3.11:1  | 4.5:1     | No        |
-| Secondary label, Hover      | `#FFFFFF` on `#C75300`   | 4.50:1  | 4.5:1     | Yes       |
-| Secondary label, Pressed    | `#FFFFFF` on `#A14200`   | 6.37:1  | 4.5:1     | Yes       |
-| Outline label, Enabled      | `#484E53` on `#FFFFFF`   | 8.43:1  | 4.5:1     | Yes       |
-| Outline label, Hover        | `#1B1D1F` on `#F2F4F5`   | 15.32:1 | 4.5:1     | Yes       |
-| Outline label, Pressed      | `#1B1D1F` on `#E3E7E9`   | 13.58:1 | 4.5:1     | Yes       |
-| Outline border, Enabled     | `#B0B9BF` on `#FFFFFF`   | 1.99:1  | 3:1       | No        |
-| Outline border, Hover       | `#909AA1` on `#FFFFFF`   | 2.87:1  | 3:1       | No        |
-| Outline border, Pressed     | `#747D84` on `#FFFFFF`   | 4.19:1  | 3:1       | Yes       |
-| Focus ring on white page bg | `#00A5E4` on `#FFFFFF`   | 2.80:1  | 3:1       | No        |
-
-Disabled states are excluded — WCAG's contrast requirement doesn't apply to disabled
-controls.
-
-**Known gaps**
+Checked against WCAG 2.1: 4.5:1 for text, 3:1 for large text and non-text UI components
+(borders, focus indicators). Most label and border combinations pass. Three don't:
 
 - Primary and Secondary Enabled labels (3.06:1, 3.11:1) fall short of the 4.5:1 text
   threshold. Fixing this means darkening `background-enabled` for both variants — a
@@ -210,38 +198,9 @@ controls.
 - The shared focus ring (2.80:1 against a white page background) falls short of the 3:1
   non-text threshold.
 
+Full ratio breakdown for every state and variant: [Color contrast](?path=/docs/components-button-color-contrast--docs).
+
 **Focus indicator**
 
 The focus ring is mandatory and shared across all three types — restyle it, don't
 suppress it.
-
-## Tokens used
-
-Every value resolves to a design token built from the Figma `Button` component set — no
-hardcoded colors or sizes.
-
-**Color — component tier**
-
-- `--ds-component-button-primary-color-background-{enabled, hover, pressed, disabled, loading}`
-- `--ds-component-button-primary-color-content-{enabled, hover, pressed, disabled, loading}`
-- `--ds-component-button-secondary-color-background-{enabled, hover, pressed, disabled, loading}`
-- `--ds-component-button-secondary-color-content-{enabled, hover, pressed, disabled, loading}`
-- `--ds-component-button-outline-color-background-{enabled, hover, pressed, loading}` — focus and disabled resolve through `enabled`
-- `--ds-component-button-outline-color-content-{enabled, hover, pressed, disabled, loading}`
-- `--ds-component-button-outline-color-border-{enabled, hover, pressed, disabled, loading}`
-
-**Spacing & shape — component tier**
-
-- `--ds-component-button-padding-horizontal` (24px)
-- `--ds-component-button-padding-vertical` (12px)
-- `--ds-component-button-border-radius` (8px)
-- `--ds-component-button-border-width` (1px)
-
-**Typography — semantic tier (`label/lg`)**
-
-- `--ds-semantic-typography-label-lg-{font-family, font-size, line-height, letter-spacing, font-weight}` — Helvetica Bold, 16/24px
-
-**Focus — semantic tier**
-
-- `--ds-semantic-focus-ring-{color, x, y, blur, spread}`
-- `--ds-semantic-focus-gap-{color, x, y, blur, spread}`

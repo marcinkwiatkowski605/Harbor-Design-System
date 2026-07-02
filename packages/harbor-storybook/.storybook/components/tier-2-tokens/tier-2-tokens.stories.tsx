@@ -129,17 +129,70 @@ const colorGroups: ColorGroup[] = [
   },
 ];
 
-const ColorSwatch = ({ cssVar, label }: { cssVar: string; label: string }) => (
-  <div style={{ minWidth: 80 }}>
-    <div style={{
-      height: 40,
-      background: `var(${cssVar})`,
-      borderRadius: 4,
-      border: '1px solid rgba(0,0,0,.07)',
-      boxShadow: 'inset 0 0 0 1px rgba(0,0,0,.04)',
-    }} />
-    <TokenLabel>{label}</TokenLabel>
-  </div>
+const ColorTableRow = ({ role, context }: { role: string; context: ColorContext }) => {
+  const cssVar = `--ds-semantic-color-${role}-${context.key}`;
+  const hex = hexFor(role, context.key);
+  return (
+    <tr>
+      <td style={{ padding: '8px 12px', verticalAlign: 'middle' }}>
+        <div style={{
+          width: 64,
+          height: 32,
+          borderRadius: 4,
+          background: `var(${cssVar})`,
+          border: '1px solid rgba(0,0,0,.07)',
+          boxShadow: 'inset 0 0 0 1px rgba(0,0,0,.04)',
+        }} />
+      </td>
+      <td style={{ padding: '8px 12px', verticalAlign: 'middle' }}>
+        <code style={{
+          fontFamily: 'monospace',
+          fontSize: 11,
+          color: '#1a56db',
+          background: '#eef4ff',
+          padding: '2px 6px',
+          borderRadius: 4,
+        }}>{cssVar}</code>
+      </td>
+      <td style={{ padding: '8px 12px', verticalAlign: 'middle', fontFamily: 'monospace', fontSize: 11, color: '#111' }}>
+        {hex}
+      </td>
+      <td style={{ padding: '8px 12px', verticalAlign: 'middle', fontSize: 12, color: '#333' }}>
+        {context.useCase}
+      </td>
+    </tr>
+  );
+};
+
+const ColorTable = ({ role, contexts }: { role: string; contexts: ColorContext[] }) => (
+  <table style={{ width: '100%', borderCollapse: 'collapse' as const, ...baseStyle }}>
+    <thead>
+      <tr>
+        {['Swatch', 'CSS Variable', 'Value', 'Use Case'].map(heading => (
+          <th
+            key={heading}
+            style={{
+              textAlign: 'left',
+              padding: '8px 12px',
+              fontSize: 11,
+              fontWeight: 600,
+              textTransform: 'uppercase' as const,
+              letterSpacing: '0.04em',
+              color: '#888',
+              borderBottom: '1px solid #eee',
+            }}
+          >
+            {heading}
+          </th>
+        ))}
+      </tr>
+    </thead>
+    <tbody>
+      {contexts.map(context => (
+        <ColorTableRow key={context.key} role={role} context={context} />
+      ))}
+    </tbody>
+  </table>
 );
 
 export const Color: StoryObj = {
@@ -147,15 +200,7 @@ export const Color: StoryObj = {
     <div style={{ padding: 24, ...baseStyle }}>
       {colorGroups.map(({ role, contexts }) => (
         <Section key={role} title={`Color · ${role}`}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 8 }}>
-            {contexts.map(ctx => {
-              const cssVar = `--ds-semantic-color-${role}-${ctx.key}`;
-              return (
-                <ColorSwatch key={ctx.key} cssVar={cssVar} label={ctx.key} />
-              );
-            })}
-          </div>
-          <TokenLabel>--ds-semantic-color-{role}-*</TokenLabel>
+          <ColorTable role={role} contexts={contexts} />
         </Section>
       ))}
     </div>

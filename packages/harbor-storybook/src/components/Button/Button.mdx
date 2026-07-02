@@ -1,7 +1,25 @@
 import { Meta, Primary, Controls } from '@storybook/blocks';
 import * as ButtonStories from './Button.stories';
+import { Button } from './Button';
 
 <Meta of={ButtonStories} />
+
+export const DoDontPair = ({ doNode, dontNode }) => (
+  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, margin: '16px 0' }}>
+    <div style={{ border: '1px solid #B7EFC5', borderRadius: 8, padding: 16, background: '#F3FBF5' }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: '#1E7B34', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 12 }}>
+        Do
+      </div>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>{doNode}</div>
+    </div>
+    <div style={{ border: '1px solid #F5B7B1', borderRadius: 8, padding: 16, background: '#FDF4F3' }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: '#B3261E', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 12 }}>
+        Don't
+      </div>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>{dontNode}</div>
+    </div>
+  </div>
+);
 
 # Button
 
@@ -119,13 +137,25 @@ but is intentionally not used here.
 
 ## Usage guidelines
 
-Choose type by hierarchy, not by which one looks better in the moment.
+Choose type by hierarchy, not by which one looks better in the moment. One Primary
+button per view — pair it with Outline or Secondary for the rest, not a second Primary.
 
-| Do | Don't |
-|----|-------|
-| Use one Primary button for the single most important action in a view. | Use two Primary buttons competing for attention in the same view. |
-| Write short, verb-led labels: `<Button>Save changes</Button>` | Write long, passive labels: `<Button>Changes will be saved</Button>` |
-| Keep Outline's border visible in every state, including Disabled. | Let Outline's border disappear because the background is already white. |
+<DoDontPair
+  doNode={<><Button variant="primary">Save</Button><Button variant="outline">Cancel</Button></>}
+  dontNode={<><Button variant="primary">Save</Button><Button variant="primary">Cancel</Button></>}
+/>
+
+Keep labels short and verb-led — a busy reader should know what happens before they
+finish reading the label.
+
+<DoDontPair
+  doNode={<Button variant="primary">Save changes</Button>}
+  dontNode={<Button variant="primary">Changes will be saved</Button>}
+/>
+
+Outline needs a visible border in every state, including Disabled — don't let it
+disappear just because the background is already white. (Harbor's Outline always renders
+a border by default; this matters if you're overriding its styles.)
 
 ## Examples
 

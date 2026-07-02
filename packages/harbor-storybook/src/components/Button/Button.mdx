@@ -150,10 +150,70 @@ import { Button } from './components/Button';
 
 ## Accessibility
 
-- The focus ring is mandatory and shared across types — restyle it, don't suppress it.
-- Disabled buttons stay in the layout so people know the action exists, just not right now.
-- Loading is announced to assistive tech: the component sets `aria-busy="true"`, not only a
-  visual change.
+Button renders a native `<button>` element, so it gets the browser's built-in `button`
+role and keyboard behavior — no custom ARIA role is needed.
+
+**Keyboard**
+
+- Tab moves focus to the button; Shift+Tab moves focus away.
+- Enter and Space activate a focused button.
+- `disabled` uses the native attribute, so the button drops out of the tab order — Tab
+  skips it entirely. Disabled buttons stay in the layout so people know the action exists,
+  just not right now.
+- `loading` keeps the button in the tab order (it sets `aria-busy`, not `disabled`) and
+  applies `pointer-events: none`, which blocks mouse activation. CSS `pointer-events: none`
+  is not guaranteed to block keyboard activation in every browser, so a loading button may
+  still respond to Enter or Space. If a double submission during loading would cause a
+  problem, guard the `onClick` handler against `loading` as well.
+
+**Screen readers**
+
+- The label read aloud comes from `children` — pass descriptive text, not an icon alone.
+- `loading` sets `aria-busy="true"`, so screen readers announce the button as busy, not
+  only a visual change.
+- `disabled` uses the native attribute, so screen readers announce the button as
+  unavailable.
+
+**Color contrast**
+
+Ratios below come from the hex values in [Color reference](#color-reference), checked
+against WCAG 2.1: 4.5:1 for text, 3:1 for large text and non-text UI components (borders,
+focus indicators). The label is 16px Bold, below the WCAG "large text" threshold
+(18.66px+ Bold), so it needs 4.5:1, not 3:1.
+
+| Element                    | Colors                    | Ratio   | Threshold | Meets it? |
+|-----------------------------|---------------------------|---------|-----------|-----------|
+| Primary label, Enabled      | `#FFFFFF` on `#9B7FFF`   | 3.06:1  | 4.5:1     | No        |
+| Primary label, Hover        | `#FFFFFF` on `#834DFF`   | 4.70:1  | 4.5:1     | Yes       |
+| Primary label, Pressed      | `#FFFFFF` on `#6C31DB`   | 6.77:1  | 4.5:1     | Yes       |
+| Secondary label, Enabled    | `#FFFFFF` on `#F36700`   | 3.11:1  | 4.5:1     | No        |
+| Secondary label, Hover      | `#FFFFFF` on `#C75300`   | 4.50:1  | 4.5:1     | Yes       |
+| Secondary label, Pressed    | `#FFFFFF` on `#A14200`   | 6.37:1  | 4.5:1     | Yes       |
+| Outline label, Enabled      | `#484E53` on `#FFFFFF`   | 8.43:1  | 4.5:1     | Yes       |
+| Outline label, Hover        | `#1B1D1F` on `#F2F4F5`   | 15.32:1 | 4.5:1     | Yes       |
+| Outline label, Pressed      | `#1B1D1F` on `#E3E7E9`   | 13.58:1 | 4.5:1     | Yes       |
+| Outline border, Enabled     | `#B0B9BF` on `#FFFFFF`   | 1.99:1  | 3:1       | No        |
+| Outline border, Hover       | `#909AA1` on `#FFFFFF`   | 2.87:1  | 3:1       | No        |
+| Outline border, Pressed     | `#747D84` on `#FFFFFF`   | 4.19:1  | 3:1       | Yes       |
+| Focus ring on white page bg | `#00A5E4` on `#FFFFFF`   | 2.80:1  | 3:1       | No        |
+
+Disabled states are excluded — WCAG's contrast requirement doesn't apply to disabled
+controls.
+
+**Known gaps**
+
+- Primary and Secondary Enabled labels (3.06:1, 3.11:1) fall short of the 4.5:1 text
+  threshold. Fixing this means darkening `background-enabled` for both variants — a
+  token/design change outside this doc.
+- The Outline border in Enabled and Hover states (1.99:1, 2.87:1) falls short of the 3:1
+  non-text threshold.
+- The shared focus ring (2.80:1 against a white page background) falls short of the 3:1
+  non-text threshold.
+
+**Focus indicator**
+
+The focus ring is mandatory and shared across all three types — restyle it, don't
+suppress it.
 
 ## Tokens used
 

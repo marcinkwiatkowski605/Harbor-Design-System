@@ -153,6 +153,7 @@ const ColorTableRow = ({ role, context }: { role: string; context: ColorContext 
           background: '#eef4ff',
           padding: '2px 6px',
           borderRadius: 4,
+          wordBreak: 'break-all' as const,
         }}>{cssVar}</code>
       </td>
       <td style={{ padding: '8px 12px', verticalAlign: 'middle', fontFamily: 'monospace', fontSize: 11, color: '#111' }}>
@@ -165,8 +166,17 @@ const ColorTableRow = ({ role, context }: { role: string; context: ColorContext 
   );
 };
 
+// Fixed per-column widths so every role's table (background/border/content/icon) lines
+// up identically, regardless of how long that table's own content happens to be.
+const COLOR_TABLE_COLUMN_WIDTHS = ['96px', '420px', '90px', 'auto'];
+
 const ColorTable = ({ role, contexts }: { role: string; contexts: ColorContext[] }) => (
-  <table style={{ width: '100%', borderCollapse: 'collapse' as const, ...baseStyle }}>
+  <table style={{ width: '100%', tableLayout: 'fixed' as const, borderCollapse: 'collapse' as const, ...baseStyle }}>
+    <colgroup>
+      {COLOR_TABLE_COLUMN_WIDTHS.map((width, i) => (
+        <col key={i} style={{ width }} />
+      ))}
+    </colgroup>
     <thead>
       <tr>
         {['Swatch', 'CSS Variable', 'Value', 'Use Case'].map(heading => (

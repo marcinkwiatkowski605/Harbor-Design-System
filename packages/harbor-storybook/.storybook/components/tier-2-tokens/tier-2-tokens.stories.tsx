@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import tokensJson from '../../../../harbor-tokens/light/build/json/tokens.json';
 
 const meta: Meta = {
   title: 'Foundations/Design Tokens/Tier 2: Semantic Tokens',
@@ -27,32 +28,104 @@ const TokenLabel = ({ children }: { children: React.ReactNode }) => (
 
 // ─── Color ───────────────────────────────────────────────────────────────────
 
-type ColorGroup = { role: string; contexts: string[] };
+type ColorContext = { key: string; useCase: string };
+type ColorGroup = { role: string; contexts: ColorContext[] };
+
+// tokens.json also contains non-color tokens with numeric values (e.g. font weights),
+// so it can't be cast directly to Record<string, string> — bridge through `unknown`.
+const semanticColorTokens = tokensJson as unknown as Record<string, string>;
+
+const hexFor = (role: string, key: string): string => {
+  const cssVarName = `ds-semantic-color-${role}-${key}`;
+  const hex = semanticColorTokens[cssVarName];
+  if (!hex) {
+    throw new Error(`Missing token value for --${cssVarName} in tokens.json`);
+  }
+  return hex;
+};
 
 const colorGroups: ColorGroup[] = [
   {
     role: 'background',
     contexts: [
-      'default','hover','pressed','disabled','subtle',
-      'accent-default','accent-hover','accent-pressed','accent-subtle',
-      'brand-default','brand-hover','brand-pressed','brand-subtle',
-      'support-error-strong','support-error-subtle',
-      'support-info-strong','support-info-subtle',
-      'support-success-strong','support-success-subtle',
-      'support-warning-strong','support-warning-subtle',
+      { key: 'default', useCase: 'Default background for pages, cards, and containers' },
+      { key: 'hover', useCase: 'Hover color for `background-default`' },
+      { key: 'pressed', useCase: 'Pressed color for `background-default`' },
+      { key: 'disabled', useCase: 'Background for disabled controls and containers' },
+      { key: 'subtle', useCase: 'Recessed, low-emphasis background' },
+      { key: 'accent-default', useCase: 'Background for accent-emphasis elements' },
+      { key: 'accent-hover', useCase: 'Hover color for `background-accent-default`' },
+      { key: 'accent-pressed', useCase: 'Pressed color for `background-accent-default`' },
+      { key: 'accent-subtle', useCase: 'Low-emphasis background for accent elements' },
+      { key: 'brand-default', useCase: 'Background for primary, brand-emphasis controls' },
+      { key: 'brand-hover', useCase: 'Hover color for `background-brand-default`' },
+      { key: 'brand-pressed', useCase: 'Pressed color for `background-brand-default`' },
+      { key: 'brand-subtle', useCase: 'Low-emphasis background for brand elements' },
+      { key: 'support-error-strong', useCase: 'High-emphasis background for error or destructive states' },
+      { key: 'support-error-subtle', useCase: 'Low-emphasis background for error or destructive states' },
+      { key: 'support-info-strong', useCase: 'High-emphasis background for informational content' },
+      { key: 'support-info-subtle', useCase: 'Low-emphasis background for informational content' },
+      { key: 'support-success-strong', useCase: 'High-emphasis background for success states' },
+      { key: 'support-success-subtle', useCase: 'Low-emphasis background for success states' },
+      { key: 'support-warning-strong', useCase: 'High-emphasis background for warnings' },
+      { key: 'support-warning-subtle', useCase: 'Low-emphasis background for warnings' },
     ],
   },
   {
     role: 'border',
-    contexts: ['default','hover','pressed','disabled','accent','brand','error','info','success','warning','focus'],
+    contexts: [
+      { key: 'default', useCase: 'Default border for containers and controls' },
+      { key: 'hover', useCase: 'Hover color for `border-default`' },
+      { key: 'pressed', useCase: 'Pressed color for `border-default`' },
+      { key: 'disabled', useCase: 'Border for disabled controls' },
+      { key: 'accent', useCase: 'Border for accent-emphasis elements' },
+      { key: 'brand', useCase: 'Border for brand-emphasis or selected controls' },
+      { key: 'error', useCase: 'Border communicating an error or destructive state' },
+      { key: 'info', useCase: 'Border communicating informational content' },
+      { key: 'success', useCase: 'Border communicating a success state' },
+      { key: 'warning', useCase: 'Border communicating a warning' },
+      { key: 'focus', useCase: 'Visible focus indicator' },
+    ],
   },
   {
     role: 'content',
-    contexts: ['default','hover','disabled','subtle','inverse','accent','brand','error','info','success','warning','on-error-subtle','on-info-subtle','on-success-subtle','on-warning-subtle'],
+    contexts: [
+      { key: 'default', useCase: 'Default text color for body copy and labels' },
+      { key: 'hover', useCase: 'Hover color for `content-default`' },
+      { key: 'disabled', useCase: 'Text color for disabled controls and copy' },
+      { key: 'subtle', useCase: 'Secondary, low-emphasis text' },
+      { key: 'inverse', useCase: 'Text on inverse (dark) backgrounds' },
+      { key: 'accent', useCase: 'Text for accent-emphasis content' },
+      { key: 'brand', useCase: 'Text for brand-emphasis or primary interactive content' },
+      { key: 'error', useCase: 'Text communicating an error or destructive state' },
+      { key: 'info', useCase: 'Text communicating informational content' },
+      { key: 'success', useCase: 'Text communicating a success state' },
+      { key: 'warning', useCase: 'Text communicating a warning' },
+      { key: 'on-error-subtle', useCase: 'Text on `background-support-error-subtle` surfaces' },
+      { key: 'on-info-subtle', useCase: 'Text on `background-support-info-subtle` surfaces' },
+      { key: 'on-success-subtle', useCase: 'Text on `background-support-success-subtle` surfaces' },
+      { key: 'on-warning-subtle', useCase: 'Text on `background-support-warning-subtle` surfaces' },
+    ],
   },
   {
     role: 'icon',
-    contexts: ['default','hover','disabled','subtle','inverse','accent','brand','error','info','success','warning','on-error','on-info','on-success','on-warning'],
+    contexts: [
+      { key: 'default', useCase: 'Default icon color' },
+      { key: 'hover', useCase: 'Hover color for `icon-default`' },
+      { key: 'disabled', useCase: 'Icon color for disabled controls' },
+      { key: 'subtle', useCase: 'Secondary, low-emphasis icon color' },
+      { key: 'inverse', useCase: 'Icons on inverse (dark) backgrounds' },
+      { key: 'accent', useCase: 'Icons for accent-emphasis elements' },
+      { key: 'brand', useCase: 'Icons for brand-emphasis or primary interactive elements' },
+      { key: 'error', useCase: 'Icon communicating an error or destructive state' },
+      { key: 'info', useCase: 'Icon communicating informational content' },
+      { key: 'success', useCase: 'Icon communicating a success state' },
+      { key: 'warning', useCase: 'Icon communicating a warning' },
+      { key: 'on-error', useCase: 'Icons on `background-support-error-subtle` surfaces' },
+      { key: 'on-info', useCase: 'Icons on `background-support-info-subtle` surfaces' },
+      { key: 'on-success', useCase: 'Icons on `background-support-success-subtle` surfaces' },
+      { key: 'on-warning', useCase: 'Icons on `background-support-warning-subtle` surfaces' },
+    ],
   },
 ];
 
@@ -76,9 +149,9 @@ export const Color: StoryObj = {
         <Section key={role} title={`Color · ${role}`}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 8 }}>
             {contexts.map(ctx => {
-              const cssVar = `--ds-semantic-color-${role}-${ctx}`;
+              const cssVar = `--ds-semantic-color-${role}-${ctx.key}`;
               return (
-                <ColorSwatch key={ctx} cssVar={cssVar} label={ctx} />
+                <ColorSwatch key={ctx.key} cssVar={cssVar} label={ctx.key} />
               );
             })}
           </div>

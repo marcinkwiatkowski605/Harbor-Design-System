@@ -21,6 +21,11 @@ export const DoDontPair = ({ doNode, dontNode }) => (
   </div>
 );
 
+<style>{`
+  .full-width-table table { width: 100%; }
+  .full-width-table th, .full-width-table td { text-align: center; }
+`}</style>
+
 # Button
 
 Buttons let people take an action, confirm a choice, or move forward in a flow.
@@ -81,6 +86,8 @@ adds the shared ring (`--ds-semantic-focus-ring-*` / `--ds-semantic-focus-gap-*`
 
 **Primary** — prefix `--ds-component-button-primary-color-`. Content is `#FFFFFF` in every state.
 
+<div className="full-width-table">
+
 | State    | Background                       | Content                       |
 |----------|----------------------------------|-------------------------------|
 | Enabled  | `#9B7FFF` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
@@ -90,7 +97,11 @@ adds the shared ring (`--ds-semantic-focus-ring-*` / `--ds-semantic-focus-gap-*`
 | Disabled | `#CFD5DA` · `background-disabled` | `#FFFFFF` · `content-disabled` |
 | Loading  | `#9B7FFF` · `background-loading`  | `#FFFFFF` · `content-loading`  |
 
+</div>
+
 **Secondary** — prefix `--ds-component-button-secondary-color-`. Content is `#FFFFFF` in every state.
+
+<div className="full-width-table">
 
 | State    | Background                       | Content                       |
 |----------|----------------------------------|-------------------------------|
@@ -101,7 +112,11 @@ adds the shared ring (`--ds-semantic-focus-ring-*` / `--ds-semantic-focus-gap-*`
 | Disabled | `#CFD5DA` · `background-disabled` | `#FFFFFF` · `content-disabled` |
 | Loading  | `#F36700` · `background-loading`  | `#FFFFFF` · `content-loading`  |
 
+</div>
+
 **Outline** — prefix `--ds-component-button-outline-color-`. White background, visible border in every state.
+
+<div className="full-width-table">
 
 | State    | Background                        | Content                       | Border                     |
 |----------|-----------------------------------|-------------------------------|----------------------------|
@@ -112,11 +127,15 @@ adds the shared ring (`--ds-semantic-focus-ring-*` / `--ds-semantic-focus-gap-*`
 | Disabled | `#FFFFFF` · `background-enabled` † | `#CFD5DA` · `content-disabled` | `#CFD5DA` · `border-disabled` |
 | Loading  | `#FFFFFF` · `background-loading`   | `#484E53` · `content-loading`  | `#B0B9BF` · `border-loading`  |
 
+</div>
+
 † Outline keeps its **enabled** (white) background when disabled — only content and
 border drop to their disabled tokens. The `…-background-disabled` token (`#CFD5DA`) exists
 but is intentionally not used here.
 
 ## Specs
+
+<div className="full-width-table">
 
 | Property        | Value | Token |
 |-----------------|-------|-------|
@@ -125,7 +144,11 @@ but is intentionally not used here.
 | Corner radius        | 8px  | `--ds-component-button-border-radius` |
 | Border width         | 1px  | `--ds-component-button-border-width` |
 
+</div>
+
 **Typography** — semantic tier `label/lg`.
+
+<div className="full-width-table">
 
 | Property       | Value      | Token |
 |----------------|------------|-------|
@@ -134,6 +157,8 @@ but is intentionally not used here.
 | Font size      | 16px       | `--ds-semantic-typography-label-lg-font-size` |
 | Line height    | 24px       | `--ds-semantic-typography-label-lg-line-height` |
 | Letter spacing | 0          | `--ds-semantic-typography-label-lg-letter-spacing` |
+
+</div>
 
 ## Usage guidelines
 

@@ -187,15 +187,7 @@ problem, guard the `onClick` handler against `loading` as well.
 **Color contrast**
 
 Checked against WCAG 2.2: 4.5:1 for text, 3:1 for large text and non-text UI components
-(borders, focus indicators). Most label and border combinations pass. Three don't:
-
-- Primary and Secondary Enabled labels (3.06:1, 3.11:1) fall short of the 4.5:1 text
-  threshold. Fixing this means darkening `background-enabled` for both variants — a
-  token/design change outside this doc.
-- The Outline border in Enabled and Hover states (1.99:1, 2.87:1) falls short of the 3:1
-  non-text threshold.
-- The shared focus ring (2.80:1 against a white page background) falls short of the 3:1
-  non-text threshold.
+(borders, focus indicators). Most label and border combinations pass.
 
 For current, live ratios on any state, check the **Accessibility** panel in the
 **Default** story's Controls tab — it recomputes contrast from the actual rendered

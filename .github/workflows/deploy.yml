@@ -37,6 +37,16 @@ jobs:
       - name: Build Storybook
         run: npm run build:storybook
 
+      # Smoke-tests every story (renders without crashing) via @storybook/test-runner.
+      # Non-blocking: a failure here surfaces in the run log but doesn't stop the
+      # Pages deploy — flip continue-on-error to false once this is trusted enough
+      # to gate the deploy.
+      - name: Test Storybook (smoke)
+        continue-on-error: true
+        run: |
+          npx playwright install --with-deps chromium
+          npm run test:storybook:ci
+
       # Generate LLM-readable Markdown docs and publish them at the site root so
       # crawlers/agents can read content the JS-rendered Storybook pages don't expose.
       - name: Build LLM docs

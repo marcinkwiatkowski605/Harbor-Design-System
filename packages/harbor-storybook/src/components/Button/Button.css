@@ -117,10 +117,14 @@
 
 /* ── Disabled / loading interaction ──────────────────────────────────────── */
 
-.harbor-button:disabled {
-  cursor: not-allowed;
-}
+/* [aria-busy='true'] is declared before :disabled so that, when a button is
+   both loading and disabled (e.g. a submit button during submission), :disabled
+   wins the cascade tie and the cursor reads "not-allowed" — matching the color
+   state above, which already resolves to disabled for the same combination. */
 .harbor-button[aria-busy='true'] {
   cursor: default;
   pointer-events: none;
+}
+.harbor-button:disabled {
+  cursor: not-allowed;
 }

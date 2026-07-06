@@ -25,7 +25,7 @@ semantic value as-is.
 | Tier | Pattern | Example |
 |------|---------|---------|
 | 1 | `--ds-primitive-{category}-{value}` | `--ds-primitive-color-brand-pale-plum-500` |
-| 2 | `--ds-semantic-{category}-{property}-{variant}-{state}` | `--ds-semantic-color-background-brand-default` |
+| 2 | `--ds-semantic-{category}-{property}-{variant}-{state}` | `--ds-semantic-color-background-brand` |
 | 3 | `--ds-component-{component}-{componentVariant}-{property}-{state}` | `--ds-component-button-primary-color-background-enabled` |
 
 Every tier starts with the global prefix `--ds`, which exists to avoid collisions with
@@ -49,8 +49,7 @@ Anatomy: `category` → `property` → `variant` → `state`.
 
 - **Category** — `color`, `typography`, `spacing`, `border`, `shadow`, or (in Harbor)
   `focus`.
-- **Property** — the surface a color applies to: `background`, `content`, `border`,
-  `icon`.
+- **Property** — the surface a color applies to: `background`, `content`, `border`.
 - **Variant** — the intention: `brand`, `accent`, `subtle`, or a support color
   (`support-error`, `support-warning`, `support-success`, `support-info`, each with a
   `-strong` or `-subtle` intensity).
@@ -81,7 +80,7 @@ The same purple traces through all three tiers when a component uses it as-is:
 | Tier | Token | Value |
 |------|-------|-------|
 | 1 — Primitive | `--ds-primitive-color-brand-pale-plum-500` | `#9B7FFF` |
-| 2 — Semantic | `--ds-semantic-color-background-brand-default` | `#9B7FFF` |
+| 2 — Semantic | `--ds-semantic-color-background-brand` | `#9B7FFF` |
 | 3 — Component | `--ds-component-button-primary-color-background-enabled` | `#9B7FFF` |
 
 Tier 3 only needed to exist here because Button's enabled state has its own token slot to

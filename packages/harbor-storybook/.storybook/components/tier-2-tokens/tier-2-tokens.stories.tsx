@@ -50,8 +50,8 @@ const colorGroups: ColorGroup[] = [
     role: 'background',
     contexts: [
       { key: 'default', useCase: 'Default background for pages, cards, and containers' },
-      { key: 'hover', useCase: 'Hover color for `background-default`' },
-      { key: 'pressed', useCase: 'Pressed color for `background-default`' },
+      { key: 'default-hover', useCase: 'Hover color for `background-default`' },
+      { key: 'default-pressed', useCase: 'Pressed color for `background-default`' },
       { key: 'disabled', useCase: 'Background for disabled controls and containers' },
       { key: 'subtle', useCase: 'Recessed, low-emphasis background' },
       { key: 'accent-default', useCase: 'Background for accent-emphasis elements' },
@@ -76,15 +76,15 @@ const colorGroups: ColorGroup[] = [
     role: 'border',
     contexts: [
       { key: 'default', useCase: 'Default border for containers and controls' },
-      { key: 'hover', useCase: 'Hover color for `border-default`' },
-      { key: 'pressed', useCase: 'Pressed color for `border-default`' },
+      { key: 'default-hover', useCase: 'Hover color for `border-default`' },
+      { key: 'default-pressed', useCase: 'Pressed color for `border-default`' },
       { key: 'disabled', useCase: 'Border for disabled controls' },
       { key: 'accent', useCase: 'Border for accent-emphasis elements' },
       { key: 'brand', useCase: 'Border for brand-emphasis or selected controls' },
-      { key: 'error', useCase: 'Border communicating an error or destructive state' },
-      { key: 'info', useCase: 'Border communicating informational content' },
-      { key: 'success', useCase: 'Border communicating a success state' },
-      { key: 'warning', useCase: 'Border communicating a warning' },
+      { key: 'support-error', useCase: 'Border communicating an error or destructive state' },
+      { key: 'support-info', useCase: 'Border communicating informational content' },
+      { key: 'support-success', useCase: 'Border communicating a success state' },
+      { key: 'support-warning', useCase: 'Border communicating a warning' },
       { key: 'focus', useCase: 'Visible focus indicator' },
     ],
   },
@@ -92,40 +92,20 @@ const colorGroups: ColorGroup[] = [
     role: 'content',
     contexts: [
       { key: 'default', useCase: 'Default text color for body copy and labels' },
-      { key: 'hover', useCase: 'Hover color for `content-default`' },
+      { key: 'default-hover', useCase: 'Hover color for `content-default`' },
       { key: 'disabled', useCase: 'Text color for disabled controls and copy' },
       { key: 'subtle', useCase: 'Secondary, low-emphasis text' },
       { key: 'inverse', useCase: 'Text on inverse (dark) backgrounds' },
       { key: 'accent', useCase: 'Text for accent-emphasis content' },
       { key: 'brand', useCase: 'Text for brand-emphasis or primary interactive content' },
-      { key: 'error', useCase: 'Text communicating an error or destructive state' },
-      { key: 'info', useCase: 'Text communicating informational content' },
-      { key: 'success', useCase: 'Text communicating a success state' },
-      { key: 'warning', useCase: 'Text communicating a warning' },
-      { key: 'on-error-subtle', useCase: 'Text on `background-support-error-subtle` surfaces' },
-      { key: 'on-info-subtle', useCase: 'Text on `background-support-info-subtle` surfaces' },
-      { key: 'on-success-subtle', useCase: 'Text on `background-support-success-subtle` surfaces' },
-      { key: 'on-warning-subtle', useCase: 'Text on `background-support-warning-subtle` surfaces' },
-    ],
-  },
-  {
-    role: 'icon',
-    contexts: [
-      { key: 'default', useCase: 'Default icon color' },
-      { key: 'hover', useCase: 'Hover color for `icon-default`' },
-      { key: 'disabled', useCase: 'Icon color for disabled controls' },
-      { key: 'subtle', useCase: 'Secondary, low-emphasis icon color' },
-      { key: 'inverse', useCase: 'Icons on inverse (dark) backgrounds' },
-      { key: 'accent', useCase: 'Icons for accent-emphasis elements' },
-      { key: 'brand', useCase: 'Icons for brand-emphasis or primary interactive elements' },
-      { key: 'error', useCase: 'Icon communicating an error or destructive state' },
-      { key: 'info', useCase: 'Icon communicating informational content' },
-      { key: 'success', useCase: 'Icon communicating a success state' },
-      { key: 'warning', useCase: 'Icon communicating a warning' },
-      { key: 'on-error-subtle', useCase: 'Icons on `background-support-error-subtle` surfaces' },
-      { key: 'on-info-subtle', useCase: 'Icons on `background-support-info-subtle` surfaces' },
-      { key: 'on-success-subtle', useCase: 'Icons on `background-support-success-subtle` surfaces' },
-      { key: 'on-warning-subtle', useCase: 'Icons on `background-support-warning-subtle` surfaces' },
+      { key: 'support-error', useCase: 'Text communicating an error or destructive state' },
+      { key: 'support-info', useCase: 'Text communicating informational content' },
+      { key: 'support-success', useCase: 'Text communicating a success state' },
+      { key: 'support-warning', useCase: 'Text communicating a warning' },
+      { key: 'support-on-error-subtle', useCase: 'Text on `background-support-error-subtle` surfaces' },
+      { key: 'support-on-info-subtle', useCase: 'Text on `background-support-info-subtle` surfaces' },
+      { key: 'support-on-success-subtle', useCase: 'Text on `background-support-success-subtle` surfaces' },
+      { key: 'support-on-warning-subtle', useCase: 'Text on `background-support-warning-subtle` surfaces' },
     ],
   },
 ];
@@ -166,7 +146,7 @@ const ColorTableRow = ({ role, context }: { role: string; context: ColorContext 
   );
 };
 
-// Fixed per-column widths so every role's table (background/border/content/icon) lines
+// Fixed per-column widths so every role's table (background/border/content) lines
 // up identically, regardless of how long that table's own content happens to be.
 const COLOR_TABLE_COLUMN_WIDTHS = ['96px', '420px', '90px', 'auto'];
 

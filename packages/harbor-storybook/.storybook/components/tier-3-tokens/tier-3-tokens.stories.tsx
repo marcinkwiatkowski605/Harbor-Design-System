@@ -145,7 +145,7 @@ export const TextInput: StoryObj = {
           style={{
             display: 'block',
             padding: 'var(--ds-component-text-input-padding-vertical, 0.75rem) var(--ds-component-text-input-padding-horizontal, 1rem)',
-            background: 'var(--ds-component-text-input-color-background-default)',
+            background: 'var(--ds-component-text-input-color-background-enabled)',
             border: `var(--ds-component-text-input-border-width, 1px) solid var(--ds-semantic-color-border-default)`,
             borderRadius: 'var(--ds-semantic-border-radius-sm)',
             fontFamily: 'system-ui, sans-serif',

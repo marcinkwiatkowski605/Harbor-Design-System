@@ -28,8 +28,8 @@ const Label = ({ children }: { children: React.ReactNode }) => (
 // ─── Colors ──────────────────────────────────────────────────────────────────
 
 const palettes = [
-  { name: 'Pale Plum', base: '--ds-primitive-color-brand-pale-plum', steps: ['50','100','200','300','400','500','600','700','800','900','950'] },
-  { name: 'Soft Orange', base: '--ds-primitive-color-brand-soft-orange', steps: ['50','100','200','300','400','500','600','700','800','900','950'] },
+  { name: 'Lavender', base: '--ds-primitive-color-brand-lavender', steps: ['50','100','200','300','400','500','600','700','800','900','950'] },
+  { name: 'Orange', base: '--ds-primitive-color-brand-orange', steps: ['50','100','200','300','400','500','600','700','800','900','950'] },
   { name: 'Neutral', base: '--ds-primitive-color-neutral', steps: ['50','100','200','300','400','500','600','700','800','900','950','black','white'] },
   { name: 'Utility Blue', base: '--ds-primitive-color-utility-blue', steps: ['50','100','200','300','400','500','600','700','800','900','950'] },
   { name: 'Utility Green', base: '--ds-primitive-color-utility-green', steps: ['50','100','200','300','400','500','600','700','800','900','950'] },
@@ -135,8 +135,8 @@ export const Typography: StoryObj = {
           <div key={step} style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginBottom: 8 }}>
             <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#bbb', width: 30, flexShrink: 0, paddingTop: 4 }}>{step}</span>
             <div style={{
-              background: 'var(--ds-primitive-color-brand-pale-plum-100)',
-              borderLeft: '2px solid var(--ds-primitive-color-brand-pale-plum-400)',
+              background: 'var(--ds-primitive-color-brand-lavender-100)',
+              borderLeft: '2px solid var(--ds-primitive-color-brand-lavender-400)',
               paddingLeft: 8,
             }}>
               <span style={{ fontSize: 16, lineHeight: `var(--ds-primitive-typography-line-height-${step})`, color: '#111', display: 'block' }}>
@@ -205,7 +205,7 @@ export const Spacing: StoryObj = {
             <div style={{
               height: 20,
               width: `var(--ds-primitive-spacing-${step})`,
-              background: 'var(--ds-primitive-color-brand-pale-plum-400)',
+              background: 'var(--ds-primitive-color-brand-lavender-400)',
               borderRadius: 2,
               minWidth: 2,
               flexShrink: 0,
@@ -234,8 +234,8 @@ export const Borders: StoryObj = {
             <div key={step} style={{ textAlign: 'center' as const }}>
               <div style={{
                 width: 64, height: 64,
-                background: 'var(--ds-primitive-color-brand-pale-plum-100)',
-                border: '1px solid var(--ds-primitive-color-brand-pale-plum-300)',
+                background: 'var(--ds-primitive-color-brand-lavender-100)',
+                border: '1px solid var(--ds-primitive-color-brand-lavender-300)',
                 borderRadius: `var(--ds-primitive-border-radius-${step})`,
               }} />
               <Label>{step}</Label>
@@ -244,8 +244,8 @@ export const Borders: StoryObj = {
           <div style={{ textAlign: 'center' as const }}>
             <div style={{
               width: 64, height: 64,
-              background: 'var(--ds-primitive-color-brand-pale-plum-100)',
-              border: '1px solid var(--ds-primitive-color-brand-pale-plum-300)',
+              background: 'var(--ds-primitive-color-brand-lavender-100)',
+              border: '1px solid var(--ds-primitive-color-brand-lavender-300)',
               borderRadius: 'var(--ds-primitive-border-radius-9999)',
             }} />
             <Label>full</Label>
@@ -260,7 +260,7 @@ export const Borders: StoryObj = {
               <div style={{
                 width: 64, height: 64,
                 background: 'var(--ds-primitive-color-neutral-50)',
-                border: `solid var(--ds-primitive-color-brand-pale-plum-500)`,
+                border: `solid var(--ds-primitive-color-brand-lavender-500)`,
                 borderWidth: `var(--ds-primitive-border-width-${step})`,
                 borderRadius: 4,
                 boxSizing: 'border-box' as const,

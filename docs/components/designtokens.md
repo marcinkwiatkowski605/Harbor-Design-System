@@ -24,8 +24,8 @@ semantic value as-is.
 
 | Tier | Pattern | Example |
 |------|---------|---------|
-| 1 | `--ds-primitive-{category}-{value}` | `--ds-primitive-color-brand-pale-plum-500` |
-| 2 | `--ds-semantic-{category}-{property}-{variant}-{state}` | `--ds-semantic-color-background-brand` |
+| 1 | `--ds-primitive-{category}-{value}` | `--ds-primitive-color-brand-lavender-500` |
+| 2 | `--ds-semantic-{category}-{property}-{variant}-{emphasis}-{state}` | `--ds-semantic-color-background-brand` |
 | 3 | `--ds-component-{component}-{componentVariant}-{property}-{state}` | `--ds-component-button-primary-color-background-enabled` |
 
 Every tier starts with the global prefix `--ds`, which exists to avoid collisions with
@@ -40,24 +40,39 @@ Categories currently built in Harbor: `color`, `typography`, `spacing`, `border`
 Harbor hasn't populated those yet.)
 
 A primitive name is just the category plus the value's position in its scale:
-`--ds-primitive-color-brand-pale-plum-500`. It carries no information about where the
+`--ds-primitive-color-brand-lavender-500`. It carries no information about where the
 color is used — that's Tier 2's job.
 
 ### Tier 2: Semantic
 
-Anatomy: `category` → `property` → `variant` → `state`.
+Anatomy: `category` → `property` → `variant` → `emphasis` → `state`.
 
 - **Category** — `color`, `typography`, `spacing`, `border`, `shadow`, or (in Harbor)
   `focus`.
 - **Property** — the surface a color applies to: `background`, `content`, `border`.
-- **Variant** — the intention: `brand`, `accent`, `subtle`, or a support color
-  (`support-error`, `support-warning`, `support-success`, `support-info`, each with a
-  `-strong` or `-subtle` intensity).
-- **State** — `default`, `hover`, `pressed`. `disabled` is modeled as its own token
-  (`--ds-semantic-color-background-disabled`) shared across every variant, rather than
-  duplicated per variant — a disabled brand button and a disabled accent button read the
-  same gray, so one token covers both instead of multiplying variant × state
-  combinations.
+- **Variant** — the role: `brand`, `accent`, `default`, `subtle` (its own muted default
+  surface — distinct from the `emphasis` value below, see note), or a support color
+  (`support-error`, `support-warning`, `support-success`, `support-info`).
+- **Emphasis** — the tonal weight of that role's color: `strong` or `subtle`. Omitted
+  means the role's own anchor tone — `--ds-semantic-color-background-brand` carries no
+  emphasis suffix because it *is* the base tone. Emphasis is a static property of the
+  swatch (which shade you picked), not an interaction, so it's a separate segment from
+  state rather than a value living inside either one. Note the word overlap: the
+  standalone `subtle` **variant** (a muted surface, its own role) and the `-subtle`
+  **emphasis** suffix on `brand-subtle` / `support-error-subtle` (a lighter tint of
+  another role) share a name but occupy different segments — don't conflate them.
+- **State** — `hover`, `pressed`, `focus` (interaction only, and only on variants that
+  are actually interactive); `default` state can be explicit or omitted. `disabled` is
+  modeled as its own token (`--ds-semantic-color-background-disabled`) shared across
+  every variant, rather than duplicated per variant — a disabled brand button and a
+  disabled accent button read the same gray, so one token covers both instead of
+  multiplying variant × state combinations.
+
+If emphasis and state ever apply to the same token, emphasis comes first —
+`{variant}-{emphasis}-{state}` — since it's the more static of the two choices. No
+token in Harbor combines them today (support colors carry emphasis but no state;
+brand/accent/default carry state but no emphasis), so this is a standing rule for
+future tokens, not a rename of anything that exists now.
 
 ### Tier 3: Component
 
@@ -68,10 +83,12 @@ Anatomy: `component` → `componentVariant` → `property` → `state`.
   (Button: `primary`, `secondary`, `outline`).
 - **Property** — `color-background`, `color-content`, `color-border`, or any other CSS
   property the component needs to override (`padding-horizontal`, `border-radius`).
-- **State** — `hover`, `pressed`, `disabled`, plus whatever states the component needs
-  that don't exist at Tier 2 (Button adds `loading`). Only add a Tier 3 `disabled` value
-  when a component's disabled look genuinely differs from the shared Tier 2 disabled
-  token — most components should just reference the Tier 2 one.
+- **State** — `hover`, `pressed`, `disabled`. Only add a state that doesn't exist at
+  Tier 2 when it needs its own color values — Button's `loading` prop, for example, has
+  no color token of its own because it renders identically to `enabled`; it's handled
+  entirely in CSS (`[aria-busy='true']`) without a dedicated token. Only add a Tier 3
+  `disabled` value when a component's disabled look genuinely differs from the shared
+  Tier 2 disabled token — most components should just reference the Tier 2 one.
 
 ## One value, three tiers
 
@@ -79,7 +96,7 @@ The same purple traces through all three tiers when a component uses it as-is:
 
 | Tier | Token | Value |
 |------|-------|-------|
-| 1 — Primitive | `--ds-primitive-color-brand-pale-plum-500` | `#9B7FFF` |
+| 1 — Primitive | `--ds-primitive-color-brand-lavender-500` | `#9B7FFF` |
 | 2 — Semantic | `--ds-semantic-color-background-brand` | `#9B7FFF` |
 | 3 — Component | `--ds-component-button-primary-color-background-enabled` | `#9B7FFF` |
 

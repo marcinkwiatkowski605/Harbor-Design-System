@@ -269,8 +269,8 @@ export const BorderAndShadow: StoryObj = {
             <div key={size} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' as const }}>
               <div style={{
                 width: 72, height: 72,
-                background: 'var(--ds-primitive-color-brand-pale-plum-100)',
-                border: '1px solid var(--ds-primitive-color-brand-pale-plum-300)',
+                background: 'var(--ds-primitive-color-brand-lavender-100)',
+                border: '1px solid var(--ds-primitive-color-brand-lavender-300)',
                 borderRadius: `var(--ds-semantic-border-radius-${size})`,
                 marginBottom: 6,
               }} />
@@ -288,7 +288,7 @@ export const BorderAndShadow: StoryObj = {
               <div style={{
                 width: 72, height: 72,
                 background: 'var(--ds-primitive-color-neutral-50)',
-                border: `solid var(--ds-primitive-color-brand-pale-plum-500)`,
+                border: `solid var(--ds-primitive-color-brand-lavender-500)`,
                 borderWidth: `var(--ds-semantic-border-width-${size})`,
                 borderRadius: 4,
                 boxSizing: 'border-box' as const,

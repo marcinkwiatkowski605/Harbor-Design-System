@@ -284,7 +284,7 @@ const shadowGroups: { group: string; dim: ShadowDim; tokens: string[] }[] = [
   { group: 'Offset X', dim: 'x', tokens: ['--ds-primitive-shadow-x-0'] },
   { group: 'Offset Y', dim: 'y', tokens: ['--ds-primitive-shadow-y-0', '--ds-primitive-shadow-y-4', '--ds-primitive-shadow-y-8'] },
   { group: 'Blur', dim: 'blur', tokens: ['--ds-primitive-shadow-blur-0', '--ds-primitive-shadow-blur-4', '--ds-primitive-shadow-blur-8'] },
-  { group: 'Spread', dim: 'spread', tokens: ['--ds-primitive-shadow-spread--4', '--ds-primitive-shadow-spread-0', '--ds-primitive-shadow-spread-2', '--ds-primitive-shadow-spread-4'] },
+  { group: 'Spread', dim: 'spread', tokens: ['--ds-primitive-shadow-spread-minus-4', '--ds-primitive-shadow-spread-0', '--ds-primitive-shadow-spread-2', '--ds-primitive-shadow-spread-4'] },
 ];
 
 const shadowFor = (dim: ShadowDim, cssVar: string): string => {

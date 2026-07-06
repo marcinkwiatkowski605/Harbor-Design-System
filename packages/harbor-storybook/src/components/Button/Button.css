@@ -53,10 +53,6 @@
   background: var(--ds-component-button-primary-color-background-pressed);
   color: var(--ds-component-button-primary-color-content-pressed);
 }
-.harbor-button[data-variant='primary'][aria-busy='true'] {
-  background: var(--ds-component-button-primary-color-background-loading);
-  color: var(--ds-component-button-primary-color-content-loading);
-}
 .harbor-button[data-variant='primary']:disabled {
   background: var(--ds-component-button-primary-color-background-disabled);
   color: var(--ds-component-button-primary-color-content-disabled);
@@ -75,10 +71,6 @@
 .harbor-button[data-variant='secondary']:active:not(:disabled):not([aria-busy='true']) {
   background: var(--ds-component-button-secondary-color-background-pressed);
   color: var(--ds-component-button-secondary-color-content-pressed);
-}
-.harbor-button[data-variant='secondary'][aria-busy='true'] {
-  background: var(--ds-component-button-secondary-color-background-loading);
-  color: var(--ds-component-button-secondary-color-content-loading);
 }
 .harbor-button[data-variant='secondary']:disabled {
   background: var(--ds-component-button-secondary-color-background-disabled);
@@ -102,11 +94,6 @@
   color: var(--ds-component-button-outline-color-content-pressed);
   border-color: var(--ds-component-button-outline-color-border-pressed);
 }
-.harbor-button[data-variant='outline'][aria-busy='true'] {
-  background: var(--ds-component-button-outline-color-background-loading);
-  color: var(--ds-component-button-outline-color-content-loading);
-  border-color: var(--ds-component-button-outline-color-border-loading);
-}
 .harbor-button[data-variant='outline']:disabled {
   /* Figma binds the outline disabled state to the *enabled* background (white),
      not background-disabled — only border + content go to their disabled tokens. */
@@ -119,8 +106,9 @@
 
 /* [aria-busy='true'] is declared before :disabled so that, when a button is
    both loading and disabled (e.g. a submit button during submission), :disabled
-   wins the cascade tie and the cursor reads "not-allowed" — matching the color
-   state above, which already resolves to disabled for the same combination. */
+   wins the cascade tie and the cursor reads "not-allowed". Loading has no color
+   rule of its own — the base variant rule already supplies the enabled-equivalent
+   look, and :hover/:active are suppressed via :not([aria-busy='true']). */
 .harbor-button[aria-busy='true'] {
   cursor: default;
   pointer-events: none;

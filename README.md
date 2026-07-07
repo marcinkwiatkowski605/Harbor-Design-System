@@ -125,7 +125,13 @@ every push to `main` analyzes commit messages since the last release (using
 `CHANGELOG.md`, publish `@harbor/tokens` to npm, and create a GitHub Release.
 No manual version bumps or changelog edits.
 
-One-time setup (already done for this repo, noted here for reference): the
-`release.yml` workflow needs an `NPM_TOKEN` secret (an npm automation token
-with publish rights to the `@harbor` org) added under
-**Settings → Secrets and variables → Actions**.
+Required one-time setup: the `release.yml` workflow needs an `NPM_TOKEN` secret
+(an npm automation token with publish rights to the `@harbor` org) added under
+**Settings → Secrets and variables → Actions**. This must be done before the
+first push to `main` after this workflow merges, or the release run will fail
+at the `npm publish` step for `@harbor/tokens`.
+
+`@semantic-release/git` also pushes the release commit directly to `main`
+using the default `GITHUB_TOKEN`, so `main` must allow the release workflow to
+push without a required-review status check, or the first release will fail
+at the git-commit step.

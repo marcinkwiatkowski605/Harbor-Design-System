@@ -3,6 +3,13 @@
   "version": "0.1.0",
   "description": "Harbor Design System tokens package",
   "type": "module",
+  "files": [
+    "light/build",
+    "index.ts"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build:tokens": "node config.js"
   },

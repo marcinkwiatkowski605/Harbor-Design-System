@@ -13,8 +13,12 @@
     "test:storybook:ci": "concurrently -k -s first -n \"SB,TEST\" -c \"magenta,blue\" \"http-server packages/harbor-storybook/storybook-static --port 6006 --silent\" \"wait-on tcp:6006 && npm run test-storybook --workspace=@harbor/storybook -- --url http://localhost:6006\""
   },
   "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/exec": "^7.1.0",
+    "@semantic-release/git": "^10.0.1",
     "concurrently": "^10.0.3",
     "http-server": "^14.1.1",
+    "semantic-release": "^25.0.5",
     "wait-on": "^9.0.10"
   }
 }

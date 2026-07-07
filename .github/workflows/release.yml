@@ -32,7 +32,7 @@ jobs:
 
       # packages/harbor-tokens/light/build is gitignored (generated output) —
       # it must exist before the exec plugin's publishCmd runs `npm publish`
-      # for @harbor/tokens, or the tarball would be empty/stale.
+      # for @harbords/tokens, or the tarball would be empty/stale.
       - name: Build design tokens
         run: npm run build:tokens
 

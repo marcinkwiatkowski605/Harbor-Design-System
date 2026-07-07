@@ -12,7 +12,7 @@
       "@semantic-release/exec",
       {
         "prepareCmd": "node scripts/sync-tokens-version.mjs ${nextRelease.version} && npm install --package-lock-only",
-        "publishCmd": "npm publish --workspace @harbor/tokens"
+        "publishCmd": "npm publish --workspace @harbords/tokens"
       }
     ],
     [

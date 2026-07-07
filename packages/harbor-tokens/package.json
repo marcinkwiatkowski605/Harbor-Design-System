@@ -1,5 +1,5 @@
 {
-  "name": "@harbor/tokens",
+  "name": "@harbords/tokens",
   "version": "1.0.0",
   "description": "Harbor Design System tokens package",
   "type": "module",

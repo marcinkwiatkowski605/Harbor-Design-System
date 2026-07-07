@@ -6,8 +6,6 @@ export type ButtonVariant = 'primary' | 'secondary' | 'outline';
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /** Visual style. Maps to the Figma `Type` variant axis. */
   variant?: ButtonVariant;
-  /** Applies the loading state colors, marks the button busy, and blocks interaction. */
-  loading?: boolean;
   /** Button label. */
   children: React.ReactNode;
 }
@@ -18,12 +16,11 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
  * Token-driven: every color, size, radius, and type value comes from the
  * `--ds-component-button-*` / `--ds-semantic-typography-label-lg-*` CSS variables built
  * from the Figma `Button` component set. Interaction states are CSS-driven
- * (`:hover`, `:active`, `:focus-visible`), `disabled` via the native attribute,
- * and `loading` via `aria-busy`.
+ * (`:hover`, `:active`, `:focus-visible`), and `disabled` via the native attribute.
  */
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
-    { variant = 'primary', loading = false, disabled, children, className, type = 'button', ...rest },
+    { variant = 'primary', disabled, children, className, type = 'button', ...rest },
     ref
   ) => {
     const classes = ['harbor-button', className].filter(Boolean).join(' ');
@@ -33,7 +30,6 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         type={type}
         className={classes}
         data-variant={variant}
-        aria-busy={loading || undefined}
         disabled={disabled}
         {...rest}
       >

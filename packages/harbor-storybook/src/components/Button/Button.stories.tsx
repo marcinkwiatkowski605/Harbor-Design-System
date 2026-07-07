@@ -13,14 +13,12 @@ const meta: Meta<typeof Button> = {
       options: ['primary', 'secondary', 'outline'],
       description: 'Visual style (Figma `Type` axis).',
     },
-    loading: { control: 'boolean', description: 'Marks the button busy (same colors as enabled) and blocks interaction.' },
     disabled: { control: 'boolean' },
     children: { control: 'text', description: 'Button label.' },
     onClick: { action: 'clicked' },
   },
   args: {
     variant: 'primary',
-    loading: false,
     disabled: false,
     children: 'Sample label',
   },
@@ -29,5 +27,5 @@ export default meta;
 
 type Story = StoryObj<typeof Button>;
 
-/** Use the Controls panel to switch variant, loading, and disabled. */
+/** Use the Controls panel to switch variant and disabled. */
 export const Default: Story = {};

@@ -84,11 +84,11 @@ Anatomy: `component` → `componentVariant` → `property` → `state`.
 - **Property** — `color-background`, `color-content`, `color-border`, or any other CSS
   property the component needs to override (`padding-horizontal`, `border-radius`).
 - **State** — `hover`, `pressed`, `disabled`. Only add a state that doesn't exist at
-  Tier 2 when it needs its own color values — Button's `loading` prop, for example, has
-  no color token of its own because it renders identically to `enabled`; it's handled
-  entirely in CSS (`[aria-busy='true']`) without a dedicated token. Only add a Tier 3
-  `disabled` value when a component's disabled look genuinely differs from the shared
-  Tier 2 disabled token — most components should just reference the Tier 2 one.
+  Tier 2 when it needs its own color values. If a state renders identically to an existing
+  one — Button's `focus`, for example, reuses the `enabled` fill and only adds the shared
+  focus ring — handle it in CSS without a dedicated token. Only add a Tier 3 `disabled`
+  value when a component's disabled look genuinely differs from the shared Tier 2 disabled
+  token — most components should just reference the Tier 2 one.
 
 ## One value, three tiers
 

@@ -58,7 +58,7 @@ flow needs rethinking before the button hierarchy does.
 
 ## States
 
-All three types share the same six states: Enabled, Hover, Pressed, Focus, Disabled, Loading.
+All three types share the same five states: Enabled, Hover, Pressed, Focus, Disabled.
 
 - **Hover / Pressed** darken the fill (or border, for Outline) to confirm interactivity.
   Outline gives Hover and Pressed two distinct border shades, so the states read differently
@@ -68,12 +68,9 @@ All three types share the same six states: Enabled, Hover, Pressed, Focus, Disab
 - **Disabled** flattens background and text to neutral gray. Outline keeps its white
   background and only dims border and label; the dimmed label color matches how Disabled
   reads on Primary and Secondary.
-- **Loading** keeps the type's fill and marks the button busy. There is no spinner — pass a
-  "Loading…" label yourself; the component only handles the state, not the text.
 
 In code, Hover/Pressed/Focus are driven by `:hover` / `:active` / `:focus-visible`,
-Disabled by the native `disabled` attribute, and Loading by the `loading` prop
-(which sets `aria-busy` and blocks interaction).
+and Disabled by the native `disabled` attribute.
 
 ## Color reference
 
@@ -95,7 +92,6 @@ adds the shared ring (`--ds-semantic-focus-ring-*` / `--ds-semantic-focus-gap-*`
 | Pressed  | `#6C31DB` · `background-pressed`  | `#FFFFFF` · `content-pressed`  |
 | Focus    | `#9B7FFF` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
 | Disabled | `#CFD5DA` · `background-disabled` | `#FFFFFF` · `content-disabled` |
-| Loading  | `#9B7FFF` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
 
 </div>
 
@@ -110,7 +106,6 @@ adds the shared ring (`--ds-semantic-focus-ring-*` / `--ds-semantic-focus-gap-*`
 | Pressed  | `#A14200` · `background-pressed`  | `#FFFFFF` · `content-pressed`  |
 | Focus    | `#F36700` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
 | Disabled | `#CFD5DA` · `background-disabled` | `#FFFFFF` · `content-disabled` |
-| Loading  | `#F36700` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
 
 </div>
 
@@ -125,7 +120,6 @@ adds the shared ring (`--ds-semantic-focus-ring-*` / `--ds-semantic-focus-gap-*`
 | Pressed  | `#E3E7E9` · `background-pressed`   | `#1B1D1F` · `content-pressed`  | `#747D84` · `border-pressed`  |
 | Focus    | `#FFFFFF` · `background-enabled`   | `#484E53` · `content-enabled`  | `#B0B9BF` · `border-enabled`  |
 | Disabled | `#FFFFFF` · `background-enabled` † | `#CFD5DA` · `content-disabled` | `#CFD5DA` · `border-disabled` |
-| Loading  | `#FFFFFF` · `background-enabled`   | `#484E53` · `content-enabled`  | `#B0B9BF` · `border-enabled`  |
 
 </div>
 
@@ -191,9 +185,6 @@ a border by default; this matters if you're overriding its styles.)
 // Secondary and outline side by side
 <Button variant="secondary">Add another</Button>
 <Button variant="outline">Cancel</Button>
-
-// Loading state — pass the busy label yourself
-<Button variant="primary" loading>Saving…</Button>
 ```
 
 ## Component API
@@ -205,7 +196,6 @@ import { Button } from './components/Button';
 | Prop       | Type                                        | Default     | Description |
 |------------|---------------------------------------------|-------------|-------------|
 | `variant`  | `'primary' \| 'secondary' \| 'outline'`     | `'primary'` | Visual style. Maps to the Figma `Type` axis. |
-| `loading`  | `boolean`                                   | `false`     | Applies the loading colors, sets `aria-busy`, and blocks interaction. |
 | `disabled` | `boolean`                                   | `false`     | Native disabled attribute. Removes the button from interaction and the tab order. |
 | `children` | `React.ReactNode`                           | —           | Button label. One line of centered text. **Required.** |
 | `...rest`  | `React.ButtonHTMLAttributes<HTMLButtonElement>` | —       | All native button attributes (`onClick`, `type`, `aria-*`, …) forward to the underlying `<button>`. |
@@ -226,17 +216,9 @@ role and keyboard behavior — no custom ARIA role is needed.
 `disabled` uses the native attribute, so the button drops out of the tab order entirely.
 Disabled buttons stay in the layout so people know the action exists, just not right now.
 
-`loading` keeps the button in the tab order (it sets `aria-busy`, not `disabled`) and
-applies `pointer-events: none`, which blocks mouse activation. CSS `pointer-events: none`
-is not guaranteed to block keyboard activation in every browser, so a loading button may
-still respond to Enter or Space. If a double submission during loading would cause a
-problem, guard the `onClick` handler against `loading` as well.
-
 **Screen readers**
 
 - The label read aloud comes from `children` — pass descriptive text, not an icon alone.
-- `loading` sets `aria-busy="true"`, so screen readers announce the button as busy, not
-  only a visual change.
 - `disabled` uses the native attribute, so screen readers announce the button as
   unavailable.
 

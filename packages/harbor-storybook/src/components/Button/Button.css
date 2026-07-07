@@ -45,11 +45,11 @@
   background: var(--ds-component-button-primary-color-background-enabled);
   color: var(--ds-component-button-primary-color-content-enabled);
 }
-.harbor-button[data-variant='primary']:hover:not(:disabled):not([aria-busy='true']) {
+.harbor-button[data-variant='primary']:hover:not(:disabled) {
   background: var(--ds-component-button-primary-color-background-hover);
   color: var(--ds-component-button-primary-color-content-hover);
 }
-.harbor-button[data-variant='primary']:active:not(:disabled):not([aria-busy='true']) {
+.harbor-button[data-variant='primary']:active:not(:disabled) {
   background: var(--ds-component-button-primary-color-background-pressed);
   color: var(--ds-component-button-primary-color-content-pressed);
 }
@@ -64,11 +64,11 @@
   background: var(--ds-component-button-secondary-color-background-enabled);
   color: var(--ds-component-button-secondary-color-content-enabled);
 }
-.harbor-button[data-variant='secondary']:hover:not(:disabled):not([aria-busy='true']) {
+.harbor-button[data-variant='secondary']:hover:not(:disabled) {
   background: var(--ds-component-button-secondary-color-background-hover);
   color: var(--ds-component-button-secondary-color-content-hover);
 }
-.harbor-button[data-variant='secondary']:active:not(:disabled):not([aria-busy='true']) {
+.harbor-button[data-variant='secondary']:active:not(:disabled) {
   background: var(--ds-component-button-secondary-color-background-pressed);
   color: var(--ds-component-button-secondary-color-content-pressed);
 }
@@ -84,12 +84,12 @@
   color: var(--ds-component-button-outline-color-content-enabled);
   border-color: var(--ds-component-button-outline-color-border-enabled);
 }
-.harbor-button[data-variant='outline']:hover:not(:disabled):not([aria-busy='true']) {
+.harbor-button[data-variant='outline']:hover:not(:disabled) {
   background: var(--ds-component-button-outline-color-background-hover);
   color: var(--ds-component-button-outline-color-content-hover);
   border-color: var(--ds-component-button-outline-color-border-hover);
 }
-.harbor-button[data-variant='outline']:active:not(:disabled):not([aria-busy='true']) {
+.harbor-button[data-variant='outline']:active:not(:disabled) {
   background: var(--ds-component-button-outline-color-background-pressed);
   color: var(--ds-component-button-outline-color-content-pressed);
   border-color: var(--ds-component-button-outline-color-border-pressed);
@@ -102,17 +102,8 @@
   border-color: var(--ds-component-button-outline-color-border-disabled);
 }
 
-/* ── Disabled / loading interaction ──────────────────────────────────────── */
+/* ── Disabled ────────────────────────────────────────────────────────────── */
 
-/* [aria-busy='true'] is declared before :disabled so that, when a button is
-   both loading and disabled (e.g. a submit button during submission), :disabled
-   wins the cascade tie and the cursor reads "not-allowed". Loading has no color
-   rule of its own — the base variant rule already supplies the enabled-equivalent
-   look, and :hover/:active are suppressed via :not([aria-busy='true']). */
-.harbor-button[aria-busy='true'] {
-  cursor: default;
-  pointer-events: none;
-}
 .harbor-button:disabled {
   cursor: not-allowed;
 }

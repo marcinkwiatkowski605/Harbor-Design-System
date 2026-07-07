@@ -115,3 +115,17 @@ new component's or foundation page's `.mdx` adds it to all three outputs automat
 ```bash
 npm run build:llms   # Regenerate docs/ after editing any component .mdx
 ```
+
+## Releasing
+
+Releases are automated with [semantic-release](https://semantic-release.gitbook.io/semantic-release/):
+every push to `main` analyzes commit messages since the last release (using
+[Conventional Commits](https://www.conventionalcommits.org/) — `feat:`, `fix:`,
+`feat!:`/`BREAKING CHANGE:`, etc.) to compute the next version, update
+`CHANGELOG.md`, publish `@harbor/tokens` to npm, and create a GitHub Release.
+No manual version bumps or changelog edits.
+
+One-time setup (already done for this repo, noted here for reference): the
+`release.yml` workflow needs an `NPM_TOKEN` secret (an npm automation token
+with publish rights to the `@harbor` org) added under
+**Settings → Secrets and variables → Actions**.

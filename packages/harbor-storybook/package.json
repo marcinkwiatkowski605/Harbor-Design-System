@@ -2,6 +2,7 @@
   "name": "@harbor/storybook",
   "version": "0.1.0",
   "description": "Harbor Design System Storybook",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "storybook": "storybook dev -p 6006",

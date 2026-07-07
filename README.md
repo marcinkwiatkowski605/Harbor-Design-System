@@ -130,10 +130,3 @@ No manual version bumps or changelog edits.
 ```bash
 npm install @harbords/tokens   # Consume the published design tokens package
 ```
-
-`release.yml` authenticates to npm via an `NPM_TOKEN` secret (a granular
-access token scoped to `@harbords`, with two-factor bypass enabled, since the
-`@harbor` scope itself belongs to an unrelated CNCF project) and pushes the
-release commit directly to `main` using the default `GITHUB_TOKEN` — both
-already configured for this repo under **Settings → Secrets and variables →
-Actions** and branch protection, respectively.

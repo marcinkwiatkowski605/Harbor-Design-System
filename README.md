@@ -122,16 +122,18 @@ Releases are automated with [semantic-release](https://semantic-release.gitbook.
 every push to `main` analyzes commit messages since the last release (using
 [Conventional Commits](https://www.conventionalcommits.org/) — `feat:`, `fix:`,
 `feat!:`/`BREAKING CHANGE:`, etc.) to compute the next version, update
-`CHANGELOG.md`, publish `@harbords/tokens` to npm, and create a GitHub Release.
+[`CHANGELOG.md`](./CHANGELOG.md), publish
+[`@harbords/tokens`](https://www.npmjs.com/package/@harbords/tokens) to npm,
+and create a [GitHub Release](https://github.com/marcinkwiatkowski605/Harbor-Design-System/releases).
 No manual version bumps or changelog edits.
 
-Required one-time setup: the `release.yml` workflow needs an `NPM_TOKEN` secret
-(an npm token with publish rights to the `@harbords` org, granular access with
-2FA bypass enabled) added under **Settings → Secrets and variables → Actions**.
-This must be done before the first push to `main` after this workflow merges,
-or the release run will fail at the `npm publish` step for `@harbords/tokens`.
+```bash
+npm install @harbords/tokens   # Consume the published design tokens package
+```
 
-`@semantic-release/git` also pushes the release commit directly to `main`
-using the default `GITHUB_TOKEN`, so `main` must allow the release workflow to
-push without a required-review status check, or the first release will fail
-at the git-commit step.
+`release.yml` authenticates to npm via an `NPM_TOKEN` secret (a granular
+access token scoped to `@harbords`, with two-factor bypass enabled, since the
+`@harbor` scope itself belongs to an unrelated CNCF project) and pushes the
+release commit directly to `main` using the default `GITHUB_TOKEN` — both
+already configured for this repo under **Settings → Secrets and variables →
+Actions** and branch protection, respectively.

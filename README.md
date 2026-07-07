@@ -1,5 +1,7 @@
 # Harbor Design System
 
+**[Live Storybook →](https://marcinkwiatkowski605.github.io/Harbor-Design-System/)**
+
 Harbor Design System is a demonstration project that showcases my skills in
 design-token architecture, tooling, and the design-to-code workflow.
 
@@ -37,7 +39,8 @@ packages/
       components/        # React components + MDX docs — currently Button
       foundations/        # Hand-written Storybook pages (e.g. Design Tokens architecture)
 scripts/
-  build-llms-docs.mjs    # Derives the LLM docs from the component/foundations MDX
+  build-llms-docs.mjs      # Derives the LLM docs from the component/foundations MDX
+  sync-tokens-version.mjs  # Keeps @harbords/tokens' version in lockstep with releases
 docs/
   components/*.md         # Generated from every src/**/*.mdx (component AND src/foundations pages)
   foundations/*.md        # Hand-authored Markdown (color, typography, dimensions, overview) — separate from the above
@@ -130,3 +133,7 @@ No manual version bumps or changelog edits.
 ```bash
 npm install @harbords/tokens   # Consume the published design tokens package
 ```
+
+## License
+
+[MIT](./LICENSE)

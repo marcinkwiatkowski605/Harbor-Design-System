@@ -1,6 +1,6 @@
 {
   "name": "@harbor/tokens",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Harbor Design System tokens package",
   "type": "module",
   "files": [

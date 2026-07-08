@@ -54,20 +54,20 @@ adds the shared ring (`--ds-semantic-focus-ring-ring-*` / `--ds-semantic-focus-r
 
 | State    | Background                       | Content                       |
 |----------|-----------------------------------|-------------------------------|
-| Enabled  | `#9B7FFF` · `background-enabled`  | `#FAF9FF` · `content-enabled`  |
-| Hover    | `#834DFF` · `background-hover`    | `#FAF9FF` · `content-hover`    |
-| Selected | `#6C31DB` · `background-selected` | `#FAF9FF` · `content-selected` |
-| Focus    | `#9B7FFF` · `background-enabled`  | `#FAF9FF` · `content-enabled`  |
+| Enabled  | `#9050E9` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
+| Hover    | `#7526E3` · `background-hover`    | `#FFFFFF` · `content-hover`    |
+| Selected | `#5A1BA9` · `background-selected` | `#FFFFFF` · `content-selected` |
+| Focus    | `#9050E9` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
 | Disabled | `#CFD5DA` · `background-disabled` | `#909AA1` · `content-disabled` |
 
 **Secondary** — prefix `--ds-component-button-secondary-color-`.
 
 | State    | Background                        | Content                        |
 |----------|------------------------------------|--------------------------------|
-| Enabled  | `#FF9969` · `background-enabled`   | `#FFF9F6` · `content-enabled`   |
-| Hover    | `#F36700` · `background-hover`     | `#FFF9F6` · `content-hover`     |
-| Selected | `#C75300` · `background-selected`  | `#FFF9F6` · `content-selected`  |
-| Focus    | `#FF9969` · `background-enabled`   | `#FFF9F6` · `content-enabled`   |
+| Enabled  | `#D83A00` · `background-enabled`   | `#FFFFFF` · `content-enabled`   |
+| Hover    | `#AA3001` · `background-hover`     | `#FFFFFF` · `content-hover`     |
+| Selected | `#7E2600` · `background-selected`  | `#FFFFFF` · `content-selected`  |
+| Focus    | `#D83A00` · `background-enabled`   | `#FFFFFF` · `content-enabled`   |
 | Disabled | `#CFD5DA` · `background-disabled`  | `#909AA1` · `content-disabled` |
 
 **Outline** — prefix `--ds-component-button-outline-color-`. White background, visible border in every state.

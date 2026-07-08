@@ -19,6 +19,13 @@ const isHigherTierToken = (token) => tierOf(token) !== 'primitive';
 const cssPrefixOf = (token) => `--ds-${tierOf(token)}-`;
 const jsonPrefixOf = (token) => `ds-${tierOf(token)}-`;
 
+// The Figma exporter can't put $value and nested state children (hover, selected...)
+// on the same node, so when a token's base value collides with its own variant
+// group it moves the base value under a synthetic "@" child instead (see buildTokens).
+// Output names strip that segment back out so the remap stays invisible downstream.
+const LEAF_REMAP_KEY = '@';
+const nameSegments = (path) => path.filter((seg) => seg !== LEAF_REMAP_KEY);
+
 // Reads design_tokens.json (W3C DTCG, exported from Figma), strips collection-level wrapper
 // keys so aliases like {color.background.default} resolve correctly, and tags each token
 // with $extensions['harbor-tier'] to preserve tier information without relying on filePath.
@@ -35,6 +42,38 @@ const buildTokens = () => {
 
   const isLeaf = (val) =>
     val !== null && typeof val === 'object' && '$value' in val;
+
+  // Aliases elsewhere in the file still point at the pre-remap bare path (see the
+  // LEAF_REMAP_KEY note above), so once tokens are tagged and merged we redirect
+  // those aliases to the "@" child so Style Dictionary can actually resolve them.
+  const collectRemappedPaths = (obj, path, out) => {
+    if (obj === null || typeof obj !== 'object') return;
+    if (LEAF_REMAP_KEY in obj && isLeaf(obj[LEAF_REMAP_KEY])) {
+      out.add(path.join('.'));
+    }
+    for (const [key, val] of Object.entries(obj)) {
+      if (key.startsWith('$') || key === LEAF_REMAP_KEY) continue;
+      if (val !== null && typeof val === 'object') {
+        collectRemappedPaths(val, [...path, key], out);
+      }
+    }
+  };
+
+  const fixRemappedAliases = (obj, remapped) => {
+    if (obj === null || typeof obj !== 'object') return;
+    if (isLeaf(obj)) {
+      if (typeof obj.$value === 'string') {
+        const m = obj.$value.match(/^\{([^}]+)\}$/);
+        if (m && remapped.has(m[1])) {
+          obj.$value = `{${m[1]}.${LEAF_REMAP_KEY}}`;
+        }
+      }
+      return;
+    }
+    for (const val of Object.values(obj)) {
+      if (val !== null && typeof val === 'object') fixRemappedAliases(val, remapped);
+    }
+  };
 
   const tagTokens = (obj, tier) => {
     const out = {};
@@ -77,6 +116,11 @@ const buildTokens = () => {
     const tier = TIER_BY_COLLECTION[collectionName] ?? 'primitive';
     deepMerge(result, tagTokens(tokens, tier));
   }
+
+  const remappedPaths = new Set();
+  collectRemappedPaths(result, [], remappedPaths);
+  fixRemappedAliases(result, remappedPaths);
+
   return result;
 };
 
@@ -94,7 +138,7 @@ const transformShadowTokens = (dictionary, size, themeTokens) => {
 };
 
 const transformLineHeight = (dictionary, prop, themeTokens) => {
-  const cleanPath = prop.path.join('-');
+  const cleanPath = nameSegments(prop.path).join('-');
   const prefix = cssPrefixOf(prop);
   const fontSizePath = [...prop.path.slice(0, -1), 'font-size'];
   const fontSizeProp = dictionary.allTokens.find(
@@ -125,7 +169,7 @@ const formatVariables = (dictionary) => {
 
   dictionary.allTokens.forEach((prop) => {
     const isHigher = isHigherTierToken(prop);
-    const cleanPath = prop.path.join('-');
+    const cleanPath = nameSegments(prop.path).join('-');
     const prefix = cssPrefixOf(prop);
 
     if (isHigher && prop.path[0] === 'shadow' && shadowSizes.includes(prop.path[1])) {
@@ -161,7 +205,7 @@ StyleDictionary.registerFormat({
 
     dictionary.allTokens.forEach((token) => {
       if (isHigherTierToken(token) && token.path[0] === 'shadow' && token.path.length === 3) return;
-      out[`${jsonPrefixOf(token)}${token.path.join('-')}`] = token.$value;
+      out[`${jsonPrefixOf(token)}${nameSegments(token.path).join('-')}`] = token.$value;
     });
 
     shadowSizes.forEach((size) => {
@@ -210,7 +254,7 @@ StyleDictionary.registerTransform({
       s.replace(/-([a-zA-Z0-9])/g, (_, c) => c.toUpperCase())
        .replace(/^(.)/, (c) => c.toUpperCase());
     const prefix = 'Ds' + toPascal(tierOf(token));
-    return prefix + token.path.map(toPascal).join('');
+    return prefix + nameSegments(token.path).map(toPascal).join('');
   },
 });
 

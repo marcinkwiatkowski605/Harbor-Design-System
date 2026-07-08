@@ -45,12 +45,13 @@ const ButtonPreview = ({ variant, state }: { variant: ButtonVariant; state: Butt
   // role and adds the shared focus ring on top. Mirrors Button.css.
   const colorState = state === 'focus' ? 'enabled' : state;
   // Shared focus ring, from the semantic focus-ring tokens — matches Button.css :focus-visible.
-  // The ring spread stacks on top of the gap spread so it sits outside the white gap.
+  // Both layers' spread is measured from the same edge (matches Figma), so the
+  // visible ring is ring-spread minus gap-spread, not their sum.
   const focusRing =
     'var(--ds-semantic-focus-ring-gap-x) var(--ds-semantic-focus-ring-gap-y) var(--ds-semantic-focus-ring-gap-blur) ' +
     'var(--ds-semantic-focus-ring-gap-spread) var(--ds-semantic-focus-ring-gap-color), ' +
     'var(--ds-semantic-focus-ring-ring-x) var(--ds-semantic-focus-ring-ring-y) var(--ds-semantic-focus-ring-ring-blur) ' +
-    'calc(var(--ds-semantic-focus-ring-gap-spread) + var(--ds-semantic-focus-ring-ring-spread)) var(--ds-semantic-focus-ring-ring-color)';
+    'var(--ds-semantic-focus-ring-ring-spread) var(--ds-semantic-focus-ring-ring-color)';
   const bgVar = `var(--ds-component-button-${variant}-color-background-${colorState})`;
   const contentVar = `var(--ds-component-button-${variant}-color-content-${colorState})`;
   const borderVar = variant === 'outline'

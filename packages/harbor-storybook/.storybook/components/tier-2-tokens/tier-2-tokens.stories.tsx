@@ -340,8 +340,9 @@ export const BorderAndShadow: StoryObj = {
               boxShadow: [
                 // gap layer: x y blur spread color
                 'var(--ds-semantic-focus-ring-gap-x) var(--ds-semantic-focus-ring-gap-y) var(--ds-semantic-focus-ring-gap-blur) var(--ds-semantic-focus-ring-gap-spread) var(--ds-semantic-focus-ring-gap-color)',
-                // ring layer offset by the gap spread so both rings are visible
-                'var(--ds-semantic-focus-ring-ring-x) var(--ds-semantic-focus-ring-ring-y) var(--ds-semantic-focus-ring-ring-blur) calc(var(--ds-semantic-focus-ring-gap-spread) + var(--ds-semantic-focus-ring-ring-spread)) var(--ds-semantic-focus-ring-ring-color)',
+                // ring layer: spread is measured from the same edge as the gap layer
+                // (matches Figma), so the visible ring is ring-spread minus gap-spread.
+                'var(--ds-semantic-focus-ring-ring-x) var(--ds-semantic-focus-ring-ring-y) var(--ds-semantic-focus-ring-ring-blur) var(--ds-semantic-focus-ring-ring-spread) var(--ds-semantic-focus-ring-ring-color)',
               ].join(', '),
             }} />
             <TokenLabel>focus gap · --ds-semantic-focus-ring-gap-*</TokenLabel>

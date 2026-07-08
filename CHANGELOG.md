@@ -1,3 +1,27 @@
+# [1.1.0](https://github.com/marcinkwiatkowski605/Harbor-Design-System/compare/v1.0.0...v1.1.0) (2026-07-08)
+
+
+### Bug Fixes
+
+* **button:** stop double-counting focus ring spread ([740d682](https://github.com/marcinkwiatkowski605/Harbor-Design-System/commit/740d682d8e0793985afd10a61962600339180741))
+* **storybook:** drop dimension previews, leave Preview blank instead ([ec2c10d](https://github.com/marcinkwiatkowski605/Harbor-Design-System/commit/ec2c10ddc0cfc1f26b2702b94210440e09060bff))
+* **storybook:** fix caption label contrast and size across all token stories ([39591a7](https://github.com/marcinkwiatkowski605/Harbor-Design-System/commit/39591a76bf4497a56a2c8dd7ba5a6e79c5eb51de)), closes [#666](https://github.com/marcinkwiatkowski605/Harbor-Design-System/issues/666)
+* **storybook:** match Tier 2 Color table column order ([0bc7d64](https://github.com/marcinkwiatkowski605/Harbor-Design-System/commit/0bc7d64f29e3aae18598788993505fe459f834cd))
+* **storybook:** render Button preview grid as real <button disabled> ([4c17382](https://github.com/marcinkwiatkowski605/Harbor-Design-System/commit/4c17382f08a8cd9233f3d28458e743d53f907995))
+* **storybook:** style alias as a chip matching Name, different hue ([4e28d31](https://github.com/marcinkwiatkowski605/Harbor-Design-System/commit/4e28d314745b735e678ae26c6609ddcb33b55179)), closes [#0f766e](https://github.com/marcinkwiatkowski605/Harbor-Design-System/issues/0f766e) [#effcf9](https://github.com/marcinkwiatkowski605/Harbor-Design-System/issues/effcf9)
+* **storybook:** use polling for file watching ([79c54af](https://github.com/marcinkwiatkowski605/Harbor-Design-System/commit/79c54af62b590e57ffa2f386182c1192c17a559a))
+* **storybook:** use real label/lg typography tokens in Button preview ([cf21c1f](https://github.com/marcinkwiatkowski605/Harbor-Design-System/commit/cf21c1f5c79eea005b79f98bc882a346d9536189))
+* **tokens:** resolve base-value/nested-state alias conflicts in tagTokens ([9876c5d](https://github.com/marcinkwiatkowski605/Harbor-Design-System/commit/9876c5d047a293d3f16294cb13d2dcf5063585a7))
+* **tokens:** resync brand/accent palette with fixed contrast ([3977bbb](https://github.com/marcinkwiatkowski605/Harbor-Design-System/commit/3977bbb27af63d917fc24c1b15981e3adafb9cae))
+
+
+### Features
+
+* **storybook:** add Name/Value/Preview table to Tier 3 Button tokens ([f2eec77](https://github.com/marcinkwiatkowski605/Harbor-Design-System/commit/f2eec774459c77e19b4d2b3fca60fc9f44b19dfd))
+* **storybook:** add Spacing section to Tier 2 token showcase ([6fd8c91](https://github.com/marcinkwiatkowski605/Harbor-Design-System/commit/6fd8c91823d75e2d9279bf7df22f79b7d73ca2e5))
+* **storybook:** show alias instead of raw value in Tier 2/3 tables ([e77f9c0](https://github.com/marcinkwiatkowski605/Harbor-Design-System/commit/e77f9c05ac9a6f395ac0a21f14524cccff8db78d))
+* **tokens:** resync new nested token architecture from Figma ([fa190da](https://github.com/marcinkwiatkowski605/Harbor-Design-System/commit/fa190da6eff628cd72e800cfc84b56ff3a637d5e))
+
 # 1.0.0 (2026-07-07)
 
 

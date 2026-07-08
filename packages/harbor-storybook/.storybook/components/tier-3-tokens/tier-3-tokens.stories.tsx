@@ -21,8 +21,6 @@ const valueFor = (cssVar: string): string => {
   return value;
 };
 
-const isHexColor = (value: string): boolean => /^#[0-9a-fA-F]{3,8}$/.test(value);
-
 // ─── Shared helpers ───────────────────────────────────────────────────────────
 
 const baseStyle = { fontFamily: 'system-ui, sans-serif', fontSize: 12, color: '#111' };
@@ -38,72 +36,18 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
 
 // ─── Token table (Name | Value | Preview) ─────────────────────────────────────
 
-const dimensionPreviews: { test: (cssVar: string) => boolean; render: (cssVar: string) => React.ReactNode }[] = [
-  {
-    test: (v) => v.endsWith('border-radius'),
-    render: (cssVar) => (
-      <div style={{ width: 40, height: 40, background: '#e6e2ff', border: '1px solid #b7a9ff', borderRadius: `var(${cssVar})` }} />
-    ),
-  },
-  {
-    test: (v) => v.endsWith('border-width'),
-    render: (cssVar) => (
-      <div style={{ width: 40, height: 40, borderStyle: 'solid', borderColor: '#834dff', borderWidth: `var(${cssVar})`, boxSizing: 'border-box' as const }} />
-    ),
-  },
-  {
-    test: (v) => v.endsWith('height'),
-    render: (cssVar) => (
-      <div style={{ width: 24, height: `var(${cssVar})`, background: '#834dff', borderRadius: 2 }} />
-    ),
-  },
-  {
-    test: (v) => v.endsWith('padding'),
-    render: (cssVar) => (
-      <div style={{ display: 'inline-flex', padding: `var(${cssVar})`, background: '#f3f2ff', border: '1px solid #d3cdff', borderRadius: 4 }}>
-        <div style={{ width: 16, height: 16, background: '#834dff', borderRadius: 2 }} />
-      </div>
-    ),
-  },
-  {
-    test: (v) => v.endsWith('spread'),
-    render: (cssVar) => (
-      <div style={{ width: 24, height: 24, background: '#fff', boxShadow: `0 0 0 var(${cssVar}) #909aa1` }} />
-    ),
-  },
-  {
-    test: (v) => v.endsWith('blur'),
-    render: (cssVar) => (
-      <div style={{ width: 24, height: 24, background: '#fff', boxShadow: `0 0 var(${cssVar}) 2px #909aa1` }} />
-    ),
-  },
-];
-
-const DimensionPreview = ({ cssVar, value }: { cssVar: string; value: string }) => {
-  const match = dimensionPreviews.find(({ test }) => test(cssVar));
-  return (
-    <div style={{ width: 48, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      {match ? match.render(cssVar) : <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#888' }}>{value}</span>}
-    </div>
-  );
-};
-
-const TokenPreview = ({ cssVar, value }: { cssVar: string; value: string }) => (
-  isHexColor(value)
-    ? (
-      <div style={{
-        width: 48, height: 24, borderRadius: 4,
-        background: `var(${cssVar})`,
-        border: '1px solid rgba(0,0,0,.07)',
-        boxShadow: 'inset 0 0 0 1px rgba(0,0,0,.04)',
-      }} />
-    )
-    : <DimensionPreview cssVar={cssVar} value={value} />
+const TokenPreview = ({ cssVar }: { cssVar: string }) => (
+  <div style={{
+    width: 48, height: 24, borderRadius: 4,
+    background: `var(${cssVar})`,
+    border: '1px solid rgba(0,0,0,.07)',
+    boxShadow: 'inset 0 0 0 1px rgba(0,0,0,.04)',
+  }} />
 );
 
 type TableToken = { name: string; cssVar: string };
 
-const TokenTableRow = ({ name, cssVar }: TableToken) => {
+const TokenTableRow = ({ cssVar, showPreview }: TableToken & { showPreview: boolean }) => {
   const value = valueFor(cssVar);
   return (
     <tr>
@@ -122,7 +66,7 @@ const TokenTableRow = ({ name, cssVar }: TableToken) => {
         {value}
       </td>
       <td style={{ padding: '8px 12px', verticalAlign: 'middle' }}>
-        <TokenPreview cssVar={cssVar} value={value} />
+        {showPreview && <TokenPreview cssVar={cssVar} />}
       </td>
     </tr>
   );
@@ -130,7 +74,7 @@ const TokenTableRow = ({ name, cssVar }: TableToken) => {
 
 const BUTTON_TABLE_COLUMN_WIDTHS = ['460px', '90px', 'auto'];
 
-const TokenTable = ({ tokens }: { tokens: TableToken[] }) => (
+const TokenTable = ({ tokens, showPreview = true }: { tokens: TableToken[]; showPreview?: boolean }) => (
   <table style={{ width: '100%', tableLayout: 'fixed' as const, borderCollapse: 'collapse' as const, ...baseStyle }}>
     <colgroup>
       {BUTTON_TABLE_COLUMN_WIDTHS.map((width, i) => (
@@ -160,7 +104,7 @@ const TokenTable = ({ tokens }: { tokens: TableToken[] }) => (
     </thead>
     <tbody>
       {tokens.map(t => (
-        <TokenTableRow key={t.cssVar} {...t} />
+        <TokenTableRow key={t.cssVar} {...t} showPreview={showPreview} />
       ))}
     </tbody>
   </table>
@@ -260,7 +204,7 @@ export const Button: StoryObj = {
       </Section>
 
       <Section title="Shared button tokens">
-        <TokenTable tokens={[
+        <TokenTable showPreview={false} tokens={[
           { name: 'border-radius', cssVar: '--ds-component-button-border-radius' },
           { name: 'border-width', cssVar: '--ds-component-button-border-width' },
           { name: 'height', cssVar: '--ds-component-button-height' },
@@ -269,7 +213,7 @@ export const Button: StoryObj = {
       </Section>
 
       <Section title="Focus ring (shared, semantic)">
-        <TokenTable tokens={[
+        <TokenTable showPreview={false} tokens={[
           { name: 'ring-color', cssVar: '--ds-semantic-focus-ring-ring-color' },
           { name: 'ring-spread', cssVar: '--ds-semantic-focus-ring-ring-spread' },
           { name: 'ring-blur', cssVar: '--ds-semantic-focus-ring-ring-blur' },

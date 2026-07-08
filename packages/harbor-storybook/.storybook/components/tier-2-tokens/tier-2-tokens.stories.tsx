@@ -206,6 +206,84 @@ export const Color: StoryObj = {
   ),
 };
 
+// ─── Spacing ───────────────────────────────────────────────────────────────────
+
+const spacingSizes = ['xs', 'sm', 'md', 'lg', 'xl'];
+
+export const Spacing: StoryObj = {
+  render: () => (
+    <div style={{ padding: 24, ...baseStyle }}>
+      <Section title="Spacing · inset (padding within a container)">
+        <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+          {spacingSizes.map(size => (
+            <div key={size} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' as const }}>
+              <div style={{
+                display: 'inline-flex',
+                padding: `var(--ds-semantic-spacing-inset-${size})`,
+                background: 'var(--ds-primitive-color-brand-lavender-100)',
+                border: '1px solid var(--ds-primitive-color-brand-lavender-300)',
+                borderRadius: 4,
+                marginBottom: 6,
+              }}>
+                <div style={{ width: 32, height: 32, background: 'var(--ds-primitive-color-brand-lavender-500)', borderRadius: 2 }} />
+              </div>
+              <TokenLabel>{size}</TokenLabel>
+              <TokenLabel>--ds-semantic-spacing-inset-{size}</TokenLabel>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Spacing · inline (horizontal gap between elements)">
+        <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+          {spacingSizes.map(size => (
+            <div key={size} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' as const }}>
+              <div style={{
+                display: 'flex',
+                gap: `var(--ds-semantic-spacing-inline-${size})`,
+                padding: 8,
+                background: 'var(--ds-primitive-color-neutral-50)',
+                border: '1px solid var(--ds-primitive-color-neutral-200)',
+                borderRadius: 4,
+                marginBottom: 6,
+              }}>
+                <div style={{ width: 24, height: 32, background: 'var(--ds-primitive-color-brand-lavender-500)', borderRadius: 2 }} />
+                <div style={{ width: 24, height: 32, background: 'var(--ds-primitive-color-brand-lavender-500)', borderRadius: 2 }} />
+              </div>
+              <TokenLabel>{size}</TokenLabel>
+              <TokenLabel>--ds-semantic-spacing-inline-{size}</TokenLabel>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Spacing · stack (vertical gap between elements)">
+        <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+          {spacingSizes.map(size => (
+            <div key={size} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' as const }}>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column' as const,
+                gap: `var(--ds-semantic-spacing-stack-${size})`,
+                padding: 8,
+                background: 'var(--ds-primitive-color-neutral-50)',
+                border: '1px solid var(--ds-primitive-color-neutral-200)',
+                borderRadius: 4,
+                marginBottom: 6,
+              }}>
+                <div style={{ width: 32, height: 24, background: 'var(--ds-primitive-color-brand-lavender-500)', borderRadius: 2 }} />
+                <div style={{ width: 32, height: 24, background: 'var(--ds-primitive-color-brand-lavender-500)', borderRadius: 2 }} />
+              </div>
+              <TokenLabel>{size}</TokenLabel>
+              <TokenLabel>--ds-semantic-spacing-stack-{size}</TokenLabel>
+            </div>
+          ))}
+        </div>
+      </Section>
+    </div>
+  ),
+};
+
 // ─── Typography ───────────────────────────────────────────────────────────────
 
 type TypographyStyle = { key: string; label: string };

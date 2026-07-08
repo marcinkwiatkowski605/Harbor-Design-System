@@ -34,7 +34,7 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
   </div>
 );
 
-// ─── Token table (Name | Value | Preview) ─────────────────────────────────────
+// ─── Token table (Preview | Name | Value) ─────────────────────────────────────
 
 const TokenPreview = ({ cssVar }: { cssVar: string }) => (
   <div style={{
@@ -52,6 +52,9 @@ const TokenTableRow = ({ cssVar, showPreview }: TableToken & { showPreview: bool
   return (
     <tr>
       <td style={{ padding: '8px 12px', verticalAlign: 'middle' }}>
+        {showPreview && <TokenPreview cssVar={cssVar} />}
+      </td>
+      <td style={{ padding: '8px 12px', verticalAlign: 'middle' }}>
         <code style={{
           fontFamily: 'monospace',
           fontSize: 11,
@@ -65,14 +68,11 @@ const TokenTableRow = ({ cssVar, showPreview }: TableToken & { showPreview: bool
       <td style={{ padding: '8px 12px', verticalAlign: 'middle', fontFamily: 'monospace', fontSize: 11, color: '#111' }}>
         {value}
       </td>
-      <td style={{ padding: '8px 12px', verticalAlign: 'middle' }}>
-        {showPreview && <TokenPreview cssVar={cssVar} />}
-      </td>
     </tr>
   );
 };
 
-const BUTTON_TABLE_COLUMN_WIDTHS = ['460px', '90px', 'auto'];
+const BUTTON_TABLE_COLUMN_WIDTHS = ['96px', '440px', 'auto'];
 
 const TokenTable = ({ tokens, showPreview = true }: { tokens: TableToken[]; showPreview?: boolean }) => (
   <table style={{ width: '100%', tableLayout: 'fixed' as const, borderCollapse: 'collapse' as const, ...baseStyle }}>
@@ -83,7 +83,7 @@ const TokenTable = ({ tokens, showPreview = true }: { tokens: TableToken[]; show
     </colgroup>
     <thead>
       <tr>
-        {['Name', 'Value', 'Preview'].map(heading => (
+        {['Preview', 'Name', 'Value'].map(heading => (
           <th
             key={heading}
             style={{

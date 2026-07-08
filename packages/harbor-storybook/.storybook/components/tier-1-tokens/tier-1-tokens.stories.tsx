@@ -12,7 +12,7 @@ const tokens = { fontFamily: 'system-ui, sans-serif', fontSize: 12, color: '#111
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <div style={{ marginBottom: 40 }}>
-    <h2 style={{ ...tokens, fontWeight: 600, fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.06em', color: '#888', margin: '0 0 14px' }}>
+    <h2 style={{ ...tokens, fontWeight: 600, fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.06em', color: '#666', margin: '0 0 14px' }}>
       {title}
     </h2>
     {children}
@@ -20,7 +20,7 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
 );
 
 const Label = ({ children }: { children: React.ReactNode }) => (
-  <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#aaa', display: 'block', marginTop: 4, lineHeight: 1.3 }}>
+  <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#666', display: 'block', marginTop: 4, lineHeight: 1.3 }}>
     {children}
   </span>
 );
@@ -96,11 +96,11 @@ export const Typography: StoryObj = {
       <Section title="Font Size Scale">
         {fontSizeSteps.map(step => (
           <div key={step} style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginBottom: 10, paddingBottom: 10, borderBottom: '1px solid #f0f0f0' }}>
-            <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#bbb', width: 30, flexShrink: 0 }}>{step}</span>
+            <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#666', width: 30, flexShrink: 0 }}>{step}</span>
             <span style={{ fontSize: `var(--ds-primitive-typography-font-size-${step})`, lineHeight: 1.1, color: '#111', whiteSpace: 'nowrap', overflow: 'hidden' }}>
               Harbor
             </span>
-            <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#ccc', marginLeft: 'auto', flexShrink: 0 }}>
+            <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#666', marginLeft: 'auto', flexShrink: 0 }}>
               --ds-primitive-typography-font-size-{step}
             </span>
           </div>
@@ -110,7 +110,7 @@ export const Typography: StoryObj = {
       <Section title="Font Weight">
         {(['regular', 'bold'] as const).map(w => (
           <div key={w} style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginBottom: 12 }}>
-            <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#bbb', width: 50, flexShrink: 0 }}>{w}</span>
+            <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#666', width: 50, flexShrink: 0 }}>{w}</span>
             <span style={{ fontSize: 24, fontWeight: w === 'bold' ? 700 : 400, color: '#111' }}>
               Harbor Design System
             </span>
@@ -133,7 +133,7 @@ export const Typography: StoryObj = {
       <Section title="Line Height">
         {lineHeightSteps.map(step => (
           <div key={step} style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginBottom: 8 }}>
-            <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#bbb', width: 30, flexShrink: 0, paddingTop: 4 }}>{step}</span>
+            <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#666', width: 30, flexShrink: 0, paddingTop: 4 }}>{step}</span>
             <div style={{
               background: 'var(--ds-primitive-color-brand-lavender-100)',
               borderLeft: '2px solid var(--ds-primitive-color-brand-lavender-400)',
@@ -143,7 +143,7 @@ export const Typography: StoryObj = {
                 Harbor Design System<br />two lines of text
               </span>
             </div>
-            <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#ccc', marginLeft: 'auto', flexShrink: 0 }}>
+            <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#666', marginLeft: 'auto', flexShrink: 0 }}>
               --ds-primitive-typography-line-height-{step}
             </span>
           </div>
@@ -153,7 +153,7 @@ export const Typography: StoryObj = {
       <Section title="Font Style">
         {fontStyleSteps.map(s => (
           <div key={s} style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginBottom: 12 }}>
-            <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#bbb', width: 70, flexShrink: 0 }}>{s}</span>
+            <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#666', width: 70, flexShrink: 0 }}>{s}</span>
             <span style={{ fontSize: 24, fontStyle: `var(--ds-primitive-typography-font-style-${s})` as any, color: '#111' }}>
               Harbor Design System
             </span>
@@ -165,7 +165,7 @@ export const Typography: StoryObj = {
       <Section title="Text Decoration">
         {textDecorationSteps.map(s => (
           <div key={s} style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginBottom: 12 }}>
-            <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#bbb', width: 70, flexShrink: 0 }}>{s}</span>
+            <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#666', width: 70, flexShrink: 0 }}>{s}</span>
             <span style={{ fontSize: 24, textDecoration: `var(--ds-primitive-typography-text-decoration-${s})` as any, color: '#111' }}>
               Harbor Design System
             </span>
@@ -177,7 +177,7 @@ export const Typography: StoryObj = {
       <Section title="Text Transform">
         {textTransformSteps.map(s => (
           <div key={s} style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginBottom: 12 }}>
-            <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#bbb', width: 70, flexShrink: 0 }}>{s}</span>
+            <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#666', width: 70, flexShrink: 0 }}>{s}</span>
             <span style={{ fontSize: 24, textTransform: `var(--ds-primitive-typography-text-transform-${s})` as any, color: '#111' }}>
               Harbor Design System
             </span>
@@ -199,7 +199,7 @@ export const Spacing: StoryObj = {
       <Section title="Spacing Scale">
         {spacingSteps.map(step => (
           <div key={step} style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>
-            <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#bbb', width: 30, flexShrink: 0 }}>
+            <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#666', width: 30, flexShrink: 0 }}>
               {step}
             </span>
             <div style={{
@@ -210,7 +210,7 @@ export const Spacing: StoryObj = {
               minWidth: 2,
               flexShrink: 0,
             }} />
-            <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#ccc' }}>
+            <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#666' }}>
               --ds-primitive-spacing-{step}
             </span>
           </div>

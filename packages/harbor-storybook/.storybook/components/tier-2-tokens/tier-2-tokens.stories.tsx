@@ -14,7 +14,7 @@ const baseStyle = { fontFamily: 'system-ui, sans-serif', fontSize: 12, color: '#
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <div style={{ marginBottom: 40 }}>
-    <h2 style={{ ...baseStyle, fontWeight: 600, fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.06em', color: '#888', margin: '0 0 14px' }}>
+    <h2 style={{ ...baseStyle, fontWeight: 600, fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.06em', color: '#666', margin: '0 0 14px' }}>
       {title}
     </h2>
     {children}
@@ -22,7 +22,7 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
 );
 
 const TokenLabel = ({ children }: { children: React.ReactNode }) => (
-  <span style={{ fontFamily: 'monospace', fontSize: 9, color: '#bbb', display: 'block', lineHeight: 1.4 }}>
+  <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#666', display: 'block', lineHeight: 1.4 }}>
     {children}
   </span>
 );
@@ -177,7 +177,7 @@ const ColorTable = ({ role, contexts }: { role: string; contexts: ColorContext[]
               fontWeight: 600,
               textTransform: 'uppercase' as const,
               letterSpacing: '0.04em',
-              color: '#888',
+              color: '#666',
               borderBottom: '1px solid #eee',
             }}
           >
@@ -312,7 +312,7 @@ export const Typography: StoryObj = {
           const prefix = `--ds-semantic-typography-${key}`;
           return (
             <div key={key} style={{ display: 'flex', alignItems: 'baseline', gap: 20, marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid #f5f5f5' }}>
-              <span style={{ width: 96, fontFamily: 'monospace', fontSize: 9, color: '#bbb', flexShrink: 0, alignSelf: 'center' }}>
+              <span style={{ width: 96, fontFamily: 'monospace', fontSize: 11, color: '#666', flexShrink: 0, alignSelf: 'center' }}>
                 {label}
               </span>
               <span style={{
@@ -329,7 +329,7 @@ export const Typography: StoryObj = {
               }}>
                 Harbor Design System
               </span>
-              <span style={{ fontFamily: 'monospace', fontSize: 9, color: '#ccc', marginLeft: 'auto', flexShrink: 0 }}>
+              <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#666', marginLeft: 'auto', flexShrink: 0 }}>
                 {prefix}-*
               </span>
             </div>

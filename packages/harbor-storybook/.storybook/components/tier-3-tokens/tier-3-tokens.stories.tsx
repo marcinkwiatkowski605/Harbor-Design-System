@@ -27,7 +27,7 @@ const baseStyle = { fontFamily: 'system-ui, sans-serif', fontSize: 12, color: '#
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <div style={{ marginBottom: 40 }}>
-    <h2 style={{ ...baseStyle, fontWeight: 600, fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.06em', color: '#888', margin: '0 0 14px' }}>
+    <h2 style={{ ...baseStyle, fontWeight: 600, fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.06em', color: '#666', margin: '0 0 14px' }}>
       {title}
     </h2>
     {children}
@@ -93,7 +93,7 @@ const TokenTable = ({ tokens, showPreview = true }: { tokens: TableToken[]; show
               fontWeight: 600,
               textTransform: 'uppercase' as const,
               letterSpacing: '0.04em',
-              color: '#888',
+              color: '#666',
               borderBottom: '1px solid #eee',
             }}
           >
@@ -176,11 +176,11 @@ export const Button: StoryObj = {
         <table style={{ borderCollapse: 'collapse' as const, ...baseStyle }}>
           <thead>
             <tr>
-              <th style={{ padding: '0 16px 12px 0', textAlign: 'left' as const, fontWeight: 600, fontSize: 10, color: '#888', textTransform: 'uppercase' as const }}>
+              <th style={{ padding: '0 16px 12px 0', textAlign: 'left' as const, fontWeight: 600, fontSize: 11, color: '#666', textTransform: 'uppercase' as const }}>
                 Variant
               </th>
               {states.map(s => (
-                <th key={s} style={{ padding: '0 12px 12px', textAlign: 'center' as const, fontWeight: 600, fontSize: 10, color: '#888', textTransform: 'uppercase' as const }}>
+                <th key={s} style={{ padding: '0 12px 12px', textAlign: 'center' as const, fontWeight: 600, fontSize: 11, color: '#666', textTransform: 'uppercase' as const }}>
                   {s}
                 </th>
               ))}
@@ -189,7 +189,7 @@ export const Button: StoryObj = {
           <tbody>
             {variants.map(variant => (
               <tr key={variant}>
-                <td style={{ paddingRight: 16, paddingBottom: 12, fontFamily: 'monospace', fontSize: 10, color: '#aaa', verticalAlign: 'middle' as const }}>
+                <td style={{ paddingRight: 16, paddingBottom: 12, fontFamily: 'monospace', fontSize: 11, color: '#666', verticalAlign: 'middle' as const }}>
                   {variantLabel[variant]}
                 </td>
                 {states.map(state => (

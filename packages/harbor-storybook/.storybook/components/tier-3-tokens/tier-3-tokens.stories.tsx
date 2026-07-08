@@ -2,6 +2,9 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 // Requires `npm run build:tokens` to have run first — this file is gitignored build output.
 import tokensJson from '../../../../harbor-tokens/light/build/json/tokens.json';
+// The DTCG source (pre-resolution) — read to show what a token *aliases*, since the
+// built tokens.json above only has the final resolved value.
+import designTokens from '../../../../../design_tokens.json';
 
 const meta: Meta = {
   title: 'Foundations/Design Tokens/Tier 3: Component Tokens',
@@ -20,6 +23,83 @@ const valueFor = (cssVar: string): string => {
   }
   return value;
 };
+
+// ─── Alias resolution (design_tokens.json → --ds-{tier}-* reference name) ──────
+
+type DtcgNode = { $value?: unknown; [key: string]: unknown };
+
+const TIER_BY_COLLECTION: Record<string, string> = {
+  'primitive-brand-a': 'primitive',
+  'primitive-global': 'primitive',
+  'semantic-modes': 'semantic',
+  'component-modes': 'component',
+};
+
+// Maps every token's dot-path (e.g. "color.brand.lavender.600") to the tier its
+// collection belongs to, so an alias reference string can become the right
+// --ds-{tier}-* name. A path ending in "@" (the Figma exporter's remap for a base
+// value that collides with its own nested states — see config.js) is also indexed
+// under its bare parent path, matching how aliases actually reference it.
+const buildTierIndex = (raw: Record<string, unknown>): Map<string, string> => {
+  const index = new Map<string, string>();
+  const walk = (node: unknown, path: string[], tier: string) => {
+    if (node === null || typeof node !== 'object') return;
+    const obj = node as DtcgNode;
+    if ('$value' in obj) {
+      index.set(path.join('.'), tier);
+      if (path[path.length - 1] === '@') {
+        index.set(path.slice(0, -1).join('.'), tier);
+      }
+      return;
+    }
+    for (const [key, val] of Object.entries(obj)) {
+      if (key.startsWith('$')) continue;
+      walk(val, [...path, key], tier);
+    }
+  };
+  for (const [collection, subtree] of Object.entries(raw)) {
+    if (collection === '$extensions') continue;
+    const tier = TIER_BY_COLLECTION[collection];
+    if (!tier) continue;
+    walk(subtree, [], tier);
+  }
+  return index;
+};
+
+const tierIndex = buildTierIndex(designTokens as unknown as Record<string, unknown>);
+
+// Walks `segments` from the design_tokens.json root; if the final node has no
+// $value of its own but has an "@" child, descends into that instead (same remap).
+const resolveDtcgNode = (segments: string[]): DtcgNode | undefined => {
+  let node: unknown = designTokens;
+  for (const seg of segments) {
+    if (node == null || typeof node !== 'object') return undefined;
+    node = (node as DtcgNode)[seg];
+  }
+  if (node && typeof node === 'object' && !('$value' in (node as DtcgNode)) && '@' in (node as DtcgNode)) {
+    node = (node as DtcgNode)['@'];
+  }
+  return node as DtcgNode | undefined;
+};
+
+const aliasFor = (segments: string[]): string | null => {
+  const raw = resolveDtcgNode(segments)?.$value;
+  if (typeof raw !== 'string') return null;
+  const match = raw.match(/^\{(.+)\}$/);
+  if (!match) return null;
+  const tier = tierIndex.get(match[1]);
+  if (!tier) return null;
+  return `--ds-${tier}-${match[1].replace(/\./g, '-')}`;
+};
+
+// Value column shows the alias in italic muted text if one resolves, otherwise
+// falls back to the raw resolved value (kept as a defensive case — every token in
+// these tables is expected to be an alias, never a literal).
+const AliasOrValue = ({ alias, fallback }: { alias: string | null; fallback: string }) => (
+  <span style={{ fontFamily: 'monospace', fontSize: 11, fontStyle: alias ? 'italic' as const : 'normal' as const, color: alias ? '#666' : '#111' }}>
+    {alias ?? fallback}
+  </span>
+);
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────
 
@@ -45,10 +125,11 @@ const TokenPreview = ({ cssVar }: { cssVar: string }) => (
   }} />
 );
 
-type TableToken = { name: string; cssVar: string };
+type TableToken = { name: string; cssVar: string; path: string[] };
 
-const TokenTableRow = ({ cssVar, showPreview }: TableToken & { showPreview: boolean }) => {
+const TokenTableRow = ({ cssVar, path, showPreview }: TableToken & { showPreview: boolean }) => {
   const value = valueFor(cssVar);
+  const alias = aliasFor(path);
   return (
     <tr>
       <td style={{ padding: '8px 12px', verticalAlign: 'middle' }}>
@@ -65,14 +146,14 @@ const TokenTableRow = ({ cssVar, showPreview }: TableToken & { showPreview: bool
           wordBreak: 'break-all' as const,
         }}>{cssVar}</code>
       </td>
-      <td style={{ padding: '8px 12px', verticalAlign: 'middle', fontFamily: 'monospace', fontSize: 11, color: '#111' }}>
-        {value}
+      <td style={{ padding: '8px 12px', verticalAlign: 'middle' }}>
+        <AliasOrValue alias={alias} fallback={value} />
       </td>
     </tr>
   );
 };
 
-const BUTTON_TABLE_COLUMN_WIDTHS = ['96px', '440px', 'auto'];
+const BUTTON_TABLE_COLUMN_WIDTHS = ['96px', '460px', 'auto'];
 
 const TokenTable = ({ tokens, showPreview = true }: { tokens: TableToken[]; showPreview?: boolean }) => (
   <table style={{ width: '100%', tableLayout: 'fixed' as const, borderCollapse: 'collapse' as const, ...baseStyle }}>
@@ -213,21 +294,21 @@ export const Button: StoryObj = {
 
       <Section title="Shared button tokens">
         <TokenTable showPreview={false} tokens={[
-          { name: 'border-radius', cssVar: '--ds-component-button-border-radius' },
-          { name: 'border-width', cssVar: '--ds-component-button-border-width' },
-          { name: 'height', cssVar: '--ds-component-button-height' },
-          { name: 'padding', cssVar: '--ds-component-button-padding' },
+          { name: 'border-radius', cssVar: '--ds-component-button-border-radius', path: ['component-modes', 'button', 'border', 'radius'] },
+          { name: 'border-width', cssVar: '--ds-component-button-border-width', path: ['component-modes', 'button', 'border', 'width'] },
+          { name: 'height', cssVar: '--ds-component-button-height', path: ['component-modes', 'button', 'height'] },
+          { name: 'padding', cssVar: '--ds-component-button-padding', path: ['component-modes', 'button', 'padding'] },
         ]} />
       </Section>
 
       <Section title="Focus ring (shared, semantic)">
         <TokenTable showPreview={false} tokens={[
-          { name: 'ring-color', cssVar: '--ds-semantic-focus-ring-ring-color' },
-          { name: 'ring-spread', cssVar: '--ds-semantic-focus-ring-ring-spread' },
-          { name: 'ring-blur', cssVar: '--ds-semantic-focus-ring-ring-blur' },
-          { name: 'gap-color', cssVar: '--ds-semantic-focus-ring-gap-color' },
-          { name: 'gap-spread', cssVar: '--ds-semantic-focus-ring-gap-spread' },
-          { name: 'gap-blur', cssVar: '--ds-semantic-focus-ring-gap-blur' },
+          { name: 'ring-color', cssVar: '--ds-semantic-focus-ring-ring-color', path: ['semantic-modes', 'focus-ring', 'ring', 'color'] },
+          { name: 'ring-spread', cssVar: '--ds-semantic-focus-ring-ring-spread', path: ['semantic-modes', 'focus-ring', 'ring', 'spread'] },
+          { name: 'ring-blur', cssVar: '--ds-semantic-focus-ring-ring-blur', path: ['semantic-modes', 'focus-ring', 'ring', 'blur'] },
+          { name: 'gap-color', cssVar: '--ds-semantic-focus-ring-gap-color', path: ['semantic-modes', 'focus-ring', 'gap', 'color'] },
+          { name: 'gap-spread', cssVar: '--ds-semantic-focus-ring-gap-spread', path: ['semantic-modes', 'focus-ring', 'gap', 'spread'] },
+          { name: 'gap-blur', cssVar: '--ds-semantic-focus-ring-gap-blur', path: ['semantic-modes', 'focus-ring', 'gap', 'blur'] },
         ]} />
       </Section>
 
@@ -236,6 +317,7 @@ export const Button: StoryObj = {
           (['background', 'content', ...(variant === 'outline' ? ['border'] : [])] as string[]).map(role => ({
             name: `${state} · ${role}`,
             cssVar: `--ds-component-button-${variant}-color-${role}-${state}`,
+            path: ['component-modes', 'button', variant, 'color', role, state],
           }))
         );
         return (

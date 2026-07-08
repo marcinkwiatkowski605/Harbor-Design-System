@@ -2,11 +2,91 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 // Requires `npm run build:tokens` to have run first — this file is gitignored build output.
 import tokensJson from '../../../../harbor-tokens/light/build/json/tokens.json';
+// The DTCG source (pre-resolution) — read to show what a token *aliases*, since the
+// built tokens.json above only has the final resolved value.
+import designTokens from '../../../../../design_tokens.json';
 
 const meta: Meta = {
   title: 'Foundations/Design Tokens/Tier 2: Semantic Tokens',
 };
 export default meta;
+
+// ─── Alias resolution (design_tokens.json → --ds-{tier}-* reference name) ──────
+
+type DtcgNode = { $value?: unknown; [key: string]: unknown };
+
+const TIER_BY_COLLECTION: Record<string, string> = {
+  'primitive-brand-a': 'primitive',
+  'primitive-global': 'primitive',
+  'semantic-modes': 'semantic',
+  'component-modes': 'component',
+};
+
+// Maps every token's dot-path (e.g. "color.brand.lavender.600") to the tier its
+// collection belongs to, so an alias reference string can become the right
+// --ds-{tier}-* name. A path ending in "@" (the Figma exporter's remap for a base
+// value that collides with its own nested states — see config.js) is also indexed
+// under its bare parent path, matching how aliases actually reference it.
+const buildTierIndex = (raw: Record<string, unknown>): Map<string, string> => {
+  const index = new Map<string, string>();
+  const walk = (node: unknown, path: string[], tier: string) => {
+    if (node === null || typeof node !== 'object') return;
+    const obj = node as DtcgNode;
+    if ('$value' in obj) {
+      index.set(path.join('.'), tier);
+      if (path[path.length - 1] === '@') {
+        index.set(path.slice(0, -1).join('.'), tier);
+      }
+      return;
+    }
+    for (const [key, val] of Object.entries(obj)) {
+      if (key.startsWith('$')) continue;
+      walk(val, [...path, key], tier);
+    }
+  };
+  for (const [collection, subtree] of Object.entries(raw)) {
+    if (collection === '$extensions') continue;
+    const tier = TIER_BY_COLLECTION[collection];
+    if (!tier) continue;
+    walk(subtree, [], tier);
+  }
+  return index;
+};
+
+const tierIndex = buildTierIndex(designTokens as unknown as Record<string, unknown>);
+
+// Walks `segments` from the design_tokens.json root; if the final node has no
+// $value of its own but has an "@" child, descends into that instead (same remap).
+const resolveDtcgNode = (segments: string[]): DtcgNode | undefined => {
+  let node: unknown = designTokens;
+  for (const seg of segments) {
+    if (node == null || typeof node !== 'object') return undefined;
+    node = (node as DtcgNode)[seg];
+  }
+  if (node && typeof node === 'object' && !('$value' in (node as DtcgNode)) && '@' in (node as DtcgNode)) {
+    node = (node as DtcgNode)['@'];
+  }
+  return node as DtcgNode | undefined;
+};
+
+const aliasFor = (segments: string[]): string | null => {
+  const raw = resolveDtcgNode(segments)?.$value;
+  if (typeof raw !== 'string') return null;
+  const match = raw.match(/^\{(.+)\}$/);
+  if (!match) return null;
+  const tier = tierIndex.get(match[1]);
+  if (!tier) return null;
+  return `--ds-${tier}-${match[1].replace(/\./g, '-')}`;
+};
+
+// Value column shows the alias in italic muted text if one resolves, otherwise
+// falls back to the raw resolved value (kept as a defensive case — every token in
+// these tables is expected to be an alias, never a literal).
+const AliasOrValue = ({ alias, fallback }: { alias: string | null; fallback: string }) => (
+  <span style={{ fontFamily: 'monospace', fontSize: 11, fontStyle: alias ? 'italic' as const : 'normal' as const, color: alias ? '#666' : '#111' }}>
+    {alias ?? fallback}
+  </span>
+);
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────
 
@@ -118,9 +198,22 @@ const colorGroups: ColorGroup[] = [
   },
 ];
 
+// Splits a flattened context key back into design_tokens.json path segments.
+// Covers every key shape actually used in colorGroups below: '' is the base value
+// (segments live directly under the role), 'on-*' names are one literal segment
+// (never split), and '*-hover' / '*-selected' are the only two-segment shapes.
+const splitContextKey = (key: string): string[] => {
+  if (key === '') return [];
+  if (key.startsWith('on-')) return [key];
+  if (key.endsWith('-hover')) return [key.slice(0, -'-hover'.length), 'hover'];
+  if (key.endsWith('-selected')) return [key.slice(0, -'-selected'.length), 'selected'];
+  return [key];
+};
+
 const ColorTableRow = ({ role, context }: { role: string; context: ColorContext }) => {
   const cssVar = cssVarFor(role, context.key);
   const hex = hexFor(role, context.key);
+  const alias = aliasFor(['semantic-modes', 'color', role, ...splitContextKey(context.key)]);
   return (
     <tr>
       <td style={{ padding: '8px 12px', verticalAlign: 'middle' }}>
@@ -144,8 +237,8 @@ const ColorTableRow = ({ role, context }: { role: string; context: ColorContext 
           wordBreak: 'break-all' as const,
         }}>{cssVar}</code>
       </td>
-      <td style={{ padding: '8px 12px', verticalAlign: 'middle', fontFamily: 'monospace', fontSize: 11, color: '#111' }}>
-        {hex}
+      <td style={{ padding: '8px 12px', verticalAlign: 'middle' }}>
+        <AliasOrValue alias={alias} fallback={hex} />
       </td>
       <td style={{ padding: '8px 12px', verticalAlign: 'middle', fontSize: 12, color: '#333' }}>
         {context.useCase}
@@ -156,7 +249,7 @@ const ColorTableRow = ({ role, context }: { role: string; context: ColorContext 
 
 // Fixed per-column widths so every role's table (background/border/content) lines
 // up identically, regardless of how long that table's own content happens to be.
-const COLOR_TABLE_COLUMN_WIDTHS = ['96px', '420px', '90px', 'auto'];
+const COLOR_TABLE_COLUMN_WIDTHS = ['96px', '400px', '340px', 'auto'];
 
 const ColorTable = ({ role, contexts }: { role: string; contexts: ColorContext[] }) => (
   <table style={{ width: '100%', tableLayout: 'fixed' as const, borderCollapse: 'collapse' as const, ...baseStyle }}>

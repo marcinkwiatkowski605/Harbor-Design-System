@@ -146,26 +146,34 @@ const ButtonPreview = ({ variant, state }: { variant: ButtonVariant; state: Butt
     : 'transparent';
 
   return (
-    <div style={{
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      blockSize: 'var(--ds-component-button-height)',
-      paddingInline: 'var(--ds-component-button-padding)',
-      background: bgVar,
-      color: contentVar,
-      border: `var(--ds-component-button-border-width) solid ${borderVar}`,
-      borderRadius: 'var(--ds-component-button-border-radius)',
-      boxShadow: state === 'focus' ? focusRing : undefined,
-      fontSize: 14,
-      fontFamily: 'system-ui, sans-serif',
-      fontWeight: 500,
-      cursor: state === 'disabled' ? 'not-allowed' : 'default',
-      minWidth: 80,
-      userSelect: 'none' as const,
-    }}>
+    // A real <button disabled> instead of a styled <div> — the native disabled
+    // attribute is what lets axe apply WCAG 1.4.3's inactive-component contrast
+    // exception (matches Button.tsx; a div merely styled to look disabled doesn't
+    // get that exception and shows as a false-positive contrast violation).
+    <button
+      type="button"
+      disabled={state === 'disabled'}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        blockSize: 'var(--ds-component-button-height)',
+        paddingInline: 'var(--ds-component-button-padding)',
+        background: bgVar,
+        color: contentVar,
+        border: `var(--ds-component-button-border-width) solid ${borderVar}`,
+        borderRadius: 'var(--ds-component-button-border-radius)',
+        boxShadow: state === 'focus' ? focusRing : undefined,
+        fontSize: 14,
+        fontFamily: 'system-ui, sans-serif',
+        fontWeight: 500,
+        cursor: state === 'disabled' ? 'not-allowed' : 'default',
+        minWidth: 80,
+        userSelect: 'none' as const,
+      }}
+    >
       Button
-    </div>
+    </button>
   );
 };
 

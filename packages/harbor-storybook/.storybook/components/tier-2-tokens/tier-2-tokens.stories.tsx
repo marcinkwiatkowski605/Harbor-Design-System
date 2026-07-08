@@ -36,8 +36,13 @@ type ColorGroup = { role: string; contexts: ColorContext[] };
 // so it can't be cast directly to Record<string, string> — bridge through `unknown`.
 const semanticColorTokens = tokensJson as unknown as Record<string, string>;
 
+// An empty key represents the base/default value, which carries no name suffix
+// (e.g. --ds-semantic-color-background, not --ds-semantic-color-background-default).
+const cssVarFor = (role: string, key: string): string =>
+  key ? `--ds-semantic-color-${role}-${key}` : `--ds-semantic-color-${role}`;
+
 const hexFor = (role: string, key: string): string => {
-  const cssVarName = `ds-semantic-color-${role}-${key}`;
+  const cssVarName = cssVarFor(role, key).slice(2);
   const hex = semanticColorTokens[cssVarName];
   if (!hex) {
     throw new Error(`Missing token value for --${cssVarName} in tokens.json`);
@@ -49,69 +54,72 @@ const colorGroups: ColorGroup[] = [
   {
     role: 'background',
     contexts: [
-      { key: 'default', useCase: 'Default background for pages, cards, and containers' },
-      { key: 'default-hover', useCase: 'Hover color for `background-default`' },
-      { key: 'default-pressed', useCase: 'Pressed color for `background-default`' },
+      { key: '', useCase: 'Default background for pages, cards, and containers' },
+      { key: 'hover', useCase: 'Hover color for the default background' },
+      { key: 'selected', useCase: 'Selected color for the default background' },
       { key: 'disabled', useCase: 'Background for disabled controls and containers' },
       { key: 'subtle', useCase: 'Recessed, low-emphasis background' },
       { key: 'accent', useCase: 'Background for accent-emphasis elements' },
       { key: 'accent-hover', useCase: 'Hover color for `background-accent`' },
-      { key: 'accent-pressed', useCase: 'Pressed color for `background-accent`' },
-      { key: 'accent-subtle', useCase: 'Low-emphasis background for accent elements' },
+      { key: 'accent-selected', useCase: 'Selected color for `background-accent`' },
       { key: 'brand', useCase: 'Background for primary, brand-emphasis controls' },
       { key: 'brand-hover', useCase: 'Hover color for `background-brand`' },
-      { key: 'brand-pressed', useCase: 'Pressed color for `background-brand`' },
-      { key: 'brand-subtle', useCase: 'Low-emphasis background for brand elements' },
-      { key: 'support-error-strong', useCase: 'High-emphasis background for error or destructive states' },
-      { key: 'support-error-subtle', useCase: 'Low-emphasis background for error or destructive states' },
-      { key: 'support-info-strong', useCase: 'High-emphasis background for informational content' },
-      { key: 'support-info-subtle', useCase: 'Low-emphasis background for informational content' },
-      { key: 'support-success-strong', useCase: 'High-emphasis background for success states' },
-      { key: 'support-success-subtle', useCase: 'Low-emphasis background for success states' },
-      { key: 'support-warning-strong', useCase: 'High-emphasis background for warnings' },
-      { key: 'support-warning-subtle', useCase: 'Low-emphasis background for warnings' },
+      { key: 'brand-selected', useCase: 'Selected color for `background-brand`' },
+      { key: 'error', useCase: 'Background for error or destructive states' },
+      { key: 'error-hover', useCase: 'Hover color for `background-error`' },
+      { key: 'error-selected', useCase: 'Selected color for `background-error`' },
+      { key: 'info', useCase: 'Background for informational content' },
+      { key: 'info-hover', useCase: 'Hover color for `background-info`' },
+      { key: 'info-selected', useCase: 'Selected color for `background-info`' },
+      { key: 'success', useCase: 'Background for success states' },
+      { key: 'success-hover', useCase: 'Hover color for `background-success`' },
+      { key: 'success-selected', useCase: 'Selected color for `background-success`' },
+      { key: 'warning', useCase: 'Background for warnings' },
+      { key: 'warning-hover', useCase: 'Hover color for `background-warning`' },
+      { key: 'warning-selected', useCase: 'Selected color for `background-warning`' },
     ],
   },
   {
     role: 'border',
     contexts: [
-      { key: 'default', useCase: 'Default border for containers and controls' },
-      { key: 'default-hover', useCase: 'Hover color for `border-default`' },
-      { key: 'default-pressed', useCase: 'Pressed color for `border-default`' },
+      { key: '', useCase: 'Default border for containers and controls' },
+      { key: 'hover', useCase: 'Hover color for the default border' },
+      { key: 'selected', useCase: 'Selected color for the default border' },
       { key: 'disabled', useCase: 'Border for disabled controls' },
       { key: 'accent', useCase: 'Border for accent-emphasis elements' },
       { key: 'brand', useCase: 'Border for brand-emphasis or selected controls' },
-      { key: 'support-error', useCase: 'Border communicating an error or destructive state' },
-      { key: 'support-info', useCase: 'Border communicating informational content' },
-      { key: 'support-success', useCase: 'Border communicating a success state' },
-      { key: 'support-warning', useCase: 'Border communicating a warning' },
+      { key: 'error', useCase: 'Border communicating an error or destructive state' },
+      { key: 'info', useCase: 'Border communicating informational content' },
+      { key: 'success', useCase: 'Border communicating a success state' },
+      { key: 'warning', useCase: 'Border communicating a warning' },
       { key: 'focus', useCase: 'Visible focus indicator' },
     ],
   },
   {
     role: 'content',
     contexts: [
-      { key: 'default', useCase: 'Default text color for body copy and labels' },
-      { key: 'default-hover', useCase: 'Hover color for `content-default`' },
+      { key: '', useCase: 'Default text color for body copy and labels' },
+      { key: 'secondary', useCase: 'Secondary, low-emphasis text' },
       { key: 'disabled', useCase: 'Text color for disabled controls and copy' },
-      { key: 'subtle', useCase: 'Secondary, low-emphasis text' },
-      { key: 'inverse', useCase: 'Text on inverse (dark) backgrounds' },
       { key: 'accent', useCase: 'Text for accent-emphasis content' },
       { key: 'brand', useCase: 'Text for brand-emphasis or primary interactive content' },
-      { key: 'support-error', useCase: 'Text communicating an error or destructive state' },
-      { key: 'support-info', useCase: 'Text communicating informational content' },
-      { key: 'support-success', useCase: 'Text communicating a success state' },
-      { key: 'support-warning', useCase: 'Text communicating a warning' },
-      { key: 'support-on-error-subtle', useCase: 'Text on `background-support-error-subtle` surfaces' },
-      { key: 'support-on-info-subtle', useCase: 'Text on `background-support-info-subtle` surfaces' },
-      { key: 'support-on-success-subtle', useCase: 'Text on `background-support-success-subtle` surfaces' },
-      { key: 'support-on-warning-subtle', useCase: 'Text on `background-support-warning-subtle` surfaces' },
+      { key: 'error', useCase: 'Text communicating an error or destructive state' },
+      { key: 'info', useCase: 'Text communicating informational content' },
+      { key: 'success', useCase: 'Text communicating a success state' },
+      { key: 'warning', useCase: 'Text communicating a warning' },
+      { key: 'on-brand', useCase: 'Text on `background-brand` surfaces' },
+      { key: 'on-accent', useCase: 'Text on `background-accent` surfaces' },
+      { key: 'on-error', useCase: 'Text on `background-error` surfaces' },
+      { key: 'on-info', useCase: 'Text on `background-info` surfaces' },
+      { key: 'on-success', useCase: 'Text on `background-success` surfaces' },
+      { key: 'on-warning', useCase: 'Text on `background-warning` surfaces' },
+      { key: 'on-disabled', useCase: 'Text on `background-disabled` surfaces' },
     ],
   },
 ];
 
 const ColorTableRow = ({ role, context }: { role: string; context: ColorContext }) => {
-  const cssVar = `--ds-semantic-color-${role}-${context.key}`;
+  const cssVar = cssVarFor(role, context.key);
   const hex = hexFor(role, context.key);
   return (
     <tr>
@@ -325,19 +333,19 @@ export const BorderAndShadow: StoryObj = {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' as const }}>
             <div style={{
               width: 120, height: 40,
-              background: 'var(--ds-semantic-color-background-default)',
-              border: '1px solid var(--ds-semantic-color-border-default)',
+              background: 'var(--ds-semantic-color-background)',
+              border: '1px solid var(--ds-semantic-color-border)',
               borderRadius: 4,
               margin: '8px 16px 14px',
               boxShadow: [
                 // gap layer: x y blur spread color
-                'var(--ds-semantic-focus-gap-x) var(--ds-semantic-focus-gap-y) var(--ds-semantic-focus-gap-blur) var(--ds-semantic-focus-gap-spread) var(--ds-semantic-focus-gap-color)',
+                'var(--ds-semantic-focus-ring-gap-x) var(--ds-semantic-focus-ring-gap-y) var(--ds-semantic-focus-ring-gap-blur) var(--ds-semantic-focus-ring-gap-spread) var(--ds-semantic-focus-ring-gap-color)',
                 // ring layer offset by the gap spread so both rings are visible
-                'var(--ds-semantic-focus-ring-x) var(--ds-semantic-focus-ring-y) var(--ds-semantic-focus-ring-blur) calc(var(--ds-semantic-focus-gap-spread) + var(--ds-semantic-focus-ring-spread)) var(--ds-semantic-focus-ring-color)',
+                'var(--ds-semantic-focus-ring-ring-x) var(--ds-semantic-focus-ring-ring-y) var(--ds-semantic-focus-ring-ring-blur) calc(var(--ds-semantic-focus-ring-gap-spread) + var(--ds-semantic-focus-ring-ring-spread)) var(--ds-semantic-focus-ring-ring-color)',
               ].join(', '),
             }} />
-            <TokenLabel>focus gap · --ds-semantic-focus-gap-*</TokenLabel>
-            <TokenLabel>focus ring · --ds-semantic-focus-ring-*</TokenLabel>
+            <TokenLabel>focus gap · --ds-semantic-focus-ring-gap-*</TokenLabel>
+            <TokenLabel>focus ring · --ds-semantic-focus-ring-ring-*</TokenLabel>
           </div>
         </div>
       </Section>

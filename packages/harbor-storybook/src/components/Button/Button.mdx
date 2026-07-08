@@ -39,8 +39,8 @@ They're the primary way of triggering something to happen on screen.
 
 A button has two parts: a **container** (background, border, corner radius, focus
 ring) and a **label** (one line of centered text). There's no icon slot and no size
-property yet — every button renders at the same padding scale (24px horizontal,
-12px vertical, 8px corner radius).
+property yet — every button renders at a fixed 48px height, with 24px horizontal
+padding and an 8px corner radius.
 
 ## Types
 
@@ -58,18 +58,17 @@ flow needs rethinking before the button hierarchy does.
 
 ## States
 
-All three types share the same five states: Enabled, Hover, Pressed, Focus, Disabled.
+All three types share the same five states: Enabled, Hover, Selected, Focus, Disabled.
 
-- **Hover / Pressed** darken the fill (or border, for Outline) to confirm interactivity.
-  Outline gives Hover and Pressed two distinct border shades, so the states read differently
+- **Hover / Selected** darken the fill (or border, for Outline) to confirm interactivity.
+  Outline gives Hover and Selected two distinct border shades, so the states read differently
   instead of looking identical.
 - **Focus** adds a two-layer ring — a white gap plus a colored outer ring — shared across all
   three types via one token pair, so focus looks the same regardless of button type.
-- **Disabled** flattens background and text to neutral gray. Outline keeps its white
-  background and only dims border and label; the dimmed label color matches how Disabled
-  reads on Primary and Secondary.
+- **Disabled** flattens background and text to neutral gray on every type, including
+  Outline — background, border, and label all drop to their disabled tokens.
 
-In code, Hover/Pressed/Focus are driven by `:hover` / `:active` / `:focus-visible`,
+In code, Hover/Selected/Focus are driven by `:hover` / `:active` / `:focus-visible`,
 and Disabled by the native `disabled` attribute.
 
 ## Color reference
@@ -79,33 +78,33 @@ from the built component tokens; the state→token mapping is what `Button.css` 
 references. Token names below drop the per-variant prefix shown above each table.
 
 **Focus** has no fill token of its own — it keeps the Enabled background/content and
-adds the shared ring (`--ds-semantic-focus-ring-*` / `--ds-semantic-focus-gap-*`).
+adds the shared ring (`--ds-semantic-focus-ring-ring-*` / `--ds-semantic-focus-ring-gap-*`).
 
-**Primary** — prefix `--ds-component-button-primary-color-`. Content is `#FFFFFF` in every state.
+**Primary** — prefix `--ds-component-button-primary-color-`.
 
 <div className="full-width-table">
 
 | State    | Background                       | Content                       |
-|----------|----------------------------------|-------------------------------|
-| Enabled  | `#9B7FFF` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
-| Hover    | `#834DFF` · `background-hover`    | `#FFFFFF` · `content-hover`    |
-| Pressed  | `#6C31DB` · `background-pressed`  | `#FFFFFF` · `content-pressed`  |
-| Focus    | `#9B7FFF` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
-| Disabled | `#CFD5DA` · `background-disabled` | `#FFFFFF` · `content-disabled` |
+|----------|-----------------------------------|-------------------------------|
+| Enabled  | `#9B7FFF` · `background-enabled`  | `#FAF9FF` · `content-enabled`  |
+| Hover    | `#834DFF` · `background-hover`    | `#FAF9FF` · `content-hover`    |
+| Selected | `#6C31DB` · `background-selected` | `#FAF9FF` · `content-selected` |
+| Focus    | `#9B7FFF` · `background-enabled`  | `#FAF9FF` · `content-enabled`  |
+| Disabled | `#CFD5DA` · `background-disabled` | `#909AA1` · `content-disabled` |
 
 </div>
 
-**Secondary** — prefix `--ds-component-button-secondary-color-`. Content is `#FFFFFF` in every state.
+**Secondary** — prefix `--ds-component-button-secondary-color-`.
 
 <div className="full-width-table">
 
-| State    | Background                       | Content                       |
-|----------|----------------------------------|-------------------------------|
-| Enabled  | `#F36700` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
-| Hover    | `#C75300` · `background-hover`    | `#FFFFFF` · `content-hover`    |
-| Pressed  | `#A14200` · `background-pressed`  | `#FFFFFF` · `content-pressed`  |
-| Focus    | `#F36700` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
-| Disabled | `#CFD5DA` · `background-disabled` | `#FFFFFF` · `content-disabled` |
+| State    | Background                        | Content                        |
+|----------|------------------------------------|--------------------------------|
+| Enabled  | `#FF9969` · `background-enabled`   | `#FFF9F6` · `content-enabled`   |
+| Hover    | `#F36700` · `background-hover`     | `#FFF9F6` · `content-hover`     |
+| Selected | `#C75300` · `background-selected`  | `#FFF9F6` · `content-selected`  |
+| Focus    | `#FF9969` · `background-enabled`   | `#FFF9F6` · `content-enabled`   |
+| Disabled | `#CFD5DA` · `background-disabled`  | `#909AA1` · `content-disabled` |
 
 </div>
 
@@ -113,19 +112,15 @@ adds the shared ring (`--ds-semantic-focus-ring-*` / `--ds-semantic-focus-gap-*`
 
 <div className="full-width-table">
 
-| State    | Background                        | Content                       | Border                     |
-|----------|-----------------------------------|-------------------------------|----------------------------|
-| Enabled  | `#FFFFFF` · `background-enabled`   | `#484E53` · `content-enabled`  | `#B0B9BF` · `border-enabled`  |
-| Hover    | `#F2F4F5` · `background-hover`     | `#1B1D1F` · `content-hover`    | `#909AA1` · `border-hover`    |
-| Pressed  | `#E3E7E9` · `background-pressed`   | `#1B1D1F` · `content-pressed`  | `#747D84` · `border-pressed`  |
-| Focus    | `#FFFFFF` · `background-enabled`   | `#484E53` · `content-enabled`  | `#B0B9BF` · `border-enabled`  |
-| Disabled | `#FFFFFF` · `background-enabled` † | `#CFD5DA` · `content-disabled` | `#CFD5DA` · `border-disabled` |
+| State    | Background                        | Content                        | Border                        |
+|----------|------------------------------------|---------------------------------|--------------------------------|
+| Enabled  | `#FFFFFF` · `background-enabled`   | `#484E53` · `content-enabled`   | `#909AA1` · `border-enabled`   |
+| Hover    | `#F2F4F5` · `background-hover`     | `#484E53` · `content-hover`     | `#747D84` · `border-hover`     |
+| Selected | `#E3E7E9` · `background-selected`  | `#484E53` · `content-selected`  | `#5D646A` · `border-selected`  |
+| Focus    | `#FFFFFF` · `background-enabled`   | `#484E53` · `content-enabled`   | `#909AA1` · `border-enabled`   |
+| Disabled | `#CFD5DA` · `background-disabled`  | `#909AA1` · `content-disabled` | `#B0B9BF` · `border-disabled`  |
 
 </div>
-
-† Outline keeps its **enabled** (white) background when disabled — only content and
-border drop to their disabled tokens. The `…-background-disabled` token (`#CFD5DA`) exists
-but is intentionally not used here.
 
 ## Specs
 
@@ -133,8 +128,8 @@ but is intentionally not used here.
 
 | Property        | Value | Token |
 |-----------------|-------|-------|
-| Padding (horizontal) | 24px | `--ds-component-button-padding-horizontal` |
-| Padding (vertical)   | 12px | `--ds-component-button-padding-vertical` |
+| Height               | 48px | `--ds-component-button-height` |
+| Padding (horizontal) | 24px | `--ds-component-button-padding` |
 | Corner radius        | 8px  | `--ds-component-button-border-radius` |
 | Border width         | 1px  | `--ds-component-button-border-width` |
 
@@ -234,10 +229,9 @@ colors, so it can't go stale the way a hand-written table can.
 **Target size**
 
 WCAG 2.2 adds Target Size (Minimum) (2.5.8, AA): interactive targets need to be at least
-24×24 CSS pixels. Button's height is `padding-vertical` (12px) × 2 plus the `label/lg`
-line height (24px) — 48px — regardless of variant or label length, well above the
-minimum. Width only grows with the label, so it never drops below the horizontal padding
-(24px × 2) alone.
+24×24 CSS pixels. Button's height is a fixed 48px (the `height` token) regardless of
+variant or label length, well above the minimum. Width only grows with the label, so it
+never drops below the horizontal padding (24px × 2) alone.
 
 **Focus indicator**
 

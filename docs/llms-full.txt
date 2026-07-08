@@ -31,8 +31,8 @@ They're the primary way of triggering something to happen on screen.
 
 A button has two parts: a **container** (background, border, corner radius, focus
 ring) and a **label** (one line of centered text). There's no icon slot and no size
-property yet — every button renders at the same padding scale (24px horizontal,
-12px vertical, 8px corner radius).
+property yet — every button renders at a fixed 48px height, with 24px horizontal
+padding and an 8px corner radius.
 
 ## Types
 
@@ -50,18 +50,17 @@ flow needs rethinking before the button hierarchy does.
 
 ## States
 
-All three types share the same five states: Enabled, Hover, Pressed, Focus, Disabled.
+All three types share the same five states: Enabled, Hover, Selected, Focus, Disabled.
 
-- **Hover / Pressed** darken the fill (or border, for Outline) to confirm interactivity.
-  Outline gives Hover and Pressed two distinct border shades, so the states read differently
+- **Hover / Selected** darken the fill (or border, for Outline) to confirm interactivity.
+  Outline gives Hover and Selected two distinct border shades, so the states read differently
   instead of looking identical.
 - **Focus** adds a two-layer ring — a white gap plus a colored outer ring — shared across all
   three types via one token pair, so focus looks the same regardless of button type.
-- **Disabled** flattens background and text to neutral gray. Outline keeps its white
-  background and only dims border and label; the dimmed label color matches how Disabled
-  reads on Primary and Secondary.
+- **Disabled** flattens background and text to neutral gray on every type, including
+  Outline — background, border, and label all drop to their disabled tokens.
 
-In code, Hover/Pressed/Focus are driven by `:hover` / `:active` / `:focus-visible`,
+In code, Hover/Selected/Focus are driven by `:hover` / `:active` / `:focus-visible`,
 and Disabled by the native `disabled` attribute.
 
 ## Color reference
@@ -71,48 +70,44 @@ from the built component tokens; the state→token mapping is what `Button.css` 
 references. Token names below drop the per-variant prefix shown above each table.
 
 **Focus** has no fill token of its own — it keeps the Enabled background/content and
-adds the shared ring (`--ds-semantic-focus-ring-*` / `--ds-semantic-focus-gap-*`).
+adds the shared ring (`--ds-semantic-focus-ring-ring-*` / `--ds-semantic-focus-ring-gap-*`).
 
-**Primary** — prefix `--ds-component-button-primary-color-`. Content is `#FFFFFF` in every state.
-
-| State    | Background                       | Content                       |
-|----------|----------------------------------|-------------------------------|
-| Enabled  | `#9B7FFF` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
-| Hover    | `#834DFF` · `background-hover`    | `#FFFFFF` · `content-hover`    |
-| Pressed  | `#6C31DB` · `background-pressed`  | `#FFFFFF` · `content-pressed`  |
-| Focus    | `#9B7FFF` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
-| Disabled | `#CFD5DA` · `background-disabled` | `#FFFFFF` · `content-disabled` |
-
-**Secondary** — prefix `--ds-component-button-secondary-color-`. Content is `#FFFFFF` in every state.
+**Primary** — prefix `--ds-component-button-primary-color-`.
 
 | State    | Background                       | Content                       |
-|----------|----------------------------------|-------------------------------|
-| Enabled  | `#F36700` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
-| Hover    | `#C75300` · `background-hover`    | `#FFFFFF` · `content-hover`    |
-| Pressed  | `#A14200` · `background-pressed`  | `#FFFFFF` · `content-pressed`  |
-| Focus    | `#F36700` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
-| Disabled | `#CFD5DA` · `background-disabled` | `#FFFFFF` · `content-disabled` |
+|----------|-----------------------------------|-------------------------------|
+| Enabled  | `#9B7FFF` · `background-enabled`  | `#FAF9FF` · `content-enabled`  |
+| Hover    | `#834DFF` · `background-hover`    | `#FAF9FF` · `content-hover`    |
+| Selected | `#6C31DB` · `background-selected` | `#FAF9FF` · `content-selected` |
+| Focus    | `#9B7FFF` · `background-enabled`  | `#FAF9FF` · `content-enabled`  |
+| Disabled | `#CFD5DA` · `background-disabled` | `#909AA1` · `content-disabled` |
+
+**Secondary** — prefix `--ds-component-button-secondary-color-`.
+
+| State    | Background                        | Content                        |
+|----------|------------------------------------|--------------------------------|
+| Enabled  | `#FF9969` · `background-enabled`   | `#FFF9F6` · `content-enabled`   |
+| Hover    | `#F36700` · `background-hover`     | `#FFF9F6` · `content-hover`     |
+| Selected | `#C75300` · `background-selected`  | `#FFF9F6` · `content-selected`  |
+| Focus    | `#FF9969` · `background-enabled`   | `#FFF9F6` · `content-enabled`   |
+| Disabled | `#CFD5DA` · `background-disabled`  | `#909AA1` · `content-disabled` |
 
 **Outline** — prefix `--ds-component-button-outline-color-`. White background, visible border in every state.
 
-| State    | Background                        | Content                       | Border                     |
-|----------|-----------------------------------|-------------------------------|----------------------------|
-| Enabled  | `#FFFFFF` · `background-enabled`   | `#484E53` · `content-enabled`  | `#B0B9BF` · `border-enabled`  |
-| Hover    | `#F2F4F5` · `background-hover`     | `#1B1D1F` · `content-hover`    | `#909AA1` · `border-hover`    |
-| Pressed  | `#E3E7E9` · `background-pressed`   | `#1B1D1F` · `content-pressed`  | `#747D84` · `border-pressed`  |
-| Focus    | `#FFFFFF` · `background-enabled`   | `#484E53` · `content-enabled`  | `#B0B9BF` · `border-enabled`  |
-| Disabled | `#FFFFFF` · `background-enabled` † | `#CFD5DA` · `content-disabled` | `#CFD5DA` · `border-disabled` |
-
-† Outline keeps its **enabled** (white) background when disabled — only content and
-border drop to their disabled tokens. The `…-background-disabled` token (`#CFD5DA`) exists
-but is intentionally not used here.
+| State    | Background                        | Content                        | Border                        |
+|----------|------------------------------------|---------------------------------|--------------------------------|
+| Enabled  | `#FFFFFF` · `background-enabled`   | `#484E53` · `content-enabled`   | `#909AA1` · `border-enabled`   |
+| Hover    | `#F2F4F5` · `background-hover`     | `#484E53` · `content-hover`     | `#747D84` · `border-hover`     |
+| Selected | `#E3E7E9` · `background-selected`  | `#484E53` · `content-selected`  | `#5D646A` · `border-selected`  |
+| Focus    | `#FFFFFF` · `background-enabled`   | `#484E53` · `content-enabled`   | `#909AA1` · `border-enabled`   |
+| Disabled | `#CFD5DA` · `background-disabled`  | `#909AA1` · `content-disabled` | `#B0B9BF` · `border-disabled`  |
 
 ## Specs
 
 | Property        | Value | Token |
 |-----------------|-------|-------|
-| Padding (horizontal) | 24px | `--ds-component-button-padding-horizontal` |
-| Padding (vertical)   | 12px | `--ds-component-button-padding-vertical` |
+| Height               | 48px | `--ds-component-button-height` |
+| Padding (horizontal) | 24px | `--ds-component-button-padding` |
 | Corner radius        | 8px  | `--ds-component-button-border-radius` |
 | Border width         | 1px  | `--ds-component-button-border-width` |
 
@@ -200,10 +195,9 @@ colors, so it can't go stale the way a hand-written table can.
 **Target size**
 
 WCAG 2.2 adds Target Size (Minimum) (2.5.8, AA): interactive targets need to be at least
-24×24 CSS pixels. Button's height is `padding-vertical` (12px) × 2 plus the `label/lg`
-line height (24px) — 48px — regardless of variant or label length, well above the
-minimum. Width only grows with the label, so it never drops below the horizontal padding
-(24px × 2) alone.
+24×24 CSS pixels. Button's height is a fixed 48px (the `height` token) regardless of
+variant or label length, well above the minimum. Width only grows with the label, so it
+never drops below the horizontal padding (24px × 2) alone.
 
 **Focus indicator**
 
@@ -240,7 +234,7 @@ semantic value as-is.
 | Tier | Pattern | Example |
 |------|---------|---------|
 | 1 | `--ds-primitive-{category}-{value}` | `--ds-primitive-color-brand-lavender-500` |
-| 2 | `--ds-semantic-{category}-{property}-{variant}-{emphasis}-{state}` | `--ds-semantic-color-background-brand` |
+| 2 | `--ds-semantic-{category}-{property}-{variant}-{state}` | `--ds-semantic-color-background-brand` |
 | 3 | `--ds-component-{component}-{componentVariant}-{property}-{state}` | `--ds-component-button-primary-color-background-enabled` |
 
 Every tier starts with the global prefix `--ds`, which exists to avoid collisions with
@@ -260,34 +254,26 @@ color is used — that's Tier 2's job.
 
 ### Tier 2: Semantic
 
-Anatomy: `category` → `property` → `variant` → `emphasis` → `state`.
+Anatomy: `category` → `property` → `variant` → `state`.
 
 - **Category** — `color`, `typography`, `spacing`, `border`, `shadow`, or (in Harbor)
-  `focus`.
+  `focus-ring`.
 - **Property** — the surface a color applies to: `background`, `content`, `border`.
-- **Variant** — the role: `brand`, `accent`, `default`, `subtle` (its own muted default
-  surface — distinct from the `emphasis` value below, see note), or a support color
-  (`support-error`, `support-warning`, `support-success`, `support-info`).
-- **Emphasis** — the tonal weight of that role's color: `strong` or `subtle`. Omitted
-  means the role's own anchor tone — `--ds-semantic-color-background-brand` carries no
-  emphasis suffix because it *is* the base tone. Emphasis is a static property of the
-  swatch (which shade you picked), not an interaction, so it's a separate segment from
-  state rather than a value living inside either one. Note the word overlap: the
-  standalone `subtle` **variant** (a muted surface, its own role) and the `-subtle`
-  **emphasis** suffix on `brand-subtle` / `support-error-subtle` (a lighter tint of
-  another role) share a name but occupy different segments — don't conflate them.
-- **State** — `hover`, `pressed`, `focus` (interaction only, and only on variants that
-  are actually interactive); `default` state can be explicit or omitted. `disabled` is
-  modeled as its own token (`--ds-semantic-color-background-disabled`) shared across
-  every variant, rather than duplicated per variant — a disabled brand button and a
-  disabled accent button read the same gray, so one token covers both instead of
-  multiplying variant × state combinations.
+- **Variant** — the role: `brand`, `accent`, `error`, `warning`, `info`, `success`, or the
+  default (unnamed) surface. `subtle` and `secondary` are their own muted/low-emphasis
+  roles, not a tonal modifier of another variant.
+- **State** — `hover`, `selected` (interaction only, and only on variants that are
+  actually interactive); the base state is omitted rather than named (there is no
+  `-enabled` or `-default` suffix at Tier 2 — the bare variant name **is** that state).
+  `disabled` is modeled as its own token (`--ds-semantic-color-background-disabled`)
+  shared across every variant, rather than duplicated per variant — a disabled brand
+  button and a disabled accent button read the same gray, so one token covers both
+  instead of multiplying variant × state combinations.
 
-If emphasis and state ever apply to the same token, emphasis comes first —
-`{variant}-{emphasis}-{state}` — since it's the more static of the two choices. No
-token in Harbor combines them today (support colors carry emphasis but no state;
-brand/accent/default carry state but no emphasis), so this is a standing rule for
-future tokens, not a rename of anything that exists now.
+Text (`content`) variants don't get interaction states — a label's color doesn't change
+on hover, only its container does. Where a variant's color needs to sit both as text-on-its-own
+and as text-drawn-on-top-of-that-variant's-background, the second case gets an `on-` prefix
+(`content-brand` vs. `content-on-brand`) rather than a new segment.
 
 ### Tier 3: Component
 
@@ -297,13 +283,13 @@ Anatomy: `component` → `componentVariant` → `property` → `state`.
 - **Component variant** — only the values that component's API actually exposes
   (Button: `primary`, `secondary`, `outline`).
 - **Property** — `color-background`, `color-content`, `color-border`, or any other CSS
-  property the component needs to override (`padding-horizontal`, `border-radius`).
-- **State** — `hover`, `pressed`, `disabled`. Only add a state that doesn't exist at
-  Tier 2 when it needs its own color values. If a state renders identically to an existing
-  one — Button's `focus`, for example, reuses the `enabled` fill and only adds the shared
-  focus ring — handle it in CSS without a dedicated token. Only add a Tier 3 `disabled`
-  value when a component's disabled look genuinely differs from the shared Tier 2 disabled
-  token — most components should just reference the Tier 2 one.
+  property the component needs to override (`padding`, `height`, `border-radius`).
+- **State** — `enabled`, `hover`, `selected`, `disabled`. Tier 3 states are named
+  explicitly (including `enabled`) because a component variant's base value can collide
+  with its own nested states in the token tree otherwise. Only add a state that doesn't
+  exist at Tier 2 when it needs its own color values. If a state renders identically to
+  an existing one — Button's `focus`, for example, reuses the `enabled` fill and only adds
+  the shared focus ring — handle it in CSS without a dedicated token.
 
 ## One value, three tiers
 

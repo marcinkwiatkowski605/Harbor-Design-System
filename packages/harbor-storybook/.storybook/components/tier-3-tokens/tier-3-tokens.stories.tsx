@@ -31,7 +31,7 @@ const TokenRow = ({ name, cssVar }: { name: string; cssVar: string }) => (
 type ButtonVariant = 'primary' | 'secondary' | 'outline';
 
 const variants: ButtonVariant[] = ['primary', 'secondary', 'outline'];
-const states = ['enabled', 'hover', 'pressed', 'focus', 'disabled'] as const;
+const states = ['enabled', 'hover', 'selected', 'focus', 'disabled'] as const;
 type ButtonState = typeof states[number];
 
 const variantLabel: Record<ButtonVariant, string> = {
@@ -42,19 +42,16 @@ const variantLabel: Record<ButtonVariant, string> = {
 
 const ButtonPreview = ({ variant, state }: { variant: ButtonVariant; state: ButtonState }) => {
   // Focus has no color tokens of its own — it reuses the enabled look for every
-  // role and adds the shared focus ring on top. Outline additionally keeps its
-  // enabled (white) background when disabled, while its border and content drop to
-  // their disabled tokens. Mirrors Button.css.
+  // role and adds the shared focus ring on top. Mirrors Button.css.
   const colorState = state === 'focus' ? 'enabled' : state;
-  const bgState = variant === 'outline' && colorState === 'disabled' ? 'enabled' : colorState;
-  // Shared focus ring, from the semantic focus tokens — matches Button.css :focus-visible.
+  // Shared focus ring, from the semantic focus-ring tokens — matches Button.css :focus-visible.
   // The ring spread stacks on top of the gap spread so it sits outside the white gap.
   const focusRing =
-    'var(--ds-semantic-focus-gap-x) var(--ds-semantic-focus-gap-y) var(--ds-semantic-focus-gap-blur) ' +
-    'var(--ds-semantic-focus-gap-spread) var(--ds-semantic-focus-gap-color), ' +
-    'var(--ds-semantic-focus-ring-x) var(--ds-semantic-focus-ring-y) var(--ds-semantic-focus-ring-blur) ' +
-    'calc(var(--ds-semantic-focus-gap-spread) + var(--ds-semantic-focus-ring-spread)) var(--ds-semantic-focus-ring-color)';
-  const bgVar = `var(--ds-component-button-${variant}-color-background-${bgState})`;
+    'var(--ds-semantic-focus-ring-gap-x) var(--ds-semantic-focus-ring-gap-y) var(--ds-semantic-focus-ring-gap-blur) ' +
+    'var(--ds-semantic-focus-ring-gap-spread) var(--ds-semantic-focus-ring-gap-color), ' +
+    'var(--ds-semantic-focus-ring-ring-x) var(--ds-semantic-focus-ring-ring-y) var(--ds-semantic-focus-ring-ring-blur) ' +
+    'calc(var(--ds-semantic-focus-ring-gap-spread) + var(--ds-semantic-focus-ring-ring-spread)) var(--ds-semantic-focus-ring-ring-color)';
+  const bgVar = `var(--ds-component-button-${variant}-color-background-${colorState})`;
   const contentVar = `var(--ds-component-button-${variant}-color-content-${colorState})`;
   const borderVar = variant === 'outline'
     ? `var(--ds-component-button-${variant}-color-border-${colorState})`
@@ -65,7 +62,8 @@ const ButtonPreview = ({ variant, state }: { variant: ButtonVariant; state: Butt
       display: 'inline-flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: 'var(--ds-component-button-padding-vertical) var(--ds-component-button-padding-horizontal)',
+      blockSize: 'var(--ds-component-button-height)',
+      paddingInline: 'var(--ds-component-button-padding)',
       background: bgVar,
       color: contentVar,
       border: `var(--ds-component-button-border-width) solid ${borderVar}`,
@@ -120,17 +118,17 @@ export const Button: StoryObj = {
       <Section title="Shared button tokens">
         <TokenRow name="border-radius" cssVar="--ds-component-button-border-radius" />
         <TokenRow name="border-width" cssVar="--ds-component-button-border-width" />
-        <TokenRow name="padding-horizontal" cssVar="--ds-component-button-padding-horizontal" />
-        <TokenRow name="padding-vertical" cssVar="--ds-component-button-padding-vertical" />
+        <TokenRow name="height" cssVar="--ds-component-button-height" />
+        <TokenRow name="padding" cssVar="--ds-component-button-padding" />
       </Section>
 
       <Section title="Focus ring (shared, semantic)">
-        <TokenRow name="ring-color" cssVar="--ds-semantic-focus-ring-color" />
-        <TokenRow name="ring-spread" cssVar="--ds-semantic-focus-ring-spread" />
-        <TokenRow name="ring-blur" cssVar="--ds-semantic-focus-ring-blur" />
-        <TokenRow name="gap-color" cssVar="--ds-semantic-focus-gap-color" />
-        <TokenRow name="gap-spread" cssVar="--ds-semantic-focus-gap-spread" />
-        <TokenRow name="gap-blur" cssVar="--ds-semantic-focus-gap-blur" />
+        <TokenRow name="ring-color" cssVar="--ds-semantic-focus-ring-ring-color" />
+        <TokenRow name="ring-spread" cssVar="--ds-semantic-focus-ring-ring-spread" />
+        <TokenRow name="ring-blur" cssVar="--ds-semantic-focus-ring-ring-blur" />
+        <TokenRow name="gap-color" cssVar="--ds-semantic-focus-ring-gap-color" />
+        <TokenRow name="gap-spread" cssVar="--ds-semantic-focus-ring-gap-spread" />
+        <TokenRow name="gap-blur" cssVar="--ds-semantic-focus-ring-gap-blur" />
       </Section>
 
       {variants.map(variant => (
@@ -138,13 +136,8 @@ export const Button: StoryObj = {
           {states.map(state => (
             <div key={state}>
               {(['background', 'content', ...(variant === 'outline' ? ['border'] : [])] as string[]).map(role => {
-                // Focus reuses the enabled token for every role (it adds the shared ring
-                // on top), and outline's disabled background resolves through the enabled
-                // token rather than a dedicated disabled one — mirrors Button.css and Button.mdx.
-                const tokenState =
-                  state === 'focus' ? 'enabled'
-                  : variant === 'outline' && role === 'background' && state === 'disabled' ? 'enabled'
-                  : state;
+                // Focus reuses the enabled token for every role — it adds the shared ring on top.
+                const tokenState = state === 'focus' ? 'enabled' : state;
                 const cssVar = `--ds-component-button-${variant}-color-${role}-${tokenState}`;
                 return <TokenRow key={role} name={`${state} · ${role}`} cssVar={cssVar} />;
               })}
@@ -152,46 +145,6 @@ export const Button: StoryObj = {
           ))}
         </Section>
       ))}
-    </div>
-  ),
-};
-
-// ─── Text Input ──────────────────────────────────────────────────────────────
-
-export const TextInput: StoryObj = {
-  name: 'Text Input',
-  render: () => (
-    <div style={{ padding: 24, ...baseStyle }}>
-      <Section title="Preview">
-        <input
-          type="text"
-          placeholder="Placeholder text"
-          style={{
-            display: 'block',
-            padding: 'var(--ds-component-text-input-padding-vertical, 0.75rem) var(--ds-component-text-input-padding-horizontal, 1rem)',
-            background: 'var(--ds-component-text-input-color-background-enabled)',
-            border: `var(--ds-component-text-input-border-width, 1px) solid var(--ds-semantic-color-border-default)`,
-            borderRadius: 'var(--ds-semantic-border-radius-sm)',
-            fontFamily: 'system-ui, sans-serif',
-            fontSize: 14,
-            color: 'var(--ds-semantic-color-content-default)',
-            width: 280,
-            outline: 'none',
-          }}
-        />
-      </Section>
-
-      <Section title="Text Input tokens">
-        {[
-          'border-width',
-          'color-background-default',
-          'padding-gap',
-          'padding-horizontal',
-          'padding-vertical',
-        ].map(name => (
-          <TokenRow key={name} name={name} cssVar={`--ds-component-text-input-${name}`} />
-        ))}
-      </Section>
     </div>
   ),
 };

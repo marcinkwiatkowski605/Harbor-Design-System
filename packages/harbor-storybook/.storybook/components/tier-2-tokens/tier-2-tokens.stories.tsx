@@ -2,11 +2,102 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 // Requires `npm run build:tokens` to have run first — this file is gitignored build output.
 import tokensJson from '../../../../harbor-tokens/light/build/json/tokens.json';
+// The DTCG source (pre-resolution) — read to show what a token *aliases*, since the
+// built tokens.json above only has the final resolved value.
+import designTokens from '../../../../../design_tokens.json';
 
 const meta: Meta = {
   title: 'Foundations/Design Tokens/Tier 2: Semantic Tokens',
 };
 export default meta;
+
+// ─── Alias resolution (design_tokens.json → --ds-{tier}-* reference name) ──────
+
+type DtcgNode = { $value?: unknown; [key: string]: unknown };
+
+const TIER_BY_COLLECTION: Record<string, string> = {
+  'primitive-brand-a': 'primitive',
+  'primitive-global': 'primitive',
+  'semantic-modes': 'semantic',
+  'component-modes': 'component',
+};
+
+// Maps every token's dot-path (e.g. "color.brand.lavender.600") to the tier its
+// collection belongs to, so an alias reference string can become the right
+// --ds-{tier}-* name. A path ending in "@" (the Figma exporter's remap for a base
+// value that collides with its own nested states — see config.js) is also indexed
+// under its bare parent path, matching how aliases actually reference it.
+const buildTierIndex = (raw: Record<string, unknown>): Map<string, string> => {
+  const index = new Map<string, string>();
+  const walk = (node: unknown, path: string[], tier: string) => {
+    if (node === null || typeof node !== 'object') return;
+    const obj = node as DtcgNode;
+    if ('$value' in obj) {
+      index.set(path.join('.'), tier);
+      if (path[path.length - 1] === '@') {
+        index.set(path.slice(0, -1).join('.'), tier);
+      }
+      return;
+    }
+    for (const [key, val] of Object.entries(obj)) {
+      if (key.startsWith('$')) continue;
+      walk(val, [...path, key], tier);
+    }
+  };
+  for (const [collection, subtree] of Object.entries(raw)) {
+    if (collection === '$extensions') continue;
+    const tier = TIER_BY_COLLECTION[collection];
+    if (!tier) continue;
+    walk(subtree, [], tier);
+  }
+  return index;
+};
+
+const tierIndex = buildTierIndex(designTokens as unknown as Record<string, unknown>);
+
+// Walks `segments` from the design_tokens.json root; if the final node has no
+// $value of its own but has an "@" child, descends into that instead (same remap).
+const resolveDtcgNode = (segments: string[]): DtcgNode | undefined => {
+  let node: unknown = designTokens;
+  for (const seg of segments) {
+    if (node == null || typeof node !== 'object') return undefined;
+    node = (node as DtcgNode)[seg];
+  }
+  if (node && typeof node === 'object' && !('$value' in (node as DtcgNode)) && '@' in (node as DtcgNode)) {
+    node = (node as DtcgNode)['@'];
+  }
+  return node as DtcgNode | undefined;
+};
+
+const aliasFor = (segments: string[]): string | null => {
+  const raw = resolveDtcgNode(segments)?.$value;
+  if (typeof raw !== 'string') return null;
+  const match = raw.match(/^\{(.+)\}$/);
+  if (!match) return null;
+  const tier = tierIndex.get(match[1]);
+  if (!tier) return null;
+  return `--ds-${tier}-${match[1].replace(/\./g, '-')}`;
+};
+
+// Value column shows the alias as a chip (same shape as the Name column's, a
+// different hue so the two aren't confused) if one resolves, otherwise falls back
+// to the raw resolved value (kept as a defensive case — every token in these
+// tables is expected to be an alias, never a literal).
+const AliasOrValue = ({ alias, fallback }: { alias: string | null; fallback: string }) => (
+  alias ? (
+    <code style={{
+      fontFamily: 'monospace',
+      fontSize: 11,
+      color: '#0f766e',
+      background: '#effcf9',
+      padding: '2px 6px',
+      borderRadius: 4,
+      wordBreak: 'break-all' as const,
+    }}>{alias}</code>
+  ) : (
+    <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#111' }}>{fallback}</span>
+  )
+);
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────
 
@@ -14,7 +105,7 @@ const baseStyle = { fontFamily: 'system-ui, sans-serif', fontSize: 12, color: '#
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <div style={{ marginBottom: 40 }}>
-    <h2 style={{ ...baseStyle, fontWeight: 600, fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.06em', color: '#888', margin: '0 0 14px' }}>
+    <h2 style={{ ...baseStyle, fontWeight: 600, fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.06em', color: '#666', margin: '0 0 14px' }}>
       {title}
     </h2>
     {children}
@@ -22,7 +113,7 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
 );
 
 const TokenLabel = ({ children }: { children: React.ReactNode }) => (
-  <span style={{ fontFamily: 'monospace', fontSize: 9, color: '#bbb', display: 'block', lineHeight: 1.4 }}>
+  <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#666', display: 'block', lineHeight: 1.4 }}>
     {children}
   </span>
 );
@@ -36,8 +127,13 @@ type ColorGroup = { role: string; contexts: ColorContext[] };
 // so it can't be cast directly to Record<string, string> — bridge through `unknown`.
 const semanticColorTokens = tokensJson as unknown as Record<string, string>;
 
+// An empty key represents the base/default value, which carries no name suffix
+// (e.g. --ds-semantic-color-background, not --ds-semantic-color-background-default).
+const cssVarFor = (role: string, key: string): string =>
+  key ? `--ds-semantic-color-${role}-${key}` : `--ds-semantic-color-${role}`;
+
 const hexFor = (role: string, key: string): string => {
-  const cssVarName = `ds-semantic-color-${role}-${key}`;
+  const cssVarName = cssVarFor(role, key).slice(2);
   const hex = semanticColorTokens[cssVarName];
   if (!hex) {
     throw new Error(`Missing token value for --${cssVarName} in tokens.json`);
@@ -49,70 +145,86 @@ const colorGroups: ColorGroup[] = [
   {
     role: 'background',
     contexts: [
-      { key: 'default', useCase: 'Default background for pages, cards, and containers' },
-      { key: 'default-hover', useCase: 'Hover color for `background-default`' },
-      { key: 'default-pressed', useCase: 'Pressed color for `background-default`' },
+      { key: '', useCase: 'Default background for pages, cards, and containers' },
+      { key: 'hover', useCase: 'Hover color for the default background' },
+      { key: 'selected', useCase: 'Selected color for the default background' },
       { key: 'disabled', useCase: 'Background for disabled controls and containers' },
       { key: 'subtle', useCase: 'Recessed, low-emphasis background' },
       { key: 'accent', useCase: 'Background for accent-emphasis elements' },
       { key: 'accent-hover', useCase: 'Hover color for `background-accent`' },
-      { key: 'accent-pressed', useCase: 'Pressed color for `background-accent`' },
-      { key: 'accent-subtle', useCase: 'Low-emphasis background for accent elements' },
+      { key: 'accent-selected', useCase: 'Selected color for `background-accent`' },
       { key: 'brand', useCase: 'Background for primary, brand-emphasis controls' },
       { key: 'brand-hover', useCase: 'Hover color for `background-brand`' },
-      { key: 'brand-pressed', useCase: 'Pressed color for `background-brand`' },
-      { key: 'brand-subtle', useCase: 'Low-emphasis background for brand elements' },
-      { key: 'support-error-strong', useCase: 'High-emphasis background for error or destructive states' },
-      { key: 'support-error-subtle', useCase: 'Low-emphasis background for error or destructive states' },
-      { key: 'support-info-strong', useCase: 'High-emphasis background for informational content' },
-      { key: 'support-info-subtle', useCase: 'Low-emphasis background for informational content' },
-      { key: 'support-success-strong', useCase: 'High-emphasis background for success states' },
-      { key: 'support-success-subtle', useCase: 'Low-emphasis background for success states' },
-      { key: 'support-warning-strong', useCase: 'High-emphasis background for warnings' },
-      { key: 'support-warning-subtle', useCase: 'Low-emphasis background for warnings' },
+      { key: 'brand-selected', useCase: 'Selected color for `background-brand`' },
+      { key: 'error', useCase: 'Background for error or destructive states' },
+      { key: 'error-hover', useCase: 'Hover color for `background-error`' },
+      { key: 'error-selected', useCase: 'Selected color for `background-error`' },
+      { key: 'info', useCase: 'Background for informational content' },
+      { key: 'info-hover', useCase: 'Hover color for `background-info`' },
+      { key: 'info-selected', useCase: 'Selected color for `background-info`' },
+      { key: 'success', useCase: 'Background for success states' },
+      { key: 'success-hover', useCase: 'Hover color for `background-success`' },
+      { key: 'success-selected', useCase: 'Selected color for `background-success`' },
+      { key: 'warning', useCase: 'Background for warnings' },
+      { key: 'warning-hover', useCase: 'Hover color for `background-warning`' },
+      { key: 'warning-selected', useCase: 'Selected color for `background-warning`' },
     ],
   },
   {
     role: 'border',
     contexts: [
-      { key: 'default', useCase: 'Default border for containers and controls' },
-      { key: 'default-hover', useCase: 'Hover color for `border-default`' },
-      { key: 'default-pressed', useCase: 'Pressed color for `border-default`' },
+      { key: '', useCase: 'Default border for containers and controls' },
+      { key: 'hover', useCase: 'Hover color for the default border' },
+      { key: 'selected', useCase: 'Selected color for the default border' },
       { key: 'disabled', useCase: 'Border for disabled controls' },
       { key: 'accent', useCase: 'Border for accent-emphasis elements' },
       { key: 'brand', useCase: 'Border for brand-emphasis or selected controls' },
-      { key: 'support-error', useCase: 'Border communicating an error or destructive state' },
-      { key: 'support-info', useCase: 'Border communicating informational content' },
-      { key: 'support-success', useCase: 'Border communicating a success state' },
-      { key: 'support-warning', useCase: 'Border communicating a warning' },
+      { key: 'error', useCase: 'Border communicating an error or destructive state' },
+      { key: 'info', useCase: 'Border communicating informational content' },
+      { key: 'success', useCase: 'Border communicating a success state' },
+      { key: 'warning', useCase: 'Border communicating a warning' },
       { key: 'focus', useCase: 'Visible focus indicator' },
     ],
   },
   {
     role: 'content',
     contexts: [
-      { key: 'default', useCase: 'Default text color for body copy and labels' },
-      { key: 'default-hover', useCase: 'Hover color for `content-default`' },
+      { key: '', useCase: 'Default text color for body copy and labels' },
+      { key: 'secondary', useCase: 'Secondary, low-emphasis text' },
       { key: 'disabled', useCase: 'Text color for disabled controls and copy' },
-      { key: 'subtle', useCase: 'Secondary, low-emphasis text' },
-      { key: 'inverse', useCase: 'Text on inverse (dark) backgrounds' },
       { key: 'accent', useCase: 'Text for accent-emphasis content' },
       { key: 'brand', useCase: 'Text for brand-emphasis or primary interactive content' },
-      { key: 'support-error', useCase: 'Text communicating an error or destructive state' },
-      { key: 'support-info', useCase: 'Text communicating informational content' },
-      { key: 'support-success', useCase: 'Text communicating a success state' },
-      { key: 'support-warning', useCase: 'Text communicating a warning' },
-      { key: 'support-on-error-subtle', useCase: 'Text on `background-support-error-subtle` surfaces' },
-      { key: 'support-on-info-subtle', useCase: 'Text on `background-support-info-subtle` surfaces' },
-      { key: 'support-on-success-subtle', useCase: 'Text on `background-support-success-subtle` surfaces' },
-      { key: 'support-on-warning-subtle', useCase: 'Text on `background-support-warning-subtle` surfaces' },
+      { key: 'error', useCase: 'Text communicating an error or destructive state' },
+      { key: 'info', useCase: 'Text communicating informational content' },
+      { key: 'success', useCase: 'Text communicating a success state' },
+      { key: 'warning', useCase: 'Text communicating a warning' },
+      { key: 'on-brand', useCase: 'Text on `background-brand` surfaces' },
+      { key: 'on-accent', useCase: 'Text on `background-accent` surfaces' },
+      { key: 'on-error', useCase: 'Text on `background-error` surfaces' },
+      { key: 'on-info', useCase: 'Text on `background-info` surfaces' },
+      { key: 'on-success', useCase: 'Text on `background-success` surfaces' },
+      { key: 'on-warning', useCase: 'Text on `background-warning` surfaces' },
+      { key: 'on-disabled', useCase: 'Text on `background-disabled` surfaces' },
     ],
   },
 ];
 
+// Splits a flattened context key back into design_tokens.json path segments.
+// Covers every key shape actually used in colorGroups below: '' is the base value
+// (segments live directly under the role), 'on-*' names are one literal segment
+// (never split), and '*-hover' / '*-selected' are the only two-segment shapes.
+const splitContextKey = (key: string): string[] => {
+  if (key === '') return [];
+  if (key.startsWith('on-')) return [key];
+  if (key.endsWith('-hover')) return [key.slice(0, -'-hover'.length), 'hover'];
+  if (key.endsWith('-selected')) return [key.slice(0, -'-selected'.length), 'selected'];
+  return [key];
+};
+
 const ColorTableRow = ({ role, context }: { role: string; context: ColorContext }) => {
-  const cssVar = `--ds-semantic-color-${role}-${context.key}`;
+  const cssVar = cssVarFor(role, context.key);
   const hex = hexFor(role, context.key);
+  const alias = aliasFor(['semantic-modes', 'color', role, ...splitContextKey(context.key)]);
   return (
     <tr>
       <td style={{ padding: '8px 12px', verticalAlign: 'middle' }}>
@@ -136,8 +248,8 @@ const ColorTableRow = ({ role, context }: { role: string; context: ColorContext 
           wordBreak: 'break-all' as const,
         }}>{cssVar}</code>
       </td>
-      <td style={{ padding: '8px 12px', verticalAlign: 'middle', fontFamily: 'monospace', fontSize: 11, color: '#111' }}>
-        {hex}
+      <td style={{ padding: '8px 12px', verticalAlign: 'middle' }}>
+        <AliasOrValue alias={alias} fallback={hex} />
       </td>
       <td style={{ padding: '8px 12px', verticalAlign: 'middle', fontSize: 12, color: '#333' }}>
         {context.useCase}
@@ -148,7 +260,7 @@ const ColorTableRow = ({ role, context }: { role: string; context: ColorContext 
 
 // Fixed per-column widths so every role's table (background/border/content) lines
 // up identically, regardless of how long that table's own content happens to be.
-const COLOR_TABLE_COLUMN_WIDTHS = ['96px', '420px', '90px', 'auto'];
+const COLOR_TABLE_COLUMN_WIDTHS = ['96px', '400px', '340px', 'auto'];
 
 const ColorTable = ({ role, contexts }: { role: string; contexts: ColorContext[] }) => (
   <table style={{ width: '100%', tableLayout: 'fixed' as const, borderCollapse: 'collapse' as const, ...baseStyle }}>
@@ -169,7 +281,7 @@ const ColorTable = ({ role, contexts }: { role: string; contexts: ColorContext[]
               fontWeight: 600,
               textTransform: 'uppercase' as const,
               letterSpacing: '0.04em',
-              color: '#888',
+              color: '#666',
               borderBottom: '1px solid #eee',
             }}
           >
@@ -194,6 +306,84 @@ export const Color: StoryObj = {
           <ColorTable role={role} contexts={contexts} />
         </Section>
       ))}
+    </div>
+  ),
+};
+
+// ─── Spacing ───────────────────────────────────────────────────────────────────
+
+const spacingSizes = ['xs', 'sm', 'md', 'lg', 'xl'];
+
+export const Spacing: StoryObj = {
+  render: () => (
+    <div style={{ padding: 24, ...baseStyle }}>
+      <Section title="Spacing · inset (padding within a container)">
+        <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+          {spacingSizes.map(size => (
+            <div key={size} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' as const }}>
+              <div style={{
+                display: 'inline-flex',
+                padding: `var(--ds-semantic-spacing-inset-${size})`,
+                background: 'var(--ds-primitive-color-brand-lavender-100)',
+                border: '1px solid var(--ds-primitive-color-brand-lavender-300)',
+                borderRadius: 4,
+                marginBottom: 6,
+              }}>
+                <div style={{ width: 32, height: 32, background: 'var(--ds-primitive-color-brand-lavender-500)', borderRadius: 2 }} />
+              </div>
+              <TokenLabel>{size}</TokenLabel>
+              <TokenLabel>--ds-semantic-spacing-inset-{size}</TokenLabel>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Spacing · inline (horizontal gap between elements)">
+        <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+          {spacingSizes.map(size => (
+            <div key={size} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' as const }}>
+              <div style={{
+                display: 'flex',
+                gap: `var(--ds-semantic-spacing-inline-${size})`,
+                padding: 8,
+                background: 'var(--ds-primitive-color-neutral-50)',
+                border: '1px solid var(--ds-primitive-color-neutral-200)',
+                borderRadius: 4,
+                marginBottom: 6,
+              }}>
+                <div style={{ width: 24, height: 32, background: 'var(--ds-primitive-color-brand-lavender-500)', borderRadius: 2 }} />
+                <div style={{ width: 24, height: 32, background: 'var(--ds-primitive-color-brand-lavender-500)', borderRadius: 2 }} />
+              </div>
+              <TokenLabel>{size}</TokenLabel>
+              <TokenLabel>--ds-semantic-spacing-inline-{size}</TokenLabel>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Spacing · stack (vertical gap between elements)">
+        <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+          {spacingSizes.map(size => (
+            <div key={size} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' as const }}>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column' as const,
+                gap: `var(--ds-semantic-spacing-stack-${size})`,
+                padding: 8,
+                background: 'var(--ds-primitive-color-neutral-50)',
+                border: '1px solid var(--ds-primitive-color-neutral-200)',
+                borderRadius: 4,
+                marginBottom: 6,
+              }}>
+                <div style={{ width: 32, height: 24, background: 'var(--ds-primitive-color-brand-lavender-500)', borderRadius: 2 }} />
+                <div style={{ width: 32, height: 24, background: 'var(--ds-primitive-color-brand-lavender-500)', borderRadius: 2 }} />
+              </div>
+              <TokenLabel>{size}</TokenLabel>
+              <TokenLabel>--ds-semantic-spacing-stack-{size}</TokenLabel>
+            </div>
+          ))}
+        </div>
+      </Section>
     </div>
   ),
 };
@@ -226,7 +416,7 @@ export const Typography: StoryObj = {
           const prefix = `--ds-semantic-typography-${key}`;
           return (
             <div key={key} style={{ display: 'flex', alignItems: 'baseline', gap: 20, marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid #f5f5f5' }}>
-              <span style={{ width: 96, fontFamily: 'monospace', fontSize: 9, color: '#bbb', flexShrink: 0, alignSelf: 'center' }}>
+              <span style={{ width: 96, fontFamily: 'monospace', fontSize: 11, color: '#666', flexShrink: 0, alignSelf: 'center' }}>
                 {label}
               </span>
               <span style={{
@@ -243,7 +433,7 @@ export const Typography: StoryObj = {
               }}>
                 Harbor Design System
               </span>
-              <span style={{ fontFamily: 'monospace', fontSize: 9, color: '#ccc', marginLeft: 'auto', flexShrink: 0 }}>
+              <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#666', marginLeft: 'auto', flexShrink: 0 }}>
                 {prefix}-*
               </span>
             </div>
@@ -325,19 +515,20 @@ export const BorderAndShadow: StoryObj = {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' as const }}>
             <div style={{
               width: 120, height: 40,
-              background: 'var(--ds-semantic-color-background-default)',
-              border: '1px solid var(--ds-semantic-color-border-default)',
+              background: 'var(--ds-semantic-color-background)',
+              border: '1px solid var(--ds-semantic-color-border)',
               borderRadius: 4,
               margin: '8px 16px 14px',
               boxShadow: [
                 // gap layer: x y blur spread color
-                'var(--ds-semantic-focus-gap-x) var(--ds-semantic-focus-gap-y) var(--ds-semantic-focus-gap-blur) var(--ds-semantic-focus-gap-spread) var(--ds-semantic-focus-gap-color)',
-                // ring layer offset by the gap spread so both rings are visible
-                'var(--ds-semantic-focus-ring-x) var(--ds-semantic-focus-ring-y) var(--ds-semantic-focus-ring-blur) calc(var(--ds-semantic-focus-gap-spread) + var(--ds-semantic-focus-ring-spread)) var(--ds-semantic-focus-ring-color)',
+                'var(--ds-semantic-focus-ring-gap-x) var(--ds-semantic-focus-ring-gap-y) var(--ds-semantic-focus-ring-gap-blur) var(--ds-semantic-focus-ring-gap-spread) var(--ds-semantic-focus-ring-gap-color)',
+                // ring layer: spread is measured from the same edge as the gap layer
+                // (matches Figma), so the visible ring is ring-spread minus gap-spread.
+                'var(--ds-semantic-focus-ring-ring-x) var(--ds-semantic-focus-ring-ring-y) var(--ds-semantic-focus-ring-ring-blur) var(--ds-semantic-focus-ring-ring-spread) var(--ds-semantic-focus-ring-ring-color)',
               ].join(', '),
             }} />
-            <TokenLabel>focus gap · --ds-semantic-focus-gap-*</TokenLabel>
-            <TokenLabel>focus ring · --ds-semantic-focus-ring-*</TokenLabel>
+            <TokenLabel>focus gap · --ds-semantic-focus-ring-gap-*</TokenLabel>
+            <TokenLabel>focus ring · --ds-semantic-focus-ring-ring-*</TokenLabel>
           </div>
         </div>
       </Section>

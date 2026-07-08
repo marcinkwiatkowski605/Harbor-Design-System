@@ -1,10 +1,116 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+// Requires `npm run build:tokens` to have run first — this file is gitignored build output.
+import tokensJson from '../../../../harbor-tokens/light/build/json/tokens.json';
+// The DTCG source (pre-resolution) — read to show what a token *aliases*, since the
+// built tokens.json above only has the final resolved value.
+import designTokens from '../../../../../design_tokens.json';
 
 const meta: Meta = {
   title: 'Foundations/Design Tokens/Tier 3: Component Tokens',
 };
 export default meta;
+
+// tokens.json also contains non-string tokens elsewhere in the tree, so it can't be
+// cast directly to Record<string, string> — bridge through `unknown`.
+const buttonTokens = tokensJson as unknown as Record<string, string>;
+
+const valueFor = (cssVar: string): string => {
+  const name = cssVar.slice(2); // strip leading --
+  const value = buttonTokens[name];
+  if (value === undefined) {
+    throw new Error(`Missing token value for ${cssVar} in tokens.json`);
+  }
+  return value;
+};
+
+// ─── Alias resolution (design_tokens.json → --ds-{tier}-* reference name) ──────
+
+type DtcgNode = { $value?: unknown; [key: string]: unknown };
+
+const TIER_BY_COLLECTION: Record<string, string> = {
+  'primitive-brand-a': 'primitive',
+  'primitive-global': 'primitive',
+  'semantic-modes': 'semantic',
+  'component-modes': 'component',
+};
+
+// Maps every token's dot-path (e.g. "color.brand.lavender.600") to the tier its
+// collection belongs to, so an alias reference string can become the right
+// --ds-{tier}-* name. A path ending in "@" (the Figma exporter's remap for a base
+// value that collides with its own nested states — see config.js) is also indexed
+// under its bare parent path, matching how aliases actually reference it.
+const buildTierIndex = (raw: Record<string, unknown>): Map<string, string> => {
+  const index = new Map<string, string>();
+  const walk = (node: unknown, path: string[], tier: string) => {
+    if (node === null || typeof node !== 'object') return;
+    const obj = node as DtcgNode;
+    if ('$value' in obj) {
+      index.set(path.join('.'), tier);
+      if (path[path.length - 1] === '@') {
+        index.set(path.slice(0, -1).join('.'), tier);
+      }
+      return;
+    }
+    for (const [key, val] of Object.entries(obj)) {
+      if (key.startsWith('$')) continue;
+      walk(val, [...path, key], tier);
+    }
+  };
+  for (const [collection, subtree] of Object.entries(raw)) {
+    if (collection === '$extensions') continue;
+    const tier = TIER_BY_COLLECTION[collection];
+    if (!tier) continue;
+    walk(subtree, [], tier);
+  }
+  return index;
+};
+
+const tierIndex = buildTierIndex(designTokens as unknown as Record<string, unknown>);
+
+// Walks `segments` from the design_tokens.json root; if the final node has no
+// $value of its own but has an "@" child, descends into that instead (same remap).
+const resolveDtcgNode = (segments: string[]): DtcgNode | undefined => {
+  let node: unknown = designTokens;
+  for (const seg of segments) {
+    if (node == null || typeof node !== 'object') return undefined;
+    node = (node as DtcgNode)[seg];
+  }
+  if (node && typeof node === 'object' && !('$value' in (node as DtcgNode)) && '@' in (node as DtcgNode)) {
+    node = (node as DtcgNode)['@'];
+  }
+  return node as DtcgNode | undefined;
+};
+
+const aliasFor = (segments: string[]): string | null => {
+  const raw = resolveDtcgNode(segments)?.$value;
+  if (typeof raw !== 'string') return null;
+  const match = raw.match(/^\{(.+)\}$/);
+  if (!match) return null;
+  const tier = tierIndex.get(match[1]);
+  if (!tier) return null;
+  return `--ds-${tier}-${match[1].replace(/\./g, '-')}`;
+};
+
+// Value column shows the alias as a chip (same shape as the Name column's, a
+// different hue so the two aren't confused) if one resolves, otherwise falls back
+// to the raw resolved value (kept as a defensive case — every token in these
+// tables is expected to be an alias, never a literal).
+const AliasOrValue = ({ alias, fallback }: { alias: string | null; fallback: string }) => (
+  alias ? (
+    <code style={{
+      fontFamily: 'monospace',
+      fontSize: 11,
+      color: '#0f766e',
+      background: '#effcf9',
+      padding: '2px 6px',
+      borderRadius: 4,
+      wordBreak: 'break-all' as const,
+    }}>{alias}</code>
+  ) : (
+    <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#111' }}>{fallback}</span>
+  )
+);
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────
 
@@ -12,18 +118,88 @@ const baseStyle = { fontFamily: 'system-ui, sans-serif', fontSize: 12, color: '#
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <div style={{ marginBottom: 40 }}>
-    <h2 style={{ ...baseStyle, fontWeight: 600, fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.06em', color: '#888', margin: '0 0 14px' }}>
+    <h2 style={{ ...baseStyle, fontWeight: 600, fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.06em', color: '#666', margin: '0 0 14px' }}>
       {title}
     </h2>
     {children}
   </div>
 );
 
-const TokenRow = ({ name, cssVar }: { name: string; cssVar: string }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 0', borderBottom: '1px solid #f5f5f5' }}>
-    <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#888', flex: 1 }}>{name}</span>
-    <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#bbb' }}>{cssVar}</span>
-  </div>
+// ─── Token table (Preview | Name | Value) ─────────────────────────────────────
+
+const TokenPreview = ({ cssVar }: { cssVar: string }) => (
+  <div style={{
+    width: 48, height: 24, borderRadius: 4,
+    background: `var(${cssVar})`,
+    border: '1px solid rgba(0,0,0,.07)',
+    boxShadow: 'inset 0 0 0 1px rgba(0,0,0,.04)',
+  }} />
+);
+
+type TableToken = { name: string; cssVar: string; path: string[] };
+
+const TokenTableRow = ({ cssVar, path, showPreview }: TableToken & { showPreview: boolean }) => {
+  const value = valueFor(cssVar);
+  const alias = aliasFor(path);
+  return (
+    <tr>
+      <td style={{ padding: '8px 12px', verticalAlign: 'middle' }}>
+        {showPreview && <TokenPreview cssVar={cssVar} />}
+      </td>
+      <td style={{ padding: '8px 12px', verticalAlign: 'middle' }}>
+        <code style={{
+          fontFamily: 'monospace',
+          fontSize: 11,
+          color: '#1a56db',
+          background: '#eef4ff',
+          padding: '2px 6px',
+          borderRadius: 4,
+          wordBreak: 'break-all' as const,
+        }}>{cssVar}</code>
+      </td>
+      <td style={{ padding: '8px 12px', verticalAlign: 'middle' }}>
+        <AliasOrValue alias={alias} fallback={value} />
+      </td>
+    </tr>
+  );
+};
+
+const BUTTON_TABLE_COLUMN_WIDTHS = ['96px', '460px', 'auto'];
+
+const TokenTable = ({ tokens, showPreview = true }: { tokens: TableToken[]; showPreview?: boolean }) => (
+  <table style={{ width: '100%', tableLayout: 'fixed' as const, borderCollapse: 'collapse' as const, ...baseStyle }}>
+    <colgroup>
+      {BUTTON_TABLE_COLUMN_WIDTHS.map((width, i) => (
+        <col key={i} style={{ width }} />
+      ))}
+    </colgroup>
+    <thead>
+      <tr>
+        {['Preview', 'Name', 'Value'].map(heading => (
+          <th
+            key={heading}
+            style={{
+              textAlign: 'left',
+              padding: '8px 12px',
+              fontSize: 11,
+              fontWeight: 600,
+              textTransform: 'uppercase' as const,
+              letterSpacing: '0.04em',
+              color: '#666',
+              borderBottom: '1px solid #eee',
+            }}
+          >
+            {heading}
+          </th>
+        ))}
+      </tr>
+    </thead>
+    <tbody>
+      {tokens.map(t => (
+        <TokenTableRow key={t.cssVar} {...t} showPreview={showPreview} />
+      ))}
+    </tbody>
+  </table>
 );
 
 // ─── Button ──────────────────────────────────────────────────────────────────
@@ -31,8 +207,11 @@ const TokenRow = ({ name, cssVar }: { name: string; cssVar: string }) => (
 type ButtonVariant = 'primary' | 'secondary' | 'outline';
 
 const variants: ButtonVariant[] = ['primary', 'secondary', 'outline'];
-const states = ['enabled', 'hover', 'pressed', 'focus', 'disabled'] as const;
+const states = ['enabled', 'hover', 'selected', 'focus', 'disabled'] as const;
 type ButtonState = typeof states[number];
+// `focus` isn't a real token — it reuses `enabled`'s value (see ButtonPreview below),
+// so the reference tables list only the states that resolve to distinct tokens.
+const tokenTableStates = ['enabled', 'hover', 'selected', 'disabled'] as const;
 
 const variantLabel: Record<ButtonVariant, string> = {
   primary: 'Primary',
@@ -42,44 +221,53 @@ const variantLabel: Record<ButtonVariant, string> = {
 
 const ButtonPreview = ({ variant, state }: { variant: ButtonVariant; state: ButtonState }) => {
   // Focus has no color tokens of its own — it reuses the enabled look for every
-  // role and adds the shared focus ring on top. Outline additionally keeps its
-  // enabled (white) background when disabled, while its border and content drop to
-  // their disabled tokens. Mirrors Button.css.
+  // role and adds the shared focus ring on top. Mirrors Button.css.
   const colorState = state === 'focus' ? 'enabled' : state;
-  const bgState = variant === 'outline' && colorState === 'disabled' ? 'enabled' : colorState;
-  // Shared focus ring, from the semantic focus tokens — matches Button.css :focus-visible.
-  // The ring spread stacks on top of the gap spread so it sits outside the white gap.
+  // Shared focus ring, from the semantic focus-ring tokens — matches Button.css :focus-visible.
+  // Both layers' spread is measured from the same edge (matches Figma), so the
+  // visible ring is ring-spread minus gap-spread, not their sum.
   const focusRing =
-    'var(--ds-semantic-focus-gap-x) var(--ds-semantic-focus-gap-y) var(--ds-semantic-focus-gap-blur) ' +
-    'var(--ds-semantic-focus-gap-spread) var(--ds-semantic-focus-gap-color), ' +
-    'var(--ds-semantic-focus-ring-x) var(--ds-semantic-focus-ring-y) var(--ds-semantic-focus-ring-blur) ' +
-    'calc(var(--ds-semantic-focus-gap-spread) + var(--ds-semantic-focus-ring-spread)) var(--ds-semantic-focus-ring-color)';
-  const bgVar = `var(--ds-component-button-${variant}-color-background-${bgState})`;
+    'var(--ds-semantic-focus-ring-gap-x) var(--ds-semantic-focus-ring-gap-y) var(--ds-semantic-focus-ring-gap-blur) ' +
+    'var(--ds-semantic-focus-ring-gap-spread) var(--ds-semantic-focus-ring-gap-color), ' +
+    'var(--ds-semantic-focus-ring-ring-x) var(--ds-semantic-focus-ring-ring-y) var(--ds-semantic-focus-ring-ring-blur) ' +
+    'var(--ds-semantic-focus-ring-ring-spread) var(--ds-semantic-focus-ring-ring-color)';
+  const bgVar = `var(--ds-component-button-${variant}-color-background-${colorState})`;
   const contentVar = `var(--ds-component-button-${variant}-color-content-${colorState})`;
   const borderVar = variant === 'outline'
     ? `var(--ds-component-button-${variant}-color-border-${colorState})`
     : 'transparent';
 
   return (
-    <div style={{
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: 'var(--ds-component-button-padding-vertical) var(--ds-component-button-padding-horizontal)',
-      background: bgVar,
-      color: contentVar,
-      border: `var(--ds-component-button-border-width) solid ${borderVar}`,
-      borderRadius: 'var(--ds-component-button-border-radius)',
-      boxShadow: state === 'focus' ? focusRing : undefined,
-      fontSize: 14,
-      fontFamily: 'system-ui, sans-serif',
-      fontWeight: 500,
-      cursor: state === 'disabled' ? 'not-allowed' : 'default',
-      minWidth: 80,
-      userSelect: 'none' as const,
-    }}>
+    // A real <button disabled> instead of a styled <div> — the native disabled
+    // attribute is what lets axe apply WCAG 1.4.3's inactive-component contrast
+    // exception (matches Button.tsx; a div merely styled to look disabled doesn't
+    // get that exception and shows as a false-positive contrast violation).
+    <button
+      type="button"
+      disabled={state === 'disabled'}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        blockSize: 'var(--ds-component-button-height)',
+        paddingInline: 'var(--ds-component-button-padding)',
+        background: bgVar,
+        color: contentVar,
+        border: `var(--ds-component-button-border-width) solid ${borderVar}`,
+        borderRadius: 'var(--ds-component-button-border-radius)',
+        boxShadow: state === 'focus' ? focusRing : undefined,
+        fontFamily: 'var(--ds-semantic-typography-label-lg-font-family)',
+        fontSize: 'var(--ds-semantic-typography-label-lg-font-size)',
+        lineHeight: 'var(--ds-semantic-typography-label-lg-line-height)',
+        letterSpacing: 'var(--ds-semantic-typography-label-lg-letter-spacing)',
+        fontWeight: 'var(--ds-semantic-typography-label-lg-font-weight)' as any,
+        cursor: state === 'disabled' ? 'not-allowed' : 'default',
+        minWidth: 80,
+        userSelect: 'none' as const,
+      }}
+    >
       Button
-    </div>
+    </button>
   );
 };
 
@@ -90,11 +278,11 @@ export const Button: StoryObj = {
         <table style={{ borderCollapse: 'collapse' as const, ...baseStyle }}>
           <thead>
             <tr>
-              <th style={{ padding: '0 16px 12px 0', textAlign: 'left' as const, fontWeight: 600, fontSize: 10, color: '#888', textTransform: 'uppercase' as const }}>
+              <th style={{ padding: '0 16px 12px 0', textAlign: 'left' as const, fontWeight: 600, fontSize: 11, color: '#666', textTransform: 'uppercase' as const }}>
                 Variant
               </th>
               {states.map(s => (
-                <th key={s} style={{ padding: '0 12px 12px', textAlign: 'center' as const, fontWeight: 600, fontSize: 10, color: '#888', textTransform: 'uppercase' as const }}>
+                <th key={s} style={{ padding: '0 12px 12px', textAlign: 'center' as const, fontWeight: 600, fontSize: 11, color: '#666', textTransform: 'uppercase' as const }}>
                   {s}
                 </th>
               ))}
@@ -103,7 +291,7 @@ export const Button: StoryObj = {
           <tbody>
             {variants.map(variant => (
               <tr key={variant}>
-                <td style={{ paddingRight: 16, paddingBottom: 12, fontFamily: 'monospace', fontSize: 10, color: '#aaa', verticalAlign: 'middle' as const }}>
+                <td style={{ paddingRight: 16, paddingBottom: 12, fontFamily: 'monospace', fontSize: 11, color: '#666', verticalAlign: 'middle' as const }}>
                   {variantLabel[variant]}
                 </td>
                 {states.map(state => (
@@ -118,80 +306,39 @@ export const Button: StoryObj = {
       </Section>
 
       <Section title="Shared button tokens">
-        <TokenRow name="border-radius" cssVar="--ds-component-button-border-radius" />
-        <TokenRow name="border-width" cssVar="--ds-component-button-border-width" />
-        <TokenRow name="padding-horizontal" cssVar="--ds-component-button-padding-horizontal" />
-        <TokenRow name="padding-vertical" cssVar="--ds-component-button-padding-vertical" />
+        <TokenTable showPreview={false} tokens={[
+          { name: 'border-radius', cssVar: '--ds-component-button-border-radius', path: ['component-modes', 'button', 'border', 'radius'] },
+          { name: 'border-width', cssVar: '--ds-component-button-border-width', path: ['component-modes', 'button', 'border', 'width'] },
+          { name: 'height', cssVar: '--ds-component-button-height', path: ['component-modes', 'button', 'height'] },
+          { name: 'padding', cssVar: '--ds-component-button-padding', path: ['component-modes', 'button', 'padding'] },
+        ]} />
       </Section>
 
       <Section title="Focus ring (shared, semantic)">
-        <TokenRow name="ring-color" cssVar="--ds-semantic-focus-ring-color" />
-        <TokenRow name="ring-spread" cssVar="--ds-semantic-focus-ring-spread" />
-        <TokenRow name="ring-blur" cssVar="--ds-semantic-focus-ring-blur" />
-        <TokenRow name="gap-color" cssVar="--ds-semantic-focus-gap-color" />
-        <TokenRow name="gap-spread" cssVar="--ds-semantic-focus-gap-spread" />
-        <TokenRow name="gap-blur" cssVar="--ds-semantic-focus-gap-blur" />
+        <TokenTable showPreview={false} tokens={[
+          { name: 'ring-color', cssVar: '--ds-semantic-focus-ring-ring-color', path: ['semantic-modes', 'focus-ring', 'ring', 'color'] },
+          { name: 'ring-spread', cssVar: '--ds-semantic-focus-ring-ring-spread', path: ['semantic-modes', 'focus-ring', 'ring', 'spread'] },
+          { name: 'ring-blur', cssVar: '--ds-semantic-focus-ring-ring-blur', path: ['semantic-modes', 'focus-ring', 'ring', 'blur'] },
+          { name: 'gap-color', cssVar: '--ds-semantic-focus-ring-gap-color', path: ['semantic-modes', 'focus-ring', 'gap', 'color'] },
+          { name: 'gap-spread', cssVar: '--ds-semantic-focus-ring-gap-spread', path: ['semantic-modes', 'focus-ring', 'gap', 'spread'] },
+          { name: 'gap-blur', cssVar: '--ds-semantic-focus-ring-gap-blur', path: ['semantic-modes', 'focus-ring', 'gap', 'blur'] },
+        ]} />
       </Section>
 
-      {variants.map(variant => (
-        <Section key={variant} title={`${variantLabel[variant]} tokens`}>
-          {states.map(state => (
-            <div key={state}>
-              {(['background', 'content', ...(variant === 'outline' ? ['border'] : [])] as string[]).map(role => {
-                // Focus reuses the enabled token for every role (it adds the shared ring
-                // on top), and outline's disabled background resolves through the enabled
-                // token rather than a dedicated disabled one — mirrors Button.css and Button.mdx.
-                const tokenState =
-                  state === 'focus' ? 'enabled'
-                  : variant === 'outline' && role === 'background' && state === 'disabled' ? 'enabled'
-                  : state;
-                const cssVar = `--ds-component-button-${variant}-color-${role}-${tokenState}`;
-                return <TokenRow key={role} name={`${state} · ${role}`} cssVar={cssVar} />;
-              })}
-            </div>
-          ))}
-        </Section>
-      ))}
-    </div>
-  ),
-};
-
-// ─── Text Input ──────────────────────────────────────────────────────────────
-
-export const TextInput: StoryObj = {
-  name: 'Text Input',
-  render: () => (
-    <div style={{ padding: 24, ...baseStyle }}>
-      <Section title="Preview">
-        <input
-          type="text"
-          placeholder="Placeholder text"
-          style={{
-            display: 'block',
-            padding: 'var(--ds-component-text-input-padding-vertical, 0.75rem) var(--ds-component-text-input-padding-horizontal, 1rem)',
-            background: 'var(--ds-component-text-input-color-background-enabled)',
-            border: `var(--ds-component-text-input-border-width, 1px) solid var(--ds-semantic-color-border-default)`,
-            borderRadius: 'var(--ds-semantic-border-radius-sm)',
-            fontFamily: 'system-ui, sans-serif',
-            fontSize: 14,
-            color: 'var(--ds-semantic-color-content-default)',
-            width: 280,
-            outline: 'none',
-          }}
-        />
-      </Section>
-
-      <Section title="Text Input tokens">
-        {[
-          'border-width',
-          'color-background-default',
-          'padding-gap',
-          'padding-horizontal',
-          'padding-vertical',
-        ].map(name => (
-          <TokenRow key={name} name={name} cssVar={`--ds-component-text-input-${name}`} />
-        ))}
-      </Section>
+      {variants.map(variant => {
+        const tokens: TableToken[] = tokenTableStates.flatMap(state =>
+          (['background', 'content', ...(variant === 'outline' ? ['border'] : [])] as string[]).map(role => ({
+            name: `${state} · ${role}`,
+            cssVar: `--ds-component-button-${variant}-color-${role}-${state}`,
+            path: ['component-modes', 'button', variant, 'color', role, state],
+          }))
+        );
+        return (
+          <Section key={variant} title={`${variantLabel[variant]} tokens`}>
+            <TokenTable tokens={tokens} />
+          </Section>
+        );
+      })}
     </div>
   ),
 };

@@ -29,7 +29,7 @@ semantic value as-is.
 | Tier | Pattern | Example |
 |------|---------|---------|
 | 1 | `--ds-primitive-{category}-{value}` | `--ds-primitive-color-brand-lavender-500` |
-| 2 | `--ds-semantic-{category}-{property}-{variant}-{emphasis}-{state}` | `--ds-semantic-color-background-brand` |
+| 2 | `--ds-semantic-{category}-{property}-{variant}-{state}` | `--ds-semantic-color-background-brand` |
 | 3 | `--ds-component-{component}-{componentVariant}-{property}-{state}` | `--ds-component-button-primary-color-background-enabled` |
 
 Every tier starts with the global prefix `--ds`, which exists to avoid collisions with
@@ -49,34 +49,26 @@ color is used — that's Tier 2's job.
 
 ### Tier 2: Semantic
 
-Anatomy: `category` → `property` → `variant` → `emphasis` → `state`.
+Anatomy: `category` → `property` → `variant` → `state`.
 
 - **Category** — `color`, `typography`, `spacing`, `border`, `shadow`, or (in Harbor)
-  `focus`.
+  `focus-ring`.
 - **Property** — the surface a color applies to: `background`, `content`, `border`.
-- **Variant** — the role: `brand`, `accent`, `default`, `subtle` (its own muted default
-  surface — distinct from the `emphasis` value below, see note), or a support color
-  (`support-error`, `support-warning`, `support-success`, `support-info`).
-- **Emphasis** — the tonal weight of that role's color: `strong` or `subtle`. Omitted
-  means the role's own anchor tone — `--ds-semantic-color-background-brand` carries no
-  emphasis suffix because it *is* the base tone. Emphasis is a static property of the
-  swatch (which shade you picked), not an interaction, so it's a separate segment from
-  state rather than a value living inside either one. Note the word overlap: the
-  standalone `subtle` **variant** (a muted surface, its own role) and the `-subtle`
-  **emphasis** suffix on `brand-subtle` / `support-error-subtle` (a lighter tint of
-  another role) share a name but occupy different segments — don't conflate them.
-- **State** — `hover`, `pressed`, `focus` (interaction only, and only on variants that
-  are actually interactive); `default` state can be explicit or omitted. `disabled` is
-  modeled as its own token (`--ds-semantic-color-background-disabled`) shared across
-  every variant, rather than duplicated per variant — a disabled brand button and a
-  disabled accent button read the same gray, so one token covers both instead of
-  multiplying variant × state combinations.
+- **Variant** — the role: `brand`, `accent`, `error`, `warning`, `info`, `success`, or the
+  default (unnamed) surface. `subtle` and `secondary` are their own muted/low-emphasis
+  roles, not a tonal modifier of another variant.
+- **State** — `hover`, `selected` (interaction only, and only on variants that are
+  actually interactive); the base state is omitted rather than named (there is no
+  `-enabled` or `-default` suffix at Tier 2 — the bare variant name **is** that state).
+  `disabled` is modeled as its own token (`--ds-semantic-color-background-disabled`)
+  shared across every variant, rather than duplicated per variant — a disabled brand
+  button and a disabled accent button read the same gray, so one token covers both
+  instead of multiplying variant × state combinations.
 
-If emphasis and state ever apply to the same token, emphasis comes first —
-`{variant}-{emphasis}-{state}` — since it's the more static of the two choices. No
-token in Harbor combines them today (support colors carry emphasis but no state;
-brand/accent/default carry state but no emphasis), so this is a standing rule for
-future tokens, not a rename of anything that exists now.
+Text (`content`) variants don't get interaction states — a label's color doesn't change
+on hover, only its container does. Where a variant's color needs to sit both as text-on-its-own
+and as text-drawn-on-top-of-that-variant's-background, the second case gets an `on-` prefix
+(`content-brand` vs. `content-on-brand`) rather than a new segment.
 
 ### Tier 3: Component
 
@@ -86,13 +78,13 @@ Anatomy: `component` → `componentVariant` → `property` → `state`.
 - **Component variant** — only the values that component's API actually exposes
   (Button: `primary`, `secondary`, `outline`).
 - **Property** — `color-background`, `color-content`, `color-border`, or any other CSS
-  property the component needs to override (`padding-horizontal`, `border-radius`).
-- **State** — `hover`, `pressed`, `disabled`. Only add a state that doesn't exist at
-  Tier 2 when it needs its own color values. If a state renders identically to an existing
-  one — Button's `focus`, for example, reuses the `enabled` fill and only adds the shared
-  focus ring — handle it in CSS without a dedicated token. Only add a Tier 3 `disabled`
-  value when a component's disabled look genuinely differs from the shared Tier 2 disabled
-  token — most components should just reference the Tier 2 one.
+  property the component needs to override (`padding`, `height`, `border-radius`).
+- **State** — `enabled`, `hover`, `selected`, `disabled`. Tier 3 states are named
+  explicitly (including `enabled`) because a component variant's base value can collide
+  with its own nested states in the token tree otherwise. Only add a state that doesn't
+  exist at Tier 2 when it needs its own color values. If a state renders identically to
+  an existing one — Button's `focus`, for example, reuses the `enabled` fill and only adds
+  the shared focus ring — handle it in CSS without a dedicated token.
 
 ## One value, three tiers
 
@@ -100,9 +92,9 @@ The same purple traces through all three tiers when a component uses it as-is:
 
 | Tier | Token | Value |
 |------|-------|-------|
-| 1 — Primitive | `--ds-primitive-color-brand-lavender-500` | `#9B7FFF` |
-| 2 — Semantic | `--ds-semantic-color-background-brand` | `#9B7FFF` |
-| 3 — Component | `--ds-component-button-primary-color-background-enabled` | `#9B7FFF` |
+| 1 — Primitive | `--ds-primitive-color-brand-lavender-600` | `#9050E9` |
+| 2 — Semantic | `--ds-semantic-color-background-brand` | `#9050E9` |
+| 3 — Component | `--ds-component-button-primary-color-background-enabled` | `#9050E9` |
 
 Tier 3 only needed to exist here because Button's enabled state has its own token slot to
 fill — its value still traces back to the same Tier 2 role.

@@ -10,7 +10,8 @@
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  padding: var(--ds-component-button-padding-vertical) var(--ds-component-button-padding-horizontal);
+  block-size: var(--ds-component-button-height);
+  padding-inline: var(--ds-component-button-padding);
   border-radius: var(--ds-component-button-border-radius);
   border: var(--ds-component-button-border-width) solid transparent;
 
@@ -28,15 +29,15 @@
   white-space: nowrap;
 }
 
-/* ── Focus ring (shared, from focus tokens) ──────────────────────────────── */
+/* ── Focus ring (shared, from focus-ring tokens) ─────────────────────────── */
 
 .harbor-button:focus-visible {
   box-shadow:
-    var(--ds-semantic-focus-gap-x) var(--ds-semantic-focus-gap-y) var(--ds-semantic-focus-gap-blur)
-      var(--ds-semantic-focus-gap-spread) var(--ds-semantic-focus-gap-color),
-    var(--ds-semantic-focus-ring-x) var(--ds-semantic-focus-ring-y) var(--ds-semantic-focus-ring-blur)
-      calc(var(--ds-semantic-focus-gap-spread) + var(--ds-semantic-focus-ring-spread))
-      var(--ds-semantic-focus-ring-color);
+    var(--ds-semantic-focus-ring-gap-x) var(--ds-semantic-focus-ring-gap-y) var(--ds-semantic-focus-ring-gap-blur)
+      var(--ds-semantic-focus-ring-gap-spread) var(--ds-semantic-focus-ring-gap-color),
+    var(--ds-semantic-focus-ring-ring-x) var(--ds-semantic-focus-ring-ring-y) var(--ds-semantic-focus-ring-ring-blur)
+      var(--ds-semantic-focus-ring-ring-spread)
+      var(--ds-semantic-focus-ring-ring-color);
 }
 
 /* ── Primary ─────────────────────────────────────────────────────────────── */
@@ -50,8 +51,8 @@
   color: var(--ds-component-button-primary-color-content-hover);
 }
 .harbor-button[data-variant='primary']:active:not(:disabled) {
-  background: var(--ds-component-button-primary-color-background-pressed);
-  color: var(--ds-component-button-primary-color-content-pressed);
+  background: var(--ds-component-button-primary-color-background-selected);
+  color: var(--ds-component-button-primary-color-content-selected);
 }
 .harbor-button[data-variant='primary']:disabled {
   background: var(--ds-component-button-primary-color-background-disabled);
@@ -69,8 +70,8 @@
   color: var(--ds-component-button-secondary-color-content-hover);
 }
 .harbor-button[data-variant='secondary']:active:not(:disabled) {
-  background: var(--ds-component-button-secondary-color-background-pressed);
-  color: var(--ds-component-button-secondary-color-content-pressed);
+  background: var(--ds-component-button-secondary-color-background-selected);
+  color: var(--ds-component-button-secondary-color-content-selected);
 }
 .harbor-button[data-variant='secondary']:disabled {
   background: var(--ds-component-button-secondary-color-background-disabled);
@@ -90,14 +91,12 @@
   border-color: var(--ds-component-button-outline-color-border-hover);
 }
 .harbor-button[data-variant='outline']:active:not(:disabled) {
-  background: var(--ds-component-button-outline-color-background-pressed);
-  color: var(--ds-component-button-outline-color-content-pressed);
-  border-color: var(--ds-component-button-outline-color-border-pressed);
+  background: var(--ds-component-button-outline-color-background-selected);
+  color: var(--ds-component-button-outline-color-content-selected);
+  border-color: var(--ds-component-button-outline-color-border-selected);
 }
 .harbor-button[data-variant='outline']:disabled {
-  /* Figma binds the outline disabled state to the *enabled* background (white),
-     not background-disabled — only border + content go to their disabled tokens. */
-  background: var(--ds-component-button-outline-color-background-enabled);
+  background: var(--ds-component-button-outline-color-background-disabled);
   color: var(--ds-component-button-outline-color-content-disabled);
   border-color: var(--ds-component-button-outline-color-border-disabled);
 }

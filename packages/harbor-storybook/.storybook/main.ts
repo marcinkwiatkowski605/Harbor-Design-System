@@ -26,6 +26,20 @@ const config: StorybookConfig = {
   framework: {
     name: '@storybook/react-vite',
     options: {}
+  },
+  // macOS's native FSEvents watcher can silently stop delivering change events on a
+  // long-running dev server (observed after the process sat idle across a sleep/wake
+  // cycle) — polling re-checks files on an interval instead, so it can't go stale.
+  viteFinal: async (viteConfig) => {
+    viteConfig.server = {
+      ...viteConfig.server,
+      watch: {
+        ...viteConfig.server?.watch,
+        usePolling: true,
+        interval: 1000
+      }
+    };
+    return viteConfig;
   }
 };
 

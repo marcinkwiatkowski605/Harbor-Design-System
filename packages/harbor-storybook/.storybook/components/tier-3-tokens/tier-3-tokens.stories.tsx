@@ -92,13 +92,24 @@ const aliasFor = (segments: string[]): string | null => {
   return `--ds-${tier}-${match[1].replace(/\./g, '-')}`;
 };
 
-// Value column shows the alias in italic muted text if one resolves, otherwise
-// falls back to the raw resolved value (kept as a defensive case — every token in
-// these tables is expected to be an alias, never a literal).
+// Value column shows the alias as a chip (same shape as the Name column's, a
+// different hue so the two aren't confused) if one resolves, otherwise falls back
+// to the raw resolved value (kept as a defensive case — every token in these
+// tables is expected to be an alias, never a literal).
 const AliasOrValue = ({ alias, fallback }: { alias: string | null; fallback: string }) => (
-  <span style={{ fontFamily: 'monospace', fontSize: 11, fontStyle: alias ? 'italic' as const : 'normal' as const, color: alias ? '#666' : '#111' }}>
-    {alias ?? fallback}
-  </span>
+  alias ? (
+    <code style={{
+      fontFamily: 'monospace',
+      fontSize: 11,
+      color: '#0f766e',
+      background: '#effcf9',
+      padding: '2px 6px',
+      borderRadius: 4,
+      wordBreak: 'break-all' as const,
+    }}>{alias}</code>
+  ) : (
+    <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#111' }}>{fallback}</span>
+  )
 );
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────

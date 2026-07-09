@@ -88,12 +88,12 @@
   border-bottom: 2px solid #71717a; /* PLACEHOLDER */
   transform: rotate(45deg);
   transition: transform 0.15s ease;
-  margin-block-start: -4px; /* optical centering for the rotated corner */
+  margin-block-start: -4px; /* PLACEHOLDER — optical centering for the rotated corner */
 }
 
 .harbor-select[data-open] .harbor-select__chevron {
   transform: rotate(225deg);
-  margin-block-start: 4px;
+  margin-block-start: 4px; /* PLACEHOLDER */
 }
 
 .harbor-select__description {

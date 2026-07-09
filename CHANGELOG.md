@@ -1,3 +1,15 @@
+# [1.3.0](https://github.com/marcinkwiatkowski605/Harbor-Design-System/compare/v1.2.0...v1.3.0) (2026-07-09)
+
+
+### Bug Fixes
+
+* **select:** mark chevron optical-adjustment values as PLACEHOLDER ([f1a3d21](https://github.com/marcinkwiatkowski605/Harbor-Design-System/commit/f1a3d21f0fa069bd7336cb85b7638cb1db45969e))
+
+
+### Features
+
+* **ci:** add token-audit script for component CSS ([4800a52](https://github.com/marcinkwiatkowski605/Harbor-Design-System/commit/4800a5243819c75c94bb5bc1b8152f33ef4f9b0a))
+
 # [1.2.0](https://github.com/marcinkwiatkowski605/Harbor-Design-System/compare/v1.1.0...v1.2.0) (2026-07-09)
 
 

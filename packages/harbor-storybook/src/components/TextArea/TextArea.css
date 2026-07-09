@@ -1,0 +1,100 @@
+/*
+ * TextArea styles — Harbor Design System (experimental React Aria Components build).
+ *
+ * PLACEHOLDER VALUES — component tokens for TextArea don't exist yet (same as
+ * TextField/Select). Once component tokens are prepared, every literal value
+ * below gets swapped for the matching var(--ds-component-text-area-*) reference.
+ * The shared focus-ring already uses real tokens (var(--ds-semantic-focus-ring-*)),
+ * same as Button/TextField/Select.
+ *
+ * State selectors use the data-attributes react-aria-components exposes on the
+ * TextField container (data-required / data-invalid) and directly on the
+ * TextArea element (data-hovered / data-focused / data-focus-visible /
+ * data-disabled / data-invalid) — TextArea shares the same render-prop shape
+ * as Input.
+ */
+
+.harbor-textarea {
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* PLACEHOLDER */
+  width: 320px; /* PLACEHOLDER */
+  font-family: Helvetica, Arial, sans-serif; /* PLACEHOLDER */
+}
+
+.harbor-textarea__label {
+  font-size: 14px; /* PLACEHOLDER */
+  font-weight: 600; /* PLACEHOLDER */
+  color: #18181b; /* PLACEHOLDER */
+}
+
+.harbor-textarea[data-required] .harbor-textarea__label::after {
+  content: ' *';
+  color: #dc2626; /* PLACEHOLDER */
+}
+
+.harbor-textarea__input {
+  box-sizing: border-box;
+  min-block-size: 80px; /* PLACEHOLDER — roughly 3 lines */
+  padding: 8px 12px; /* PLACEHOLDER */
+  border-radius: 6px; /* PLACEHOLDER */
+  border: 1px solid #a1a1aa; /* PLACEHOLDER */
+  background: #ffffff; /* PLACEHOLDER */
+  color: #18181b; /* PLACEHOLDER */
+  font-family: inherit;
+  font-size: 14px; /* PLACEHOLDER */
+  line-height: 20px; /* PLACEHOLDER */
+  resize: vertical;
+  outline: none;
+}
+
+.harbor-textarea__input[data-hovered] {
+  border-color: #71717a; /* PLACEHOLDER */
+}
+
+.harbor-textarea__input[data-focus-visible] {
+  /* Border-color intentionally unchanged here — matches Button, where the
+     focus-visible treatment is the shared box-shadow ring only. */
+  box-shadow:
+    var(--ds-semantic-focus-ring-gap-x) var(--ds-semantic-focus-ring-gap-y) var(--ds-semantic-focus-ring-gap-blur)
+      var(--ds-semantic-focus-ring-gap-spread) var(--ds-semantic-focus-ring-gap-color),
+    var(--ds-semantic-focus-ring-ring-x) var(--ds-semantic-focus-ring-ring-y) var(--ds-semantic-focus-ring-ring-blur)
+      var(--ds-semantic-focus-ring-ring-spread)
+      var(--ds-semantic-focus-ring-ring-color);
+}
+
+.harbor-textarea__input[data-disabled] {
+  background: #f4f4f5; /* PLACEHOLDER */
+  border-color: #d4d4d8; /* PLACEHOLDER */
+  color: #a1a1aa; /* PLACEHOLDER */
+  cursor: not-allowed;
+  resize: none;
+}
+
+.harbor-textarea[data-readonly] .harbor-textarea__input {
+  background: #f4f4f5; /* PLACEHOLDER */
+  border-style: dashed; /* PLACEHOLDER */
+}
+
+.harbor-textarea[data-invalid] .harbor-textarea__input {
+  border-color: #dc2626; /* PLACEHOLDER */
+}
+
+.harbor-textarea[data-invalid] .harbor-textarea__input[data-focus-visible] {
+  box-shadow:
+    var(--ds-semantic-focus-ring-gap-x) var(--ds-semantic-focus-ring-gap-y) var(--ds-semantic-focus-ring-gap-blur)
+      var(--ds-semantic-focus-ring-gap-spread) var(--ds-semantic-focus-ring-gap-color),
+    var(--ds-semantic-focus-ring-ring-x) var(--ds-semantic-focus-ring-ring-y) var(--ds-semantic-focus-ring-ring-blur)
+      var(--ds-semantic-focus-ring-ring-spread)
+      #dc2626; /* PLACEHOLDER — error ring color */
+}
+
+.harbor-textarea__description {
+  font-size: 12px; /* PLACEHOLDER */
+  color: #71717a; /* PLACEHOLDER */
+}
+
+.harbor-textarea__error {
+  font-size: 12px; /* PLACEHOLDER */
+  color: #dc2626; /* PLACEHOLDER */
+}

@@ -11,6 +11,7 @@
     "build:tokens": "cd ./packages/harbor-tokens && npm run build:tokens",
     "build:storybook": "cd ./packages/harbor-storybook && npm run build-storybook",
     "build:llms": "node scripts/build-llms-docs.mjs",
+    "audit:tokens": "node scripts/audit-tokens.mjs",
     "test:storybook:ci": "concurrently -k -s first -n \"SB,TEST\" -c \"magenta,blue\" \"http-server packages/harbor-storybook/storybook-static --port 6006 --silent\" \"wait-on tcp:6006 && npm run test-storybook --workspace=@harbor/storybook -- --url http://localhost:6006\""
   },
   "devDependencies": {

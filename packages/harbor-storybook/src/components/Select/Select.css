@@ -1,0 +1,153 @@
+/*
+ * Select styles — Harbor Design System (experimental React Aria Components build).
+ *
+ * PLACEHOLDER VALUES — component tokens for Select don't exist yet. Once component
+ * tokens are prepared, every literal value below gets swapped for the matching
+ * var(--ds-component-select-*) reference, mirroring how Button.css is
+ * token-driven on main.
+ *
+ * State selectors use the data-attributes react-aria-components exposes:
+ * on the Select container (data-open / data-disabled / data-invalid /
+ * data-required / data-focus-visible), on the trigger Button
+ * (data-hovered / data-pressed / data-focus-visible / data-disabled), on
+ * SelectValue (data-placeholder), and on each ListBoxItem
+ * (data-hovered / data-selected / data-focused / data-focus-visible / data-disabled).
+ */
+
+.harbor-select {
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* PLACEHOLDER */
+  width: 320px; /* PLACEHOLDER */
+  font-family: Helvetica, Arial, sans-serif; /* PLACEHOLDER */
+}
+
+.harbor-select__label {
+  font-size: 14px; /* PLACEHOLDER */
+  font-weight: 600; /* PLACEHOLDER */
+  color: #18181b; /* PLACEHOLDER */
+}
+
+.harbor-select[data-required] .harbor-select__label::after {
+  content: ' *';
+  color: #dc2626; /* PLACEHOLDER */
+}
+
+.harbor-select__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px; /* PLACEHOLDER */
+  box-sizing: border-box;
+  block-size: 40px; /* PLACEHOLDER */
+  padding-inline: 12px; /* PLACEHOLDER */
+  border-radius: 6px; /* PLACEHOLDER */
+  border: 1px solid #a1a1aa; /* PLACEHOLDER */
+  background: #ffffff; /* PLACEHOLDER */
+  color: #18181b; /* PLACEHOLDER */
+  font-size: 14px; /* PLACEHOLDER */
+  cursor: pointer;
+  outline: none;
+}
+
+.harbor-select__trigger[data-hovered] {
+  border-color: #71717a; /* PLACEHOLDER */
+}
+
+.harbor-select__trigger[data-focus-visible] {
+  border-color: var(--ds-semantic-focus-ring-ring-color);
+  box-shadow:
+    var(--ds-semantic-focus-ring-gap-x) var(--ds-semantic-focus-ring-gap-y) var(--ds-semantic-focus-ring-gap-blur)
+      var(--ds-semantic-focus-ring-gap-spread) var(--ds-semantic-focus-ring-gap-color),
+    var(--ds-semantic-focus-ring-ring-x) var(--ds-semantic-focus-ring-ring-y) var(--ds-semantic-focus-ring-ring-blur)
+      var(--ds-semantic-focus-ring-ring-spread)
+      var(--ds-semantic-focus-ring-ring-color);
+}
+
+.harbor-select__trigger[data-disabled] {
+  background: #f4f4f5; /* PLACEHOLDER */
+  border-color: #d4d4d8; /* PLACEHOLDER */
+  color: #a1a1aa; /* PLACEHOLDER */
+  cursor: not-allowed;
+}
+
+.harbor-select[data-invalid] .harbor-select__trigger {
+  border-color: #dc2626; /* PLACEHOLDER */
+}
+
+.harbor-select__value[data-placeholder] {
+  color: #71717a; /* PLACEHOLDER */
+}
+
+.harbor-select__chevron {
+  flex-shrink: 0;
+  width: 8px; /* PLACEHOLDER */
+  height: 8px; /* PLACEHOLDER */
+  border-right: 2px solid #71717a; /* PLACEHOLDER */
+  border-bottom: 2px solid #71717a; /* PLACEHOLDER */
+  transform: rotate(45deg);
+  transition: transform 0.15s ease;
+  margin-block-start: -4px; /* optical centering for the rotated corner */
+}
+
+.harbor-select[data-open] .harbor-select__chevron {
+  transform: rotate(225deg);
+  margin-block-start: 4px;
+}
+
+.harbor-select__description {
+  font-size: 12px; /* PLACEHOLDER */
+  color: #71717a; /* PLACEHOLDER */
+}
+
+.harbor-select__error {
+  font-size: 12px; /* PLACEHOLDER */
+  color: #dc2626; /* PLACEHOLDER */
+}
+
+.harbor-select__popover {
+  box-sizing: border-box;
+  width: 320px; /* PLACEHOLDER — matches .harbor-select's placeholder width */
+  max-block-size: 240px; /* PLACEHOLDER */
+  overflow: auto;
+  border-radius: 6px; /* PLACEHOLDER */
+  border: 1px solid #d4d4d8; /* PLACEHOLDER */
+  background: #ffffff; /* PLACEHOLDER */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12); /* PLACEHOLDER */
+}
+
+.harbor-select__listbox {
+  display: flex;
+  flex-direction: column;
+  padding: 4px; /* PLACEHOLDER */
+  outline: none;
+}
+
+.harbor-select__option {
+  box-sizing: border-box;
+  padding: 8px 12px; /* PLACEHOLDER */
+  border-radius: 4px; /* PLACEHOLDER */
+  font-size: 14px; /* PLACEHOLDER */
+  color: #18181b; /* PLACEHOLDER */
+  cursor: pointer;
+  outline: none;
+}
+
+.harbor-select__option[data-hovered] {
+  background: #f4f4f5; /* PLACEHOLDER */
+}
+
+.harbor-select__option[data-focus-visible] {
+  background: #ede9fe; /* PLACEHOLDER */
+}
+
+.harbor-select__option[data-selected] {
+  background: #6d28d9; /* PLACEHOLDER */
+  color: #ffffff; /* PLACEHOLDER */
+  font-weight: 600; /* PLACEHOLDER */
+}
+
+.harbor-select__option[data-disabled] {
+  color: #a1a1aa; /* PLACEHOLDER */
+  cursor: not-allowed;
+}

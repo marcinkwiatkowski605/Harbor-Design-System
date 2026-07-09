@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button as AriaButton } from 'react-aria-components';
 import './Button.css';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'outline';
@@ -11,12 +12,13 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 /**
- * Button — Harbor Design System.
+ * Button — Harbor Design System (experimental React Aria Components rebuild).
  *
- * Token-driven: every color, size, radius, and type value comes from the
- * `--ds-component-button-*` / `--ds-semantic-typography-label-lg-*` CSS variables built
- * from the Figma `Button` component set. Interaction states are CSS-driven
- * (`:hover`, `:active`, `:focus-visible`), and `disabled` via the native attribute.
+ * Built on `react-aria-components`' `Button` primitive instead of a native
+ * `<button>`. Interaction states are exposed as `data-hovered` / `data-pressed` /
+ * `data-focus-visible` / `data-disabled` attributes (see `Button.css`) rather than
+ * `:hover` / `:active` / `:focus-visible` pseudo-classes. Colors and sizes are
+ * PLACEHOLDER values on this branch, pending component tokens.
  */
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
@@ -25,16 +27,16 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const classes = ['harbor-button', className].filter(Boolean).join(' ');
     return (
-      <button
+      <AriaButton
         ref={ref}
         type={type}
         className={classes}
         data-variant={variant}
-        disabled={disabled}
+        isDisabled={disabled}
         {...rest}
       >
         {children}
-      </button>
+      </AriaButton>
     );
   }
 );

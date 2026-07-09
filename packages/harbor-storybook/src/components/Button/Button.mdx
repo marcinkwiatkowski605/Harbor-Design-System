@@ -31,6 +31,12 @@ export const DoDontPair = ({ doNode, dontNode }) => (
 Buttons let people take an action, confirm a choice, or move forward in a flow.
 They're the primary way of triggering something to happen on screen.
 
+> **Experimental branch note:** this is a rebuild of Button on top of
+> [`react-aria-components`](https://react-aria.adobe.com/)' `Button` primitive
+> instead of a plain `<button>`. The visual layer is unchanged — `Button.css`
+> references the same `--ds-component-button-*` / `--ds-semantic-*` tokens as
+> before, just via `data-*` state selectors instead of pseudo-classes.
+
 <Primary />
 
 <Controls />
@@ -68,8 +74,9 @@ All three types share the same five states: Enabled, Hover, Selected, Focus, Dis
 - **Disabled** flattens background and text to neutral gray on every type, including
   Outline — background, border, and label all drop to their disabled tokens.
 
-In code, Hover/Selected/Focus are driven by `:hover` / `:active` / `:focus-visible`,
-and Disabled by the native `disabled` attribute.
+In code, Hover/Selected/Focus are driven by the `data-hovered` / `data-pressed` /
+`data-focus-visible` attributes `react-aria-components`' `Button` exposes, and
+Disabled by `data-disabled` (set via the `isDisabled` prop).
 
 ## Color reference
 
@@ -191,14 +198,15 @@ import { Button } from './components/Button';
 | Prop       | Type                                        | Default     | Description |
 |------------|---------------------------------------------|-------------|-------------|
 | `variant`  | `'primary' \| 'secondary' \| 'outline'`     | `'primary'` | Visual style. Maps to the Figma `Type` axis. |
-| `disabled` | `boolean`                                   | `false`     | Native disabled attribute. Removes the button from interaction and the tab order. |
+| `disabled` | `boolean`                                   | `false`     | Mapped internally to `react-aria-components`' `isDisabled`. Removes the button from interaction and the tab order. |
 | `children` | `React.ReactNode`                           | —           | Button label. One line of centered text. **Required.** |
-| `...rest`  | `React.ButtonHTMLAttributes<HTMLButtonElement>` | —       | All native button attributes (`onClick`, `type`, `aria-*`, …) forward to the underlying `<button>`. |
+| `...rest`  | `React.ButtonHTMLAttributes<HTMLButtonElement>` | —       | All native button attributes (`onClick`, `type`, `aria-*`, …) forward to the underlying `react-aria-components` `Button` — `onClick` works as an alias for its `onPress`. |
 
 ## Accessibility
 
-Button renders a native `<button>` element, so it gets the browser's built-in `button`
-role and keyboard behavior — no custom ARIA role is needed.
+Button is built on `react-aria-components`' `Button` primitive, which renders a
+native `<button>` element under the hood and layers on Adobe's tested ARIA/keyboard
+behavior — no custom ARIA role is needed.
 
 **Keyboard**
 

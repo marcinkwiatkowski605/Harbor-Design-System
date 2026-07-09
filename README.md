@@ -13,7 +13,9 @@ The project includes:
 
 - a Figma file that defines the design tokens and a set of components;
 - an export of those tokens from Figma to a JSON file in DTCG (Design Token Community Group) format for Style Dictionary;
-- a conversion of the Figma components into token-driven React components in Storybook;
+- a conversion of the Figma components into React components in Storybook, built on
+  accessible headless primitives ([`react-aria-components`](https://react-aria.adobe.com/))
+  and wired to design tokens as each component's token pass lands;
 - a Storybook that visualizes the tokens and documents the components;
 - an adaptation of the component docs for large language models (LLMs), published as plain-text `llms.txt` files.
 
@@ -40,7 +42,7 @@ packages/
       components/        # Token visualization stories (Foundations)
       preview.ts         # Imports the built token CSS
     src/
-      components/        # React components + MDX docs — currently Button
+      components/        # React components + MDX docs — Button, Select, TextField, TextArea
       foundations/        # Hand-written Storybook pages (e.g. Design Tokens architecture)
 scripts/
   build-llms-docs.mjs      # Derives the LLM docs from the component/foundations MDX
@@ -73,13 +75,22 @@ token changes from Figma appear immediately. Every token is visualized under
 
 ## Components
 
-React components live in `packages/harbor-storybook/src/components/`. Each one is
-token-driven (no hardcoded colors or sizes), ships a single Controls-driven story, and an
-MDX docs page. Current: **Button**.
+React components live in `packages/harbor-storybook/src/components/`. Each one ships a
+single Controls-driven story and an MDX docs page. Current: **Button**, **Select**,
+**TextField**, **TextArea**.
+
+All four are built on [`react-aria-components`](https://react-aria.adobe.com/) — Adobe's
+headless, accessibility-tested behavior primitives — instead of hand-rolled focus/keyboard
+handling. **Button** is fully token-driven (`--ds-component-button-*`); **Select**,
+**TextField**, and **TextArea** are new and don't have component tokens yet, so their CSS
+uses clearly-marked placeholder values (see each component's `.css` file) pending a token
+pass — their Storybook sidebar entries are flagged 🚧 until then. The shared focus ring
+(`--ds-semantic-focus-ring-*`) is already token-driven everywhere, since it doesn't depend
+on any per-component token.
 
 Each component's MDX docs page includes an accessibility section covering keyboard
-behavior, screen reader announcements, and a WCAG 2.2 contrast/target-size audit against
-its actual rendered token values — not just a compliance claim. Storybook's
+behavior, screen reader announcements, and (for Button) a WCAG 2.2 contrast/target-size
+audit against its actual rendered token values — not just a compliance claim. Storybook's
 `@storybook/addon-a11y` runs the same kind of check live, per control state, in every
 story's Accessibility panel.
 

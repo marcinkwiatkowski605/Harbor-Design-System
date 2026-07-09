@@ -32,6 +32,12 @@ export interface TextAreaProps extends Omit<AriaTextFieldProps, 'children'> {
  * `TextField` container — Harbor's TextField and TextArea share the exact same
  * Label/description/error wiring, just a different editable element. Colors and
  * sizes are PLACEHOLDER values on this branch, pending component tokens.
+ *
+ * Note on prop naming: unlike Button (which keeps `disabled` for backward
+ * compatibility with its pre-RAC API), this is a net-new component, so it
+ * exposes RAC's native `isDisabled`/`isRequired`/`isInvalid` directly — the
+ * intended convention going forward for components without a legacy API to
+ * preserve.
  */
 export const TextArea = React.forwardRef<HTMLDivElement, TextAreaProps>(
   (

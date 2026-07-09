@@ -53,7 +53,8 @@
 }
 
 .harbor-textarea__input[data-focus-visible] {
-  border-color: var(--ds-semantic-focus-ring-ring-color);
+  /* Border-color intentionally unchanged here — matches Button, where the
+     focus-visible treatment is the shared box-shadow ring only. */
   box-shadow:
     var(--ds-semantic-focus-ring-gap-x) var(--ds-semantic-focus-ring-gap-y) var(--ds-semantic-focus-ring-gap-blur)
       var(--ds-semantic-focus-ring-gap-spread) var(--ds-semantic-focus-ring-gap-color),
@@ -70,11 +71,16 @@
   resize: none;
 }
 
-.harbor-textarea__input[data-invalid] {
+.harbor-textarea[data-readonly] .harbor-textarea__input {
+  background: #f4f4f5; /* PLACEHOLDER */
+  border-style: dashed; /* PLACEHOLDER */
+}
+
+.harbor-textarea[data-invalid] .harbor-textarea__input {
   border-color: #dc2626; /* PLACEHOLDER */
 }
 
-.harbor-textarea__input[data-invalid][data-focus-visible] {
+.harbor-textarea[data-invalid] .harbor-textarea__input[data-focus-visible] {
   box-shadow:
     var(--ds-semantic-focus-ring-gap-x) var(--ds-semantic-focus-ring-gap-y) var(--ds-semantic-focus-ring-gap-blur)
       var(--ds-semantic-focus-ring-gap-spread) var(--ds-semantic-focus-ring-gap-color),

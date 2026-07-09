@@ -55,7 +55,8 @@
 }
 
 .harbor-select__trigger[data-focus-visible] {
-  border-color: var(--ds-semantic-focus-ring-ring-color);
+  /* Border-color intentionally unchanged here — matches Button, where the
+     focus-visible treatment is the shared box-shadow ring only. */
   box-shadow:
     var(--ds-semantic-focus-ring-gap-x) var(--ds-semantic-focus-ring-gap-y) var(--ds-semantic-focus-ring-gap-blur)
       var(--ds-semantic-focus-ring-gap-spread) var(--ds-semantic-focus-ring-gap-color),

@@ -44,6 +44,12 @@ export interface SelectProps
  * giving full control over styling each part. Single-selection only for now
  * (RAC also supports `selectionMode="multiple"`, not exposed here yet). Colors
  * and sizes are PLACEHOLDER values on this branch, pending component tokens.
+ *
+ * Note on prop naming: unlike Button (which keeps `disabled` for backward
+ * compatibility with its pre-RAC API), this is a net-new component, so it
+ * exposes RAC's native `isDisabled`/`isRequired`/`isInvalid` directly — the
+ * intended convention going forward for components without a legacy API to
+ * preserve.
  */
 export const Select = React.forwardRef<HTMLDivElement, SelectProps>(
   ({ label, description, errorMessage, items, className, ...rest }, ref) => {

@@ -1,3 +1,15 @@
+# [1.2.0](https://github.com/marcinkwiatkowski605/Harbor-Design-System/compare/v1.1.0...v1.2.0) (2026-07-09)
+
+
+### Bug Fixes
+
+* **storybook:** address code review findings on RAC branch ([b684ed4](https://github.com/marcinkwiatkowski605/Harbor-Design-System/commit/b684ed44fae5bd183eccc20792f2593f8497a3f7))
+
+
+### Features
+
+* **storybook:** rebuild Button and add Select/TextField/TextArea on react-aria-components ([590811f](https://github.com/marcinkwiatkowski605/Harbor-Design-System/commit/590811ff0dda8c3319fcc8753acba74e63c880ab))
+
 # [1.1.0](https://github.com/marcinkwiatkowski605/Harbor-Design-System/compare/v1.0.0...v1.1.0) (2026-07-08)
 
 

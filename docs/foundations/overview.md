@@ -1,5 +1,145 @@
 # Token architecture
 
-<!-- TODO: three-tier model (primitive → semantic → component), CSS prefix convention
-     (--ds-primitive- / --ds-semantic- / --ds-component-), how to consume tokens,
-     and the no-theme-switching decision. Source: README token section + config.js. -->
+Harbor's values — colors, spacing, type, radii, shadows — live as design tokens, not
+hardcoded numbers. Every token belongs to one of three tiers, and each tier has a fixed
+naming pattern. This page explains that pattern: what each tier is for, how its name is
+built, how to consume tokens in code, and why there's no theme switching.
+
+It does not list every token value — see [Color](./color.md), [Typography](./typography.md),
+and [Dimensions](./dimensions.md) in this same folder for the full breakdowns, or
+**Foundations › Design Tokens** in Storybook for the exhaustive per-token tables.
+
+## Why three tiers
+
+- **Tier 1 (primitive)** defines the raw values available to the system — a color ramp
+  step, a spacing number, a font size. No meaning attached yet.
+- **Tier 2 (semantic)** maps a Tier 1 value to a role — "the brand background color,"
+  independent of any single component.
+- **Tier 3 (component)** targets one component's specific need, and only exists when that
+  component's value genuinely diverges from its Tier 2 role.
+
+A token should default to Tier 2. Reach for Tier 3 only when a component can't reuse a
+semantic value as-is.
+
+## Naming pattern per tier
+
+| Tier | Pattern | Example |
+|------|---------|---------|
+| 1 | `--ds-primitive-{category}-{value}` | `--ds-primitive-color-brand-lavender-500` |
+| 2 | `--ds-semantic-{category}-{property}-{variant}-{state}` | `--ds-semantic-color-background-brand` |
+| 3 | `--ds-component-{component}-{componentVariant}-{property}-{state}` | `--ds-component-button-primary-color-background-enabled` |
+
+Every tier starts with the global prefix `--ds`, which exists to avoid collisions with
+variables from outside the token system. Segments that don't apply to a given token are
+skipped rather than left blank — a token with no variant, for example, goes straight from
+property to state.
+
+### Tier 1: Primitive
+
+Categories currently built in Harbor: `color`, `typography`, `spacing`, `border`,
+`shadow`. (The model also supports `animation`, `viewport`, and `z-index` categories —
+Harbor hasn't populated those yet.)
+
+A primitive name is just the category plus the value's position in its scale:
+`--ds-primitive-color-brand-lavender-500`. It carries no information about where the
+color is used — that's Tier 2's job.
+
+### Tier 2: Semantic
+
+Anatomy: `category` → `property` → `variant` → `state`.
+
+- **Category** — `color`, `typography`, `spacing`, `border`, `shadow`, or (in Harbor)
+  `focus-ring`.
+- **Property** — the surface a color applies to: `background`, `content`, `border`.
+- **Variant** — the role: `brand`, `accent`, `error`, `warning`, `info`, `success`, or the
+  default (unnamed) surface. `subtle` and `secondary` are their own muted/low-emphasis
+  roles, not a tonal modifier of another variant.
+- **State** — `hover`, `selected` (interaction only, and only on variants that are
+  actually interactive); the base state is omitted rather than named (there is no
+  `-enabled` or `-default` suffix at Tier 2 — the bare variant name **is** that state).
+  `disabled` is modeled as its own token (`--ds-semantic-color-background-disabled`)
+  shared across every variant, rather than duplicated per variant — a disabled brand
+  button and a disabled accent button read the same gray, so one token covers both
+  instead of multiplying variant × state combinations.
+
+Text (`content`) variants don't get interaction states — a label's color doesn't change
+on hover, only its container does. Where a variant's color needs to sit both as
+text-on-its-own and as text-drawn-on-top-of-that-variant's-background, the second case
+gets an `on-` prefix (`content-brand` vs. `content-on-brand`) rather than a new segment.
+
+### Tier 3: Component
+
+Anatomy: `component` → `componentVariant` → `property` → `state`.
+
+- **Component** — the component name, dashed for multi-word (`text-field`).
+- **Component variant** — only the values that component's API actually exposes
+  (Button: `primary`, `secondary`, `outline`).
+- **Property** — `color-background`, `color-content`, `color-border`, or any other CSS
+  property the component needs to override (`padding`, `height`, `border-radius`).
+- **State** — `enabled`, `hover`, `selected`, `disabled`. Tier 3 states are named
+  explicitly (including `enabled`) because a component variant's base value can collide
+  with its own nested states in the token tree otherwise. Only add a state that doesn't
+  exist at Tier 2 when it needs its own color values. If a state renders identically to
+  an existing one — Button's `focus`, for example, reuses the `enabled` fill and only adds
+  the shared focus ring — handle it in CSS without a dedicated token.
+
+## One value, three tiers
+
+The same purple traces through all three tiers when a component uses it as-is:
+
+| Tier | Token | Value |
+|------|-------|-------|
+| 1 — Primitive | `--ds-primitive-color-brand-lavender-600` | `#9050E9` |
+| 2 — Semantic | `--ds-semantic-color-background-brand` | `#9050E9` |
+| 3 — Component | `--ds-component-button-primary-color-background-enabled` | `#9050E9` |
+
+Tier 3 only needed to exist here because Button's enabled state has its own token slot to
+fill — its value still traces back to the same Tier 2 role.
+
+## Choosing a tier for a new token
+
+1. Does this value need to exist independent of any UI role (a raw color, a spacing
+   number)? → Tier 1.
+2. Does it express a role or intention shared across components (a background color for
+   "brand," a state color for "error")? → Tier 2. Default here.
+3. Does a specific component need a value that genuinely diverges from its Tier 2 role? →
+   Tier 3, scoped to that component only.
+
+Skipping a check and going straight to Tier 3 is the most common way naming drifts —
+check Tier 2 first.
+
+## Where tokens come from, and how to consume them
+
+Tokens live in Figma (file **HRDS**) and are exported to `design_tokens.json` at the repo
+root in W3C DTCG format. `npm run build:tokens` runs Style Dictionary
+(`packages/harbor-tokens/config.js`), which resolves aliases and emits CSS custom
+properties, flat JSON, and JS/TS exports into `packages/harbor-tokens/light/build/`.
+
+To use a token in a component's CSS, reference it directly — never hand-write the
+resolved value:
+
+```css
+.harbor-button[data-variant='primary'] {
+  background: var(--ds-component-button-primary-color-background-enabled);
+}
+```
+
+The built CSS is imported once, globally, in Storybook's `.storybook/preview.ts`, so
+after `npm run build:tokens` any token change from Figma is immediately visible across
+every component and every Foundations page — there's nothing to import per-component.
+
+## No theme switching
+
+Harbor has a single, fixed token set — there is no light/dark mode or brand-variant
+switching today. A CSS variable's prefix marks its **tier** (which Figma collection it
+was exported from), not a theme:
+
+| Tier | Figma collection | CSS prefix |
+|---|---|---|
+| Primitive | Primitive – Brand A / Global | `--ds-primitive-` |
+| Semantic | Semantic (modes) | `--ds-semantic-` |
+| Component | Component (modes) | `--ds-component-` |
+
+If Harbor adds theming later, it layers onto this same three-tier structure (most likely
+as alternate values for the same semantic/component token names, resolved per theme)
+rather than replacing it — the tier prefix already does the job a theme prefix would.

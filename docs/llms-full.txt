@@ -6,17 +6,308 @@
 
 # Token architecture
 
+Harbor's values — colors, spacing, type, radii, shadows — live as design tokens, not
+hardcoded numbers. Every token belongs to one of three tiers, and each tier has a fixed
+naming pattern. This page explains that pattern: what each tier is for, how its name is
+built, how to consume tokens in code, and why there's no theme switching.
+
+It does not list every token value — see [Color](./color.md), [Typography](./typography.md),
+and [Dimensions](./dimensions.md) in this same folder for the full breakdowns, or
+**Foundations › Design Tokens** in Storybook for the exhaustive per-token tables.
+
+## Why three tiers
+
+- **Tier 1 (primitive)** defines the raw values available to the system — a color ramp
+  step, a spacing number, a font size. No meaning attached yet.
+- **Tier 2 (semantic)** maps a Tier 1 value to a role — "the brand background color,"
+  independent of any single component.
+- **Tier 3 (component)** targets one component's specific need, and only exists when that
+  component's value genuinely diverges from its Tier 2 role.
+
+A token should default to Tier 2. Reach for Tier 3 only when a component can't reuse a
+semantic value as-is.
+
+## Naming pattern per tier
+
+| Tier | Pattern | Example |
+|------|---------|---------|
+| 1 | `--ds-primitive-{category}-{value}` | `--ds-primitive-color-brand-lavender-500` |
+| 2 | `--ds-semantic-{category}-{property}-{variant}-{state}` | `--ds-semantic-color-background-brand` |
+| 3 | `--ds-component-{component}-{componentVariant}-{property}-{state}` | `--ds-component-button-primary-color-background-enabled` |
+
+Every tier starts with the global prefix `--ds`, which exists to avoid collisions with
+variables from outside the token system. Segments that don't apply to a given token are
+skipped rather than left blank — a token with no variant, for example, goes straight from
+property to state.
+
+### Tier 1: Primitive
+
+Categories currently built in Harbor: `color`, `typography`, `spacing`, `border`,
+`shadow`. (The model also supports `animation`, `viewport`, and `z-index` categories —
+Harbor hasn't populated those yet.)
+
+A primitive name is just the category plus the value's position in its scale:
+`--ds-primitive-color-brand-lavender-500`. It carries no information about where the
+color is used — that's Tier 2's job.
+
+### Tier 2: Semantic
+
+Anatomy: `category` → `property` → `variant` → `state`.
+
+- **Category** — `color`, `typography`, `spacing`, `border`, `shadow`, or (in Harbor)
+  `focus-ring`.
+- **Property** — the surface a color applies to: `background`, `content`, `border`.
+- **Variant** — the role: `brand`, `accent`, `error`, `warning`, `info`, `success`, or the
+  default (unnamed) surface. `subtle` and `secondary` are their own muted/low-emphasis
+  roles, not a tonal modifier of another variant.
+- **State** — `hover`, `selected` (interaction only, and only on variants that are
+  actually interactive); the base state is omitted rather than named (there is no
+  `-enabled` or `-default` suffix at Tier 2 — the bare variant name **is** that state).
+  `disabled` is modeled as its own token (`--ds-semantic-color-background-disabled`)
+  shared across every variant, rather than duplicated per variant — a disabled brand
+  button and a disabled accent button read the same gray, so one token covers both
+  instead of multiplying variant × state combinations.
+
+Text (`content`) variants don't get interaction states — a label's color doesn't change
+on hover, only its container does. Where a variant's color needs to sit both as
+text-on-its-own and as text-drawn-on-top-of-that-variant's-background, the second case
+gets an `on-` prefix (`content-brand` vs. `content-on-brand`) rather than a new segment.
+
+### Tier 3: Component
+
+Anatomy: `component` → `componentVariant` → `property` → `state`.
+
+- **Component** — the component name, dashed for multi-word (`text-field`).
+- **Component variant** — only the values that component's API actually exposes
+  (Button: `primary`, `secondary`, `outline`).
+- **Property** — `color-background`, `color-content`, `color-border`, or any other CSS
+  property the component needs to override (`padding`, `height`, `border-radius`).
+- **State** — `enabled`, `hover`, `selected`, `disabled`. Tier 3 states are named
+  explicitly (including `enabled`) because a component variant's base value can collide
+  with its own nested states in the token tree otherwise. Only add a state that doesn't
+  exist at Tier 2 when it needs its own color values. If a state renders identically to
+  an existing one — Button's `focus`, for example, reuses the `enabled` fill and only adds
+  the shared focus ring — handle it in CSS without a dedicated token.
+
+## One value, three tiers
+
+The same purple traces through all three tiers when a component uses it as-is:
+
+| Tier | Token | Value |
+|------|-------|-------|
+| 1 — Primitive | `--ds-primitive-color-brand-lavender-600` | `#9050E9` |
+| 2 — Semantic | `--ds-semantic-color-background-brand` | `#9050E9` |
+| 3 — Component | `--ds-component-button-primary-color-background-enabled` | `#9050E9` |
+
+Tier 3 only needed to exist here because Button's enabled state has its own token slot to
+fill — its value still traces back to the same Tier 2 role.
+
+## Choosing a tier for a new token
+
+1. Does this value need to exist independent of any UI role (a raw color, a spacing
+   number)? → Tier 1.
+2. Does it express a role or intention shared across components (a background color for
+   "brand," a state color for "error")? → Tier 2. Default here.
+3. Does a specific component need a value that genuinely diverges from its Tier 2 role? →
+   Tier 3, scoped to that component only.
+
+Skipping a check and going straight to Tier 3 is the most common way naming drifts —
+check Tier 2 first.
+
+## Where tokens come from, and how to consume them
+
+Tokens live in Figma (file **HRDS**) and are exported to `design_tokens.json` at the repo
+root in W3C DTCG format. `npm run build:tokens` runs Style Dictionary
+(`packages/harbor-tokens/config.js`), which resolves aliases and emits CSS custom
+properties, flat JSON, and JS/TS exports into `packages/harbor-tokens/light/build/`.
+
+To use a token in a component's CSS, reference it directly — never hand-write the
+resolved value:
+
+```css
+.harbor-button[data-variant='primary'] {
+  background: var(--ds-component-button-primary-color-background-enabled);
+}
+```
+
+The built CSS is imported once, globally, in Storybook's `.storybook/preview.ts`, so
+after `npm run build:tokens` any token change from Figma is immediately visible across
+every component and every Foundations page — there's nothing to import per-component.
+
+## No theme switching
+
+Harbor has a single, fixed token set — there is no light/dark mode or brand-variant
+switching today. A CSS variable's prefix marks its **tier** (which Figma collection it
+was exported from), not a theme:
+
+| Tier | Figma collection | CSS prefix |
+|---|---|---|
+| Primitive | Primitive – Brand A / Global | `--ds-primitive-` |
+| Semantic | Semantic (modes) | `--ds-semantic-` |
+| Component | Component (modes) | `--ds-component-` |
+
+If Harbor adds theming later, it layers onto this same three-tier structure (most likely
+as alternate values for the same semantic/component token names, resolved per theme)
+rather than replacing it — the tier prefix already does the job a theme prefix would.
+
 ---
 
 # Color
+
+Every color in Harbor resolves to a token — see [Token architecture](./overview.md) for
+how the tier system works. This page summarizes what exists at Tier 1 (primitive) and
+Tier 2 (semantic). For exact per-token values and current counts, see **Foundations ›
+Design Tokens › Tier 1 / Tier 2** in Storybook, or
+`packages/harbor-tokens/light/build/json/tokens.json` directly — those stay
+authoritative as the palette evolves, rather than duplicated here. Never hand-write a
+hex value in component CSS — reference the token.
+
+## Primitive palette
+
+Raw color values, organized into ramps. No meaning attached to where they're used yet.
+
+| Group | Steps |
+|---|---|
+| `brand-lavender` | 50–950 ramp |
+| `brand-orange` | 50–950 ramp |
+| `neutral` | 50–950 ramp, plus `black` and `white` |
+| `utility-red` | 50–950 ramp |
+| `utility-yellow` | 50–950 ramp |
+| `utility-blue` | 50–950 ramp |
+| `utility-green` | 50–950 ramp |
+| `black-alpha` | a small number of opacity steps |
+
+Naming: `--ds-primitive-color-{group}-{step}`, e.g. `--ds-primitive-color-brand-lavender-600`.
+
+Brand and utility ramps were rebuilt with gamut-correct OKLCH chroma reduction (holds hue
+while darkening) specifically so every step clears WCAG AA contrast against both black
+and white text at the steps components actually use — see the Button color reference in
+Storybook for a worked example.
+
+## Semantic color roles
+
+Tier 1 values mapped to an intended use, independent of any one component. Naming:
+`--ds-semantic-color-{property}-{variant}-{state}` (see [Token architecture](./overview.md#tier-2-semantic)
+for the full anatomy).
+
+| Property | Covers |
+|---|---|
+| `background` | default/subtle/hover/selected/disabled + `brand`, `accent`, `error`, `warning`, `info`, `success` variants (each with their own `hover`/`selected`) |
+| `border` | default/hover/selected/disabled/`focus` + `brand`, `accent`, `error`, `warning`, `info`, `success` |
+| `content` | default/secondary/disabled + `brand`, `accent`, `error`, `warning`, `info`, `success`, and their `on-*` counterparts (text/icon color drawn *on top of* that variant's background) |
+
+A few naming notes worth remembering when picking a token:
+
+- There's no `-enabled` or `-default` suffix — the bare variant name (`background-brand`)
+  **is** the enabled state. Only interactive states (`hover`, `selected`) get a suffix.
+- `disabled` is one token per property (`background-disabled`, `content-disabled`),
+  shared across every variant — not duplicated per variant.
+- `content` is a single merged category for both text and icon color — there's no
+  separate `icon-*` token family; a label and an icon in the same context use the same
+  `content-*` token.
 
 ---
 
 # Typography
 
+See [Token architecture](./overview.md) for how the tier system works. This page
+summarizes Harbor's type styles. For the full per-token value table and current counts,
+see **Foundations › Design Tokens › Tier 1 / Tier 2** in Storybook, or
+`packages/harbor-tokens/light/build/json/tokens.json` directly.
+
+## Semantic type styles
+
+Each semantic style is a **bundle** of CSS properties, not a single value:
+`font-family`, `font-size`, `font-style`, `font-weight`, `letter-spacing`, `line-height`,
+`text-transform`. Naming: `--ds-semantic-typography-{style}-{property}`, e.g.
+`--ds-semantic-typography-label-lg-font-weight`.
+
+| Style | Used for (typical) |
+|---|---|
+| `display-default` | Hero/marketing-scale text — the single largest style |
+| `heading-2xl` / `xl` / `lg` / `md` / `sm` / `xs` | Page and section headings, largest to smallest |
+| `body-lg` / `md` / `sm` | Paragraph and UI copy |
+| `label-lg` / `md` / `sm` | Form labels, button labels, and other short UI text (Button uses `label-lg`) |
+
+Example — every property `label-lg` bundles:
+
+| Property | Value |
+|---|---|
+| `font-family` | Helvetica |
+| `font-size` | 1rem (16px) |
+| `font-weight` | 700 |
+| `line-height` | 1.5 |
+| `letter-spacing` | 0rem |
+| `font-style` | normal |
+| `text-transform` | — |
+
+## Primitive typography
+
+The raw building blocks each semantic style resolves to: font family names, the numeric
+font-size scale, font weights, the line-height scale, and letter-spacing steps. These
+aren't meant to be referenced directly by components — use a semantic style instead, so
+that "Button's label" stays traceable to a named role rather than a bare pixel value.
+
 ---
 
 # Dimensions
+
+See [Token architecture](./overview.md) for how the tier system works. This page
+summarizes Harbor's spacing, border, and shadow tokens. For the full per-token value
+table and current counts, see **Foundations › Design Tokens › Tier 1 / Tier 2** in
+Storybook, or `packages/harbor-tokens/light/build/json/tokens.json` directly.
+
+## Spacing
+
+**Primitive scale, 4px base:** `4, 8, 12, 16, 24, 32, 40, 48, 64, 80, 96, 128` (px). Steps
+go up by 4px to 16px, then 8px to 48px, then 16px from there — more precision where it's
+actually needed, fewer meaningless in-between options past 48px. Naming:
+`--ds-primitive-spacing-{value}`.
+
+**Semantic spacing** has three roles (`inset`, `inline`, `stack`), each with the same
+sizes (`xs`, `sm`, `md`, `lg`, `xl`) mapping to a primitive step:
+
+| Size | `xs` | `sm` | `md` | `lg` | `xl` |
+|---|---|---|---|---|---|
+| Primitive | 4 | 8 | 12 | 16 | 24 |
+
+- `inset` — padding inside a container.
+- `inline` — horizontal gaps between elements sitting side by side.
+- `stack` — vertical gaps between elements stacked on top of each other.
+
+Naming: `--ds-semantic-spacing-{role}-{size}`, e.g. `--ds-semantic-spacing-inset-md`.
+
+## Border
+
+| Tier | Radius | Width |
+|---|---|---|
+| Primitive | `0, 2, 4, 8, 12, 16, 24, 32, 48, 9999` (px; `9999` = fully round) | `0, 1, 2, 4, 8` (px) |
+| Semantic | `sharp, sm, md, lg` | `none, sm, md, lg` |
+
+Semantic border tokens resolve to a primitive step the same way semantic color tokens
+resolve to a primitive color — e.g. `--ds-semantic-border-radius-md` currently equals
+`--ds-primitive-border-radius-8`.
+
+## Shadow
+
+| Tier | Covers |
+|---|---|
+| Primitive | Individual `blur`, `spread` (including a negative value), `x`-offset, and `y`-offset values |
+| Semantic | `sm` and `md` — each a full `box-shadow` shorthand (offset + blur + spread + color) composed from the primitives above |
+
+## Focus ring / gap
+
+Semantic only — no primitive tier, since these values only make sense as a bundle.
+Harbor's focus indicator is a shared, two-layer ring used identically by Button,
+TextField, Select, and TextArea:
+
+- **`gap`** (`x`, `y`, `blur`, `spread`, `color`) — the inner layer, a white halo that
+  pushes the ring away from the element's own border.
+- **`ring`** (`x`, `y`, `blur`, `spread`, `color`) — the outer, visible colored ring.
+
+Both layers are plain `box-shadow` values stacked together (`gap` painted on top of
+`ring`) — see [Token architecture](./overview.md) for why this needs two independently
+tokenized layers instead of one.
 
 ---
 
@@ -24,6 +315,12 @@
 
 Buttons let people take an action, confirm a choice, or move forward in a flow.
 They're the primary way of triggering something to happen on screen.
+
+> **Experimental branch note:** this is a rebuild of Button on top of
+> [`react-aria-components`](https://react-aria.adobe.com/)' `Button` primitive
+> instead of a plain `<button>`. The visual layer is unchanged — `Button.css`
+> references the same `--ds-component-button-*` / `--ds-semantic-*` tokens as
+> before, just via `data-*` state selectors instead of pseudo-classes.
 
 > _Live, interactive example — see this component in Storybook._
 
@@ -60,8 +357,9 @@ All three types share the same five states: Enabled, Hover, Selected, Focus, Dis
 - **Disabled** flattens background and text to neutral gray on every type, including
   Outline — background, border, and label all drop to their disabled tokens.
 
-In code, Hover/Selected/Focus are driven by `:hover` / `:active` / `:focus-visible`,
-and Disabled by the native `disabled` attribute.
+In code, Hover/Selected/Focus are driven by the `data-hovered` / `data-pressed` /
+`data-focus-visible` attributes `react-aria-components`' `Button` exposes, and
+Disabled by `data-disabled` (set via the `isDisabled` prop).
 
 ## Color reference
 
@@ -157,14 +455,15 @@ import { Button } from './components/Button';
 | Prop       | Type                                        | Default     | Description |
 |------------|---------------------------------------------|-------------|-------------|
 | `variant`  | `'primary' \| 'secondary' \| 'outline'`     | `'primary'` | Visual style. Maps to the Figma `Type` axis. |
-| `disabled` | `boolean`                                   | `false`     | Native disabled attribute. Removes the button from interaction and the tab order. |
+| `disabled` | `boolean`                                   | `false`     | Mapped internally to `react-aria-components`' `isDisabled`. Removes the button from interaction and the tab order. |
 | `children` | `React.ReactNode`                           | —           | Button label. One line of centered text. **Required.** |
-| `...rest`  | `React.ButtonHTMLAttributes<HTMLButtonElement>` | —       | All native button attributes (`onClick`, `type`, `aria-*`, …) forward to the underlying `<button>`. |
+| `...rest`  | `React.ButtonHTMLAttributes<HTMLButtonElement>` | —       | All native button attributes (`onClick`, `type`, `aria-*`, …) forward to the underlying `react-aria-components` `Button` — `onClick` works as an alias for its `onPress`. |
 
 ## Accessibility
 
-Button renders a native `<button>` element, so it gets the browser's built-in `button`
-role and keyboard behavior — no custom ARIA role is needed.
+Button is built on `react-aria-components`' `Button` primitive, which renders a
+native `<button>` element under the hood and layers on Adobe's tested ARIA/keyboard
+behavior — no custom ARIA role is needed.
 
 **Keyboard**
 
@@ -204,6 +503,407 @@ never drops below the horizontal padding (24px × 2) alone.
 The focus ring is mandatory and shared across all three types — restyle it, don't
 suppress it. WCAG 2.2 adds Focus Not Obscured (Minimum) (2.4.11, AA): don't let a sticky
 header, footer, or overlay cover a focused button's ring.
+
+---
+
+# Select
+
+A select lets people choose one option from a list, without taking up the space
+a fully expanded set of choices (like radio buttons) would need.
+
+> **Experimental branch note:** built the same way as TextField — on
+> [`react-aria-components`](https://react-aria.adobe.com/)' `Select` primitive,
+> using its explicit anatomy (`Label` + `Button` + `SelectValue` + `Popover` +
+> `ListBox`/`ListBoxItem`) instead of the compact all-in-one API, for full control
+> over styling each part. There's no Figma spec yet, so this exposes React Aria's
+> single-selection surface rather than a Harbor-specific subset. Colors and sizes
+> below are **placeholder values**, not final component tokens.
+
+> _Live, interactive example — see this component in Storybook._
+
+## Anatomy
+
+Select composes six parts, each a separate `react-aria-components` primitive:
+
+```tsx
+<Select items={items}>
+  <Label>{label}</Label>
+  <Button>
+    <SelectValue />
+    <span aria-hidden="true" /> {/* chevron */}
+  </Button>
+  <Text slot="description">{description}</Text>
+  <FieldError>{errorMessage}</FieldError>
+  <Popover>
+    <ListBox items={items}>
+      {(item) => <ListBoxItem id={item.id}>{item.label}</ListBoxItem>}
+    </ListBox>
+  </Popover>
+</Select>
+```
+
+- **Label** — describes what's being chosen. Always visible, sits above the trigger.
+- **Trigger (Button + SelectValue)** — a button showing the current selection (or
+  `placeholder` when nothing is chosen yet) and a chevron that flips to indicate
+  open/closed.
+- **Popover + ListBox** — the list of options, only mounted in the DOM while open.
+- **Description** / **Error message** — same helper-text/validation pattern as TextField.
+
+## States
+
+- **Enabled** — default resting state.
+- **Hover** — trigger border darkens (`data-hovered` on the trigger button).
+- **Open** — popover is visible, chevron flips (`data-open` on the Select container).
+- **Focus** — same two-layer ring as Button/TextField, on the trigger
+  (`data-focus-visible`).
+- **Disabled** — `isDisabled`; trigger leaves the tab order (`data-disabled`).
+- **Required** — `isRequired`; adds a marker after the label (`data-required`).
+- **Invalid** — `isInvalid`; trigger border and error text turn to the error color
+  (`data-invalid`).
+
+Each option in the list has its own states, independent of the trigger:
+**hovered**, **focused** (keyboard), **selected**, and **disabled** (per-option,
+via that option's `isDisabled`) — see `data-hovered` / `data-focus-visible` /
+`data-selected` / `data-disabled` on `ListBoxItem`.
+
+## Color reference
+
+**Pending** — this branch uses placeholder hardcoded colors (see `Select.css`),
+not component tokens. This section will be filled in with the real value/token
+table once component tokens for Select are prepared and wired in.
+
+## Specs
+
+**Pending** — sizing (trigger height/padding, popover max height, option padding)
+is currently hardcoded as placeholder values in `Select.css`. This section will
+list the final value/token table once component tokens exist.
+
+## Usage guidelines
+
+Use Select when there are more than ~5 options, or when showing every option at
+once (radio buttons) would take up too much space. For 2–5 clearly-visible
+options, prefer radio buttons — people can compare choices without an extra click.
+
+Keep option labels short and parallel in structure (all nouns, or all
+sentence-case phrases) so the list scans quickly once open.
+
+### Code example
+
+```tsx
+<Select
+  label="Country"
+  description="We'll use this to set your default currency."
+  errorMessage="Choose a country."
+  placeholder="Select a country"
+  items={[
+    { id: 'pl', label: 'Poland' },
+    { id: 'de', label: 'Germany' },
+  ]}
+  isRequired
+  onChange={(key) => setCountry(key)}
+/>
+```
+
+## Component API
+
+```tsx
+import { Select } from './components/Select';
+```
+
+| Prop           | Type                                                 | Default | Description |
+|----------------|-------------------------------------------------------|---------|-------------|
+| `label`        | `React.ReactNode`                                      | —       | Field label, shown above the trigger. |
+| `description`  | `React.ReactNode`                                      | —       | Helper text shown below the trigger while valid. |
+| `errorMessage` | `string \| (validation: ValidationResult) => string`   | —       | Error message shown below the trigger when `isInvalid` is true. |
+| `items`        | `SelectOption[]` (`{ id, label, isDisabled? }`)        | —       | The list of selectable options. **Required.** |
+| `placeholder`  | `string`                                               | —       | Text shown in the trigger when nothing is selected. |
+| `value` / `defaultValue` | `Key \| null`                                | —       | Controlled / uncontrolled selected option id. |
+| `onChange`     | `(value: Key \| null) => void`                         | —       | Fires when the selection changes. |
+| `isDisabled`   | `boolean`                                              | `false` | Removes the trigger from interaction and the tab order. |
+| `isRequired`   | `boolean`                                              | `false` | Adds a required marker and wires up validation. |
+| `isInvalid`    | `boolean`                                              | `false` | Applies invalid styling and shows `errorMessage`. |
+| `...rest`      | `react-aria-components`' `SelectProps`                 | —       | All other React Aria Select props (`name`, `validate`, `isOpen`, `onOpenChange`, …) forward through. |
+
+## Accessibility
+
+Select is built on `react-aria-components`' `Select`, `Label`, `Button`,
+`SelectValue`, `Popover`, `ListBox`/`ListBoxItem`, `Text`, and `FieldError`
+primitives, which implement the ARIA [Listbox](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/)
+pattern for the popover and wire up all label/description/error associations
+automatically.
+
+**Keyboard**
+
+| Key | Action |
+|-----|--------|
+| Tab | Moves focus to the trigger. Skips it if `isDisabled`. |
+| Enter / Space / ↓ / ↑ | Opens the popover (when the trigger is focused). |
+| ↓ / ↑ | Moves the active option once open. |
+| Enter / Space | Selects the active option and closes the popover. |
+| Escape | Closes the popover without changing the selection. |
+| Type a letter | Jumps to the next option starting with that letter (typeahead). |
+
+**Screen readers**
+
+- The trigger announces the current value (or a "no selection" state) and that
+  activating it opens a listbox.
+- Each option announces its selected state as the list is navigated.
+- When invalid, the error message is announced and `aria-invalid` is set on the
+  trigger.
+
+**Focus indicator**
+
+Same shared two-layer focus ring as Button and TextField — restyle it, don't
+suppress it. Focus stays on the trigger the entire time the popover is open;
+it never moves into the popover itself (per the ARIA Listbox pattern), so the
+ring doesn't need special handling for the open state.
+
+---
+
+# TextArea
+
+A text area lets people enter multiple lines of plain text — a comment, a
+description, free-form feedback.
+
+> **Experimental branch note:** built on
+> [`react-aria-components`](https://react-aria.adobe.com/)' `TextArea`, which is
+> a drop-in swap for `Input` inside the same `TextField` container — TextArea
+> shares the exact same `Label`/description/error wiring as our TextField
+> component, just renders a `<textarea>` instead of an `<input>`. Colors and
+> sizes below are **placeholder values**, not final component tokens.
+
+> _Live, interactive example — see this component in Storybook._
+
+## Anatomy
+
+Same four parts as TextField, with `TextArea` swapped in for `Input`:
+
+```tsx
+<TextField>
+  <Label>{label}</Label>
+  <TextArea />
+  <Text slot="description">{description}</Text>
+  <FieldError>{errorMessage}</FieldError>
+</TextField>
+```
+
+The `rows` prop sets the visible height (native `<textarea rows>`); people can
+resize it further by dragging the bottom-right corner (`resize: vertical`).
+
+## States
+
+Identical state set to TextField — Enabled, Hover, Focus, Disabled, Read-only,
+Required, Invalid — driven by the same `data-hovered` / `data-focus-visible` /
+`data-disabled` / `data-readonly` / `data-required` / `data-invalid` attributes.
+See TextField's docs for the full breakdown; nothing about the state model
+changes for multi-line input.
+
+## Color reference
+
+**Pending** — this branch uses placeholder hardcoded colors (see `TextArea.css`),
+not component tokens. This section will be filled in with the real value/token
+table once component tokens for TextArea are prepared and wired in.
+
+## Specs
+
+**Pending** — sizing (min height, padding, radius, border width) is currently
+hardcoded as placeholder values in `TextArea.css`. This section will list the
+final value/token table once component tokens exist.
+
+## Usage guidelines
+
+Use TextArea when people need more than a short phrase — comments, descriptions,
+open-ended feedback. For a single line of text (names, emails, search), use
+TextField instead; a resizable multi-line box for one word of input just wastes
+space and invites people to type more than you need.
+
+Set `rows` to roughly the amount of text you expect by default — too short and
+people spend the whole time scrolling within a tiny box; too tall and a one-line
+answer looks lost in empty space.
+
+### Code example
+
+```tsx
+<TextArea
+  label="Feedback"
+  description="Let us know what worked and what didn't."
+  errorMessage="Feedback must be at least 10 characters."
+  rows={4}
+  onChange={(value) => setFeedback(value)}
+/>
+```
+
+## Component API
+
+```tsx
+import { TextArea } from './components/TextArea';
+```
+
+| Prop           | Type                                                | Default | Description |
+|----------------|------------------------------------------------------|---------|-------------|
+| `label`        | `React.ReactNode`                                    | —       | Field label, shown above the textarea. |
+| `description`  | `React.ReactNode`                                    | —       | Helper text shown below the textarea while valid. |
+| `errorMessage` | `string \| (validation: ValidationResult) => string`  | —       | Error message shown below the textarea when `isInvalid` is true. |
+| `placeholder`  | `string`                                              | —       | Placeholder text shown when the textarea is empty. |
+| `rows`         | `number`                                              | —       | Visible number of text lines (native `rows` attribute). |
+| `value` / `defaultValue` | `string`                                    | —       | Controlled / uncontrolled textarea value. |
+| `onChange`     | `(value: string) => void`                             | —       | Fires on every value change. |
+| `isDisabled`   | `boolean`                                             | `false` | Removes the field from interaction and the tab order. |
+| `isReadOnly`   | `boolean`                                             | `false` | Field is focusable but not editable. |
+| `isRequired`   | `boolean`                                             | `false` | Adds a required marker and wires up validation. |
+| `isInvalid`    | `boolean`                                             | `false` | Applies invalid styling and shows `errorMessage`. |
+| `textAreaRef`  | `React.Ref<HTMLTextAreaElement>`                      | —       | A ref for the underlying `<textarea>` element. |
+| `...rest`      | `react-aria-components`' `TextFieldProps`             | —       | All other React Aria TextField props (`name`, `validate`, `minLength`, `maxLength`, …) forward through. |
+
+## Accessibility
+
+Same primitives and ARIA wiring as TextField (`TextField`, `Label`, `Text`,
+`FieldError`), with `TextArea` in place of `Input` — label, description, and
+error message are always correctly associated with the textarea.
+
+**Keyboard**
+
+| Key | Action |
+|-----|--------|
+| Tab | Moves focus to the textarea. Skips it if `isDisabled`. |
+| Shift+Tab | Moves focus away from the textarea. |
+| Enter | Inserts a new line (does not submit a form, unlike TextField). |
+
+**Focus indicator**
+
+Same shared two-layer focus ring as Button, TextField, and Select.
+
+---
+
+# TextField
+
+A text field lets people enter a single line of plain text with a keyboard —
+a name, email address, or search query.
+
+> **Experimental branch note:** this is a new component, built from scratch on
+> [`react-aria-components`](https://react-aria.adobe.com/)' `TextField` primitive.
+> There's no Figma spec yet (the "🚧 Text Field" page is still empty), so this
+> exposes React Aria's full field surface rather than a Harbor-specific subset.
+> Colors and sizes below are **placeholder values**, not final component tokens.
+
+> _Live, interactive example — see this component in Storybook._
+
+## Anatomy
+
+TextField composes four parts, each a separate `react-aria-components` primitive:
+
+```tsx
+<TextField>
+  <Label>{label}</Label>
+  <Input />
+  <Text slot="description">{description}</Text>
+  <FieldError>{errorMessage}</FieldError>
+</TextField>
+```
+
+- **Label** — describes what belongs in the field. Always visible, sits above the input.
+- **Input** — the editable text box.
+- **Description** (helper text) — optional guidance shown below the input while the
+  field is valid.
+- **Error message** — shown below the input instead of the description when the field
+  is invalid (`isInvalid`). React Aria only renders `FieldError`'s content when the
+  field is actually invalid, so no conditional is needed in the component itself.
+
+## States
+
+- **Enabled** — default resting state.
+- **Hover** — border darkens slightly to confirm interactivity (`data-hovered`).
+- **Focus** — the same two-layer ring used by Button (white gap + colored outer ring),
+  driven by `data-focus-visible` so it only appears for keyboard/programmatic focus,
+  not every pointer click.
+- **Disabled** — `isDisabled`; removes the field from the tab order (`data-disabled`).
+- **Read-only** — `isReadOnly`; field is focusable and its value is selectable/copyable,
+  but not editable (`data-readonly`).
+- **Required** — `isRequired`; adds a visual marker after the label (`data-required`).
+- **Invalid** — `isInvalid`; border turns to the error color and the error message
+  appears below the input, in addition to (not instead of) the description
+  (`data-invalid`).
+
+## Color reference
+
+**Pending** — this branch uses placeholder hardcoded colors (see `TextField.css`),
+not component tokens. This section will be filled in with the real value/token
+table once component tokens for TextField are prepared and wired in.
+
+## Specs
+
+**Pending** — sizing (height, padding, radius, border width) is currently
+hardcoded as placeholder values in `TextField.css`. This section will list the
+final value/token table once component tokens exist.
+
+## Usage guidelines
+
+Keep labels short and specific — "Email address," not "Enter your email address
+here." The label already implies the action.
+
+Use `description` for guidance people need *before* they type (format hints,
+why you're asking). Use `errorMessage` only for validation problems *after* they've
+typed or tried to submit — don't use it to pre-emptively explain formatting rules.
+
+### Code example
+
+```tsx
+<TextField
+  label="Email address"
+  description="We'll only use this to send you a receipt."
+  errorMessage="Enter a valid email address."
+  isRequired
+  onChange={(value) => setEmail(value)}
+/>
+```
+
+## Component API
+
+```tsx
+import { TextField } from './components/TextField';
+```
+
+| Prop           | Type                                                | Default | Description |
+|----------------|------------------------------------------------------|---------|-------------|
+| `label`        | `React.ReactNode`                                    | —       | Field label, shown above the input. |
+| `description`  | `React.ReactNode`                                    | —       | Helper text shown below the input while valid. |
+| `errorMessage` | `string \| (validation: ValidationResult) => string`  | —       | Error message shown below the input when `isInvalid` is true. |
+| `placeholder`  | `string`                                              | —       | Placeholder text shown when the input is empty. |
+| `value` / `defaultValue` | `string`                                    | —       | Controlled / uncontrolled input value. |
+| `onChange`     | `(value: string) => void`                             | —       | Fires on every value change. |
+| `isDisabled`   | `boolean`                                             | `false` | Removes the field from interaction and the tab order. |
+| `isReadOnly`   | `boolean`                                             | `false` | Field is focusable but not editable. |
+| `isRequired`   | `boolean`                                             | `false` | Adds a required marker and wires up validation. |
+| `isInvalid`    | `boolean`                                             | `false` | Applies invalid styling and shows `errorMessage`. |
+| `inputRef`     | `React.Ref<HTMLInputElement>`                         | —       | A ref for the underlying `<input>` element. |
+| `...rest`      | `react-aria-components`' `TextFieldProps`             | —       | All other React Aria TextField props (`name`, `type`, `validate`, `minLength`, `maxLength`, `pattern`, …) forward through. |
+
+## Accessibility
+
+TextField is built on `react-aria-components`' `TextField`, `Label`, `Input`,
+`Text`, and `FieldError` primitives, which wire up the ARIA relationships
+(`aria-labelledby`, `aria-describedby`, `aria-invalid`, `aria-errormessage`)
+automatically — the label, description, and error message are always correctly
+associated with the input, without manually managed `id`s.
+
+**Keyboard**
+
+| Key | Action |
+|-----|--------|
+| Tab | Moves focus to the input. Skips it if `isDisabled`. |
+| Shift+Tab | Moves focus away from the input. |
+| Any character key | Types into the field (no-op if `isReadOnly` or `isDisabled`). |
+
+**Screen readers**
+
+- The label is announced when the field receives focus.
+- The description is announced as additional context.
+- When invalid, the error message is announced in place of the description, and
+  `aria-invalid` is set so screen readers flag the field as erroneous.
+
+**Focus indicator**
+
+Same shared two-layer focus ring as Button — restyle it, don't suppress it.
 
 ---
 

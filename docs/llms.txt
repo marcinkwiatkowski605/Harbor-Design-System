@@ -4,12 +4,15 @@
 
 ## Foundations
 
-- [Token architecture](./foundations/overview.md)
-- [Color](./foundations/color.md)
-- [Typography](./foundations/typography.md)
-- [Dimensions](./foundations/dimensions.md)
+- [Token architecture](./foundations/overview.md): Harbor's values — colors, spacing, type, radii, shadows — live as design tokens, not
+- [Color](./foundations/color.md): Every color in Harbor resolves to a token — see [Token architecture](./overview.md) for
+- [Typography](./foundations/typography.md): See [Token architecture](./overview.md) for how the tier system works.
+- [Dimensions](./foundations/dimensions.md): See [Token architecture](./overview.md) for how the tier system works.
 
 ## Components
 
 - [Button](./components/button.md): Buttons let people take an action, confirm a choice, or move forward in a flow.
+- [Select](./components/select.md): A select lets people choose one option from a list, without taking up the space
+- [TextArea](./components/textarea.md): A text area lets people enter multiple lines of plain text — a comment, a
+- [TextField](./components/textfield.md): A text field lets people enter a single line of plain text with a keyboard —
 - [Design Tokens](./components/designtokens.md): Harbor's values — colors, spacing, type, radii, shadows — live as design tokens, not

@@ -1,0 +1,129 @@
+# TextField
+
+A text field lets people enter a single line of plain text with a keyboard —
+a name, email address, or search query.
+
+> **Experimental branch note:** this is a new component, built from scratch on
+> [`react-aria-components`](https://react-aria.adobe.com/)' `TextField` primitive.
+> There's no Figma spec yet (the "🚧 Text Field" page is still empty), so this
+> exposes React Aria's full field surface rather than a Harbor-specific subset.
+> Colors and sizes below are **placeholder values**, not final component tokens.
+
+> _Live, interactive example — see this component in Storybook._
+
+## Anatomy
+
+TextField composes four parts, each a separate `react-aria-components` primitive:
+
+```tsx
+<TextField>
+  <Label>{label}</Label>
+  <Input />
+  <Text slot="description">{description}</Text>
+  <FieldError>{errorMessage}</FieldError>
+</TextField>
+```
+
+- **Label** — describes what belongs in the field. Always visible, sits above the input.
+- **Input** — the editable text box.
+- **Description** (helper text) — optional guidance shown below the input while the
+  field is valid.
+- **Error message** — shown below the input instead of the description when the field
+  is invalid (`isInvalid`). React Aria only renders `FieldError`'s content when the
+  field is actually invalid, so no conditional is needed in the component itself.
+
+## States
+
+- **Enabled** — default resting state.
+- **Hover** — border darkens slightly to confirm interactivity (`data-hovered`).
+- **Focus** — the same two-layer ring used by Button (white gap + colored outer ring),
+  driven by `data-focus-visible` so it only appears for keyboard/programmatic focus,
+  not every pointer click.
+- **Disabled** — `isDisabled`; removes the field from the tab order (`data-disabled`).
+- **Read-only** — `isReadOnly`; field is focusable and its value is selectable/copyable,
+  but not editable (`data-readonly`).
+- **Required** — `isRequired`; adds a visual marker after the label (`data-required`).
+- **Invalid** — `isInvalid`; border turns to the error color and the error message
+  appears below the input, in addition to (not instead of) the description
+  (`data-invalid`).
+
+## Color reference
+
+**Pending** — this branch uses placeholder hardcoded colors (see `TextField.css`),
+not component tokens. This section will be filled in with the real value/token
+table once component tokens for TextField are prepared and wired in.
+
+## Specs
+
+**Pending** — sizing (height, padding, radius, border width) is currently
+hardcoded as placeholder values in `TextField.css`. This section will list the
+final value/token table once component tokens exist.
+
+## Usage guidelines
+
+Keep labels short and specific — "Email address," not "Enter your email address
+here." The label already implies the action.
+
+Use `description` for guidance people need *before* they type (format hints,
+why you're asking). Use `errorMessage` only for validation problems *after* they've
+typed or tried to submit — don't use it to pre-emptively explain formatting rules.
+
+### Code example
+
+```tsx
+<TextField
+  label="Email address"
+  description="We'll only use this to send you a receipt."
+  errorMessage="Enter a valid email address."
+  isRequired
+  onChange={(value) => setEmail(value)}
+/>
+```
+
+## Component API
+
+```tsx
+import { TextField } from './components/TextField';
+```
+
+| Prop           | Type                                                | Default | Description |
+|----------------|------------------------------------------------------|---------|-------------|
+| `label`        | `React.ReactNode`                                    | —       | Field label, shown above the input. |
+| `description`  | `React.ReactNode`                                    | —       | Helper text shown below the input while valid. |
+| `errorMessage` | `string \| (validation: ValidationResult) => string`  | —       | Error message shown below the input when `isInvalid` is true. |
+| `placeholder`  | `string`                                              | —       | Placeholder text shown when the input is empty. |
+| `value` / `defaultValue` | `string`                                    | —       | Controlled / uncontrolled input value. |
+| `onChange`     | `(value: string) => void`                             | —       | Fires on every value change. |
+| `isDisabled`   | `boolean`                                             | `false` | Removes the field from interaction and the tab order. |
+| `isReadOnly`   | `boolean`                                             | `false` | Field is focusable but not editable. |
+| `isRequired`   | `boolean`                                             | `false` | Adds a required marker and wires up validation. |
+| `isInvalid`    | `boolean`                                             | `false` | Applies invalid styling and shows `errorMessage`. |
+| `inputRef`     | `React.Ref<HTMLInputElement>`                         | —       | A ref for the underlying `<input>` element. |
+| `...rest`      | `react-aria-components`' `TextFieldProps`             | —       | All other React Aria TextField props (`name`, `type`, `validate`, `minLength`, `maxLength`, `pattern`, …) forward through. |
+
+## Accessibility
+
+TextField is built on `react-aria-components`' `TextField`, `Label`, `Input`,
+`Text`, and `FieldError` primitives, which wire up the ARIA relationships
+(`aria-labelledby`, `aria-describedby`, `aria-invalid`, `aria-errormessage`)
+automatically — the label, description, and error message are always correctly
+associated with the input, without manually managed `id`s.
+
+**Keyboard**
+
+| Key | Action |
+|-----|--------|
+| Tab | Moves focus to the input. Skips it if `isDisabled`. |
+| Shift+Tab | Moves focus away from the input. |
+| Any character key | Types into the field (no-op if `isReadOnly` or `isDisabled`). |
+
+**Screen readers**
+
+- The label is announced when the field receives focus.
+- The description is announced as additional context.
+- When invalid, the error message is announced in place of the description, and
+  `aria-invalid` is set so screen readers flag the field as erroneous.
+
+**Focus indicator**
+
+Same shared two-layer focus ring as Button — restyle it, don't suppress it.

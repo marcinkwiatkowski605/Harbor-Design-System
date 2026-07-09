@@ -13,9 +13,8 @@ The project includes:
 
 - a Figma file that defines the design tokens and a set of components;
 - an export of those tokens from Figma to a JSON file in DTCG (Design Token Community Group) format for Style Dictionary;
-- a conversion of the Figma components into React components in Storybook, built on
-  accessible headless primitives ([`react-aria-components`](https://react-aria.adobe.com/))
-  and wired to design tokens as each component's token pass lands;
+- React components in Storybook, built on accessible headless primitives
+  ([`react-aria-components`](https://react-aria.adobe.com/));
 - a Storybook that visualizes the tokens and documents the components;
 - an adaptation of the component docs for large language models (LLMs), published as plain-text `llms.txt` files.
 

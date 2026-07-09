@@ -2,6 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/@harbords/tokens.svg)](https://www.npmjs.com/package/@harbords/tokens)
 [![Deploy Storybook](https://github.com/marcinkwiatkowski605/Harbor-Design-System/actions/workflows/deploy.yml/badge.svg)](https://github.com/marcinkwiatkowski605/Harbor-Design-System/actions/workflows/deploy.yml)
+[![Lint](https://github.com/marcinkwiatkowski605/Harbor-Design-System/actions/workflows/lint.yml/badge.svg)](https://github.com/marcinkwiatkowski605/Harbor-Design-System/actions/workflows/lint.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 **[Live Storybook →](https://marcinkwiatkowski605.github.io/Harbor-Design-System/)**
@@ -26,6 +27,7 @@ npm start              # Start Storybook at http://localhost:6006
 npm run build:tokens   # Build design tokens (design_tokens.json → CSS / JSON / JS)
 npm run build:storybook # Build the static Storybook site
 npm run build:llms     # Regenerate docs/ from the component/foundations MDX
+npm run audit:tokens   # Fail if component CSS has an unmarked hardcoded value
 ```
 
 ## Monorepo layout (npm workspaces)
@@ -86,6 +88,11 @@ uses clearly-marked placeholder values (see each component's `.css` file) pendin
 pass — their Storybook sidebar entries are flagged 🚧 until then. The shared focus ring
 (`--ds-semantic-focus-ring-*`) is already token-driven everywhere, since it doesn't depend
 on any per-component token.
+
+A CI check (`scripts/audit-tokens.mjs`, run as `npm run audit:tokens` and gated on every
+pull request by `.github/workflows/lint.yml`) scans component CSS for hardcoded colors and
+dimensions that aren't routed through a token. Values marked with a trailing `PLACEHOLDER`
+comment are the intentional exception described above; anything else fails the build.
 
 Each component's MDX docs page includes an accessibility section covering keyboard
 behavior, screen reader announcements, and (for Button) a WCAG 2.2 contrast/target-size

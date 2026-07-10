@@ -3,7 +3,7 @@
 A text area lets people enter multiple lines of plain text — a comment, a
 description, free-form feedback.
 
-> **Experimental branch note:** built on
+> **Note:** built on
 > [`react-aria-components`](https://react-aria.adobe.com/)' `TextArea`, which is
 > a drop-in swap for `Input` inside the same `TextField` container — TextArea
 > shares the exact same `Label`/description/error wiring as our TextField

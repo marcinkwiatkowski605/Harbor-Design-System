@@ -3,12 +3,6 @@
 Buttons let people take an action, confirm a choice, or move forward in a flow.
 They're the primary way of triggering something to happen on screen.
 
-> **Experimental branch note:** this is a rebuild of Button on top of
-> [`react-aria-components`](https://react-aria.adobe.com/)' `Button` primitive
-> instead of a plain `<button>`. The visual layer is unchanged — `Button.css`
-> references the same `--ds-component-button-*` / `--ds-semantic-*` tokens as
-> before, just via `data-*` state selectors instead of pseudo-classes.
-
 > _Live, interactive example — see this component in Storybook._
 
 ## Anatomy

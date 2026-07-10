@@ -316,12 +316,6 @@ tokenized layers instead of one.
 Buttons let people take an action, confirm a choice, or move forward in a flow.
 They're the primary way of triggering something to happen on screen.
 
-> **Experimental branch note:** this is a rebuild of Button on top of
-> [`react-aria-components`](https://react-aria.adobe.com/)' `Button` primitive
-> instead of a plain `<button>`. The visual layer is unchanged — `Button.css`
-> references the same `--ds-component-button-*` / `--ds-semantic-*` tokens as
-> before, just via `data-*` state selectors instead of pseudo-classes.
-
 > _Live, interactive example — see this component in Storybook._
 
 ## Anatomy
@@ -511,7 +505,7 @@ header, footer, or overlay cover a focused button's ring.
 A select lets people choose one option from a list, without taking up the space
 a fully expanded set of choices (like radio buttons) would need.
 
-> **Experimental branch note:** built the same way as TextField — on
+> **Note:** built the same way as TextField — on
 > [`react-aria-components`](https://react-aria.adobe.com/)' `Select` primitive,
 > using its explicit anatomy (`Label` + `Button` + `SelectValue` + `Popover` +
 > `ListBox`/`ListBoxItem`) instead of the compact all-in-one API, for full control
@@ -665,7 +659,7 @@ ring doesn't need special handling for the open state.
 A text area lets people enter multiple lines of plain text — a comment, a
 description, free-form feedback.
 
-> **Experimental branch note:** built on
+> **Note:** built on
 > [`react-aria-components`](https://react-aria.adobe.com/)' `TextArea`, which is
 > a drop-in swap for `Input` inside the same `TextField` container — TextArea
 > shares the exact same `Label`/description/error wiring as our TextField
@@ -780,7 +774,7 @@ Same shared two-layer focus ring as Button, TextField, and Select.
 A text field lets people enter a single line of plain text with a keyboard —
 a name, email address, or search query.
 
-> **Experimental branch note:** this is a new component, built from scratch on
+> **Note:** this is a new component, built from scratch on
 > [`react-aria-components`](https://react-aria.adobe.com/)' `TextField` primitive.
 > There's no Figma spec yet (the "🚧 Text Field" page is still empty), so this
 > exposes React Aria's full field surface rather than a Harbor-specific subset.

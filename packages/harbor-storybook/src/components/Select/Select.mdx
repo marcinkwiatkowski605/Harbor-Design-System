@@ -104,7 +104,7 @@ sentence-case phrases) so the list scans quickly once open.
     { id: 'de', label: 'Germany' },
   ]}
   isRequired
-  onChange={(key) => setCountry(key)}
+  onSelectionChange={(key) => setCountry(key)}
 />
 ```
 
@@ -121,8 +121,8 @@ import { Select } from './components/Select';
 | `errorMessage` | `string \| (validation: ValidationResult) => string`   | —       | Error message shown below the trigger when `isInvalid` is true. |
 | `items`        | `SelectOption[]` (`{ id, label, isDisabled? }`)        | —       | The list of selectable options. **Required.** |
 | `placeholder`  | `string`                                               | —       | Text shown in the trigger when nothing is selected. |
-| `value` / `defaultValue` | `Key \| null`                                | —       | Controlled / uncontrolled selected option id. |
-| `onChange`     | `(value: Key \| null) => void`                         | —       | Fires when the selection changes. |
+| `selectedKey` / `defaultSelectedKey` | `Key \| null`                     | —       | Controlled / uncontrolled selected option id. |
+| `onSelectionChange` | `(key: Key \| null) => void`                       | —       | Fires when the selection changes. |
 | `isDisabled`   | `boolean`                                              | `false` | Removes the trigger from interaction and the tab order. |
 | `isRequired`   | `boolean`                                              | `false` | Adds a required marker and wires up validation. |
 | `isInvalid`    | `boolean`                                              | `false` | Applies invalid styling and shows `errorMessage`. |

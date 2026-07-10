@@ -22,7 +22,7 @@ const meta: Meta<typeof Select> = {
     isDisabled: { control: 'boolean' },
     isRequired: { control: 'boolean' },
     isInvalid: { control: 'boolean' },
-    onChange: { action: 'changed' },
+    onSelectionChange: { action: 'changed' },
   },
   args: {
     label: 'Country',

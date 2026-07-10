@@ -1,5 +1,7 @@
 # Harbor Design System
 
+![Harbor Design System](./assets/cover.jpg)
+
 [![npm version](https://img.shields.io/npm/v/@harbords/tokens.svg)](https://www.npmjs.com/package/@harbords/tokens)
 [![Deploy Storybook](https://github.com/marcinkwiatkowski605/Harbor-Design-System/actions/workflows/deploy.yml/badge.svg)](https://github.com/marcinkwiatkowski605/Harbor-Design-System/actions/workflows/deploy.yml)
 [![Lint](https://github.com/marcinkwiatkowski605/Harbor-Design-System/actions/workflows/lint.yml/badge.svg)](https://github.com/marcinkwiatkowski605/Harbor-Design-System/actions/workflows/lint.yml)
@@ -19,15 +21,28 @@ The project includes:
 - a Storybook that visualizes the tokens and documents the components;
 - an adaptation of the component docs for large language models (LLMs), published as plain-text `llms.txt` files.
 
+## Project status
+
+**Button** is finished: fully tokenized, documented against real values, and
+design-verified. **Select**, **TextField**, and **TextArea** are functional and
+accessible but still run on placeholder colors and sizes — flagged 🚧 in the Storybook
+sidebar — pending a token pass once their Figma specs exist; see
+[Token coverage](#token-coverage) for what "placeholder" means in the CSS.
+
+## Prerequisites
+
+- Node.js 24+ (matches the version pinned in CI — see `.github/workflows/*.yml`)
+- npm (ships with Node.js)
+
 ## Getting started
 
 ```bash
-npm install            # Install all workspace dependencies
-npm start              # Start Storybook at http://localhost:6006
-npm run build:tokens   # Build design tokens (design_tokens.json → CSS / JSON / JS)
+npm install             # Install all workspace dependencies
+npm run build:tokens    # Build design tokens (design_tokens.json → CSS / JSON / JS) — run before start/build:storybook, which import the built CSS
+npm start               # Start Storybook at http://localhost:6006
 npm run build:storybook # Build the static Storybook site
-npm run build:llms     # Regenerate docs/ from the component/foundations MDX
-npm run audit:tokens   # Fail if component CSS has an unmarked hardcoded value
+npm run build:llms      # Regenerate docs/ from the component/foundations MDX
+npm run audit:tokens    # Fail if component CSS has an unmarked hardcoded value
 ```
 
 ## Monorepo layout (npm workspaces)
@@ -56,7 +71,7 @@ docs/
 
 ## Design tokens
 
-Tokens live in Figma (file **HRDS**) and are exported to `design_tokens.json` in W3C
+Tokens live in Figma (file [**HRDS**](https://www.figma.com/design/PiFuQxqvMoH12lGMX6nhER/HRDS?node-id=0-1&t=DsNC5NldMKx9iHIA-1)) and are exported to `design_tokens.json` in W3C
 DTCG format. `npm run build:tokens` runs Style Dictionary (`harbor-tokens/config.js`),
 which resolves aliases and emits CSS custom properties, flat JSON, and JS exports into
 `packages/harbor-tokens/light/build/`.
@@ -80,25 +95,33 @@ React components live in `packages/harbor-storybook/src/components/`. Each one s
 single Controls-driven story and an MDX docs page. Current: **Button**, **Select**,
 **TextField**, **TextArea**.
 
+### Stack
+
 All four are built on [`react-aria-components`](https://react-aria.adobe.com/) — Adobe's
 headless, accessibility-tested behavior primitives — instead of hand-rolled focus/keyboard
-handling. **Button** is fully token-driven (`--ds-component-button-*`); **Select**,
-**TextField**, and **TextArea** are new and don't have component tokens yet, so their CSS
-uses clearly-marked placeholder values (see each component's `.css` file) pending a token
-pass — their Storybook sidebar entries are flagged 🚧 until then. The shared focus ring
+handling.
+
+### Token coverage
+
+**Button** is fully token-driven (`--ds-component-button-*`). **Select**, **TextField**,
+and **TextArea** are new and don't have component tokens yet, so their CSS uses
+clearly-marked placeholder values (see each component's `.css` file) pending a token pass
+— their Storybook sidebar entries are flagged 🚧 until then. The shared focus ring
 (`--ds-semantic-focus-ring-*`) is already token-driven everywhere, since it doesn't depend
 on any per-component token.
 
-A CI check (`scripts/audit-tokens.mjs`, run as `npm run audit:tokens` and gated on every
-pull request by `.github/workflows/lint.yml`) scans component CSS for hardcoded colors and
-dimensions that aren't routed through a token. Values marked with a trailing `PLACEHOLDER`
-comment are the intentional exception described above; anything else fails the build.
+### CI audit
 
-Each component's MDX docs page includes an accessibility section covering keyboard
-behavior, screen reader announcements, and (for Button) a WCAG 2.2 contrast/target-size
-audit against its actual rendered token values — not just a compliance claim. Storybook's
-`@storybook/addon-a11y` runs the same kind of check live, per control state, in every
-story's Accessibility panel.
+[`scripts/audit-tokens.mjs`](./scripts/audit-tokens.mjs) (`npm run audit:tokens`, gated on
+every pull request by `.github/workflows/lint.yml`) fails the build on any hardcoded color
+or dimension in component CSS that isn't a `PLACEHOLDER`-marked exception.
+
+### Accessibility
+
+Each component's MDX docs page covers keyboard behavior, screen reader announcements, and
+(for Button) a WCAG 2.2 contrast/target-size audit against its actual rendered token
+values. Storybook's `@storybook/addon-a11y` runs the same kind of check live, per control
+state, in every story's Accessibility panel.
 
 ## Documentation for LLMs
 

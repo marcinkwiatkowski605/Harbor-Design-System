@@ -1,6 +1,6 @@
-# Harbor Design System
-
 ![Harbor Design System](./assets/cover.jpg)
+
+# Harbor Design System
 
 [![npm version](https://img.shields.io/npm/v/@harbords/tokens.svg)](https://www.npmjs.com/package/@harbords/tokens)
 [![Deploy Storybook](https://github.com/marcinkwiatkowski605/Harbor-Design-System/actions/workflows/deploy.yml/badge.svg)](https://github.com/marcinkwiatkowski605/Harbor-Design-System/actions/workflows/deploy.yml)

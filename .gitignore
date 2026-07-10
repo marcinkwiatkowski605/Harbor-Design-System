@@ -6,3 +6,4 @@ packages/harbor-storybook/storybook-static/
 local_docs/
 CLAUDE.md
 .DS_Store
+ds-inspection/

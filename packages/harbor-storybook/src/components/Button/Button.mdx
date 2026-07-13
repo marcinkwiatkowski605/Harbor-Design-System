@@ -58,17 +58,17 @@ flow needs rethinking before the button hierarchy does.
 
 ## States
 
-All three types share the same five states: Enabled, Hover, Selected, Focus, Disabled.
+All three types share the same five states: Enabled, Hover, Pressed, Focus, Disabled.
 
-- **Hover / Selected** darken the fill (or border, for Outline) to confirm interactivity.
-  Outline gives Hover and Selected two distinct border shades, so the states read differently
+- **Hover / Pressed** darken the fill (or border, for Outline) to confirm interactivity.
+  Outline gives Hover and Pressed two distinct border shades, so the states read differently
   instead of looking identical.
 - **Focus** adds a two-layer ring — a white gap plus a colored outer ring — shared across all
   three types via one token pair, so focus looks the same regardless of button type.
 - **Disabled** flattens background and text to neutral gray on every type, including
   Outline — background, border, and label all drop to their disabled tokens.
 
-In code, Hover/Selected/Focus are driven by the `data-hovered` / `data-pressed` /
+In code, Hover/Pressed/Focus are driven by the `data-hovered` / `data-pressed` /
 `data-focus-visible` attributes `react-aria-components`' `Button` exposes, and
 Disabled by `data-disabled` (set via the `isDisabled` prop).
 
@@ -89,7 +89,7 @@ adds the shared ring (`--ds-semantic-focus-ring-ring-*` / `--ds-semantic-focus-r
 |----------|-----------------------------------|-------------------------------|
 | Enabled  | `#9050E9` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
 | Hover    | `#7526E3` · `background-hover`    | `#FFFFFF` · `content-hover`    |
-| Selected | `#5A1BA9` · `background-selected` | `#FFFFFF` · `content-selected` |
+| Pressed  | `#5A1BA9` · `background-pressed`  | `#FFFFFF` · `content-pressed`  |
 | Focus    | `#9050E9` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
 | Disabled | `#CFD5DA` · `background-disabled` | `#909AA1` · `content-disabled` |
 
@@ -103,7 +103,7 @@ adds the shared ring (`--ds-semantic-focus-ring-ring-*` / `--ds-semantic-focus-r
 |----------|------------------------------------|--------------------------------|
 | Enabled  | `#D83A00` · `background-enabled`   | `#FFFFFF` · `content-enabled`   |
 | Hover    | `#AA3001` · `background-hover`     | `#FFFFFF` · `content-hover`     |
-| Selected | `#7E2600` · `background-selected`  | `#FFFFFF` · `content-selected`  |
+| Pressed  | `#7E2600` · `background-pressed`   | `#FFFFFF` · `content-pressed`   |
 | Focus    | `#D83A00` · `background-enabled`   | `#FFFFFF` · `content-enabled`   |
 | Disabled | `#CFD5DA` · `background-disabled`  | `#909AA1` · `content-disabled` |
 
@@ -117,7 +117,7 @@ adds the shared ring (`--ds-semantic-focus-ring-ring-*` / `--ds-semantic-focus-r
 |----------|------------------------------------|---------------------------------|--------------------------------|
 | Enabled  | `#FFFFFF` · `background-enabled`   | `#484E53` · `content-enabled`   | `#909AA1` · `border-enabled`   |
 | Hover    | `#F2F4F5` · `background-hover`     | `#484E53` · `content-hover`     | `#747D84` · `border-hover`     |
-| Selected | `#E3E7E9` · `background-selected`  | `#484E53` · `content-selected`  | `#5D646A` · `border-selected`  |
+| Pressed  | `#E3E7E9` · `background-pressed`   | `#484E53` · `content-pressed`   | `#5D646A` · `border-pressed`   |
 | Focus    | `#FFFFFF` · `background-enabled`   | `#484E53` · `content-enabled`   | `#909AA1` · `border-enabled`   |
 | Disabled | `#CFD5DA` · `background-disabled`  | `#909AA1` · `content-disabled` | `#B0B9BF` · `border-disabled`  |
 
@@ -130,7 +130,7 @@ adds the shared ring (`--ds-semantic-focus-ring-ring-*` / `--ds-semantic-focus-r
 | Property        | Value | Token |
 |-----------------|-------|-------|
 | Height               | 48px | `--ds-component-button-height` |
-| Padding (horizontal) | 24px | `--ds-component-button-padding` |
+| Padding (horizontal) | 24px | `--ds-component-button-padding-inline` |
 | Corner radius        | 8px  | `--ds-component-button-border-radius` |
 | Border width         | 1px  | `--ds-component-button-border-width` |
 

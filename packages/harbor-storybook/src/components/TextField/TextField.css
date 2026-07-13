@@ -91,6 +91,14 @@
   color: #71717a; /* PLACEHOLDER */
 }
 
+.harbor-textfield[data-invalid] .harbor-textfield__description {
+  /* FieldError already hides itself when the field is valid (react-aria-components
+     only renders it while isInvalid). Description has no such built-in behavior, so
+     it must be hidden here to keep the two mutually exclusive, matching RAC's
+     documented help-text pattern. */
+  display: none;
+}
+
 .harbor-textfield__error {
   font-size: 12px; /* PLACEHOLDER */
   color: #dc2626; /* PLACEHOLDER */

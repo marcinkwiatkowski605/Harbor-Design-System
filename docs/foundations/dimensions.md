@@ -1,19 +1,27 @@
 # Dimensions
 
 See [Token architecture](./overview.md) for how the tier system works. This page
-summarizes Harbor's spacing, border, and shadow tokens. For the full per-token value
+summarizes Harbor's dimension, border, and shadow tokens. For the full per-token value
 table and current counts, see **Foundations › Design Tokens › Tier 1 / Tier 2** in
 Storybook, or `packages/harbor-tokens/light/build/json/tokens.json` directly.
 
-## Spacing
+## Dimension
 
 **Primitive scale, 4px base:** `4, 8, 12, 16, 24, 32, 40, 48, 64, 80, 96, 128` (px). Steps
 go up by 4px to 16px, then 8px to 48px, then 16px from there — more precision where it's
 actually needed, fewer meaningless in-between options past 48px. Naming:
-`--ds-primitive-spacing-{value}`.
+`--ds-primitive-dimension-{value}`.
 
-**Semantic spacing** has three roles (`inset`, `inline`, `stack`), each with the same
-sizes (`xs`, `sm`, `md`, `lg`, `xl`) mapping to a primitive step:
+This is a single, purpose-agnostic ramp — Tier 1 carries no meaning about what a value is
+*for*. Two separate Tier 2 roles give it meaning: `spacing` (gaps and padding) and
+`sizing` (icon and control dimensions). Both map to the same primitive steps, so a
+component's internal padding and an icon sitting inside it can share a value without
+duplicating the number in two places.
+
+### Spacing
+
+Three roles (`inset`, `inline`, `stack`), each with the same sizes (`xs`, `sm`, `md`,
+`lg`, `xl`) mapping to a primitive step:
 
 | Size | `xs` | `sm` | `md` | `lg` | `xl` |
 |---|---|---|---|---|---|
@@ -24,6 +32,24 @@ sizes (`xs`, `sm`, `md`, `lg`, `xl`) mapping to a primitive step:
 - `stack` — vertical gaps between elements stacked on top of each other.
 
 Naming: `--ds-semantic-spacing-{role}-{size}`, e.g. `--ds-semantic-spacing-inset-md`.
+
+### Sizing
+
+Two roles, each with its own size steps:
+
+| Size | `xs` | `sm` | `md` | `lg` | `xl` |
+|---|---|---|---|---|---|
+| `icon` (px) | 12 | 16 | 24 | 32 | 40 |
+| `control` (px) | — | 40 | 48 | 80 | — |
+
+- `icon` — the width/height of an icon glyph (e.g. the info icon in a helper message, or
+  a select's chevron).
+- `control` — the height of an interactive form control (Button, TextField, Select).
+  TextArea's own height is a multi-line default rather than a fixed control height, so it
+  intentionally uses `control-lg` rather than sharing `sm`/`md` with the single-line
+  controls.
+
+Naming: `--ds-semantic-sizing-{role}-{size}`, e.g. `--ds-semantic-sizing-icon-sm`.
 
 ## Border
 

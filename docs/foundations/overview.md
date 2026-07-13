@@ -36,9 +36,13 @@ property to state.
 
 ### Tier 1: Primitive
 
-Categories currently built in Harbor: `color`, `typography`, `spacing`, `border`,
+Categories currently built in Harbor: `color`, `typography`, `dimension`, `border`,
 `shadow`. (The model also supports `animation`, `viewport`, and `z-index` categories —
 Harbor hasn't populated those yet.)
+
+`dimension` is the shared raw-number ramp — Tier 2 gives it meaning through separate
+semantic roles like `spacing` (gaps and padding) and `sizing` (icon and control
+dimensions), each mapping the same primitive steps to a different purpose.
 
 A primitive name is just the category plus the value's position in its scale:
 `--ds-primitive-color-brand-lavender-500`. It carries no information about where the

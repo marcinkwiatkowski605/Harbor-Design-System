@@ -189,29 +189,29 @@ export const Typography: StoryObj = {
   ),
 };
 
-// ─── Spacing ─────────────────────────────────────────────────────────────────
+// ─── Dimension ───────────────────────────────────────────────────────────────
 
-const spacingSteps = ['4','8','12','16','24','32','40','48','64','80','96','128'];
+const dimensionSteps = ['4','8','12','16','24','32','40','48','64','80','96','128'];
 
-export const Spacing: StoryObj = {
+export const Dimension: StoryObj = {
   render: () => (
     <div style={{ padding: 24, ...tokens }}>
-      <Section title="Spacing Scale">
-        {spacingSteps.map(step => (
+      <Section title="Dimension Scale">
+        {dimensionSteps.map(step => (
           <div key={step} style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>
             <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#666', width: 30, flexShrink: 0 }}>
               {step}
             </span>
             <div style={{
               height: 20,
-              width: `var(--ds-primitive-spacing-${step})`,
+              width: `var(--ds-primitive-dimension-${step})`,
               background: 'var(--ds-primitive-color-brand-lavender-400)',
               borderRadius: 2,
               minWidth: 2,
               flexShrink: 0,
             }} />
             <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#666' }}>
-              --ds-primitive-spacing-{step}
+              --ds-primitive-dimension-{step}
             </span>
           </div>
         ))}

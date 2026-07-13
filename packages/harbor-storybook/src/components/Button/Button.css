@@ -17,7 +17,7 @@
   justify-content: center;
   box-sizing: border-box;
   block-size: var(--ds-component-button-height);
-  padding-inline: var(--ds-component-button-padding);
+  padding-inline: var(--ds-component-button-padding-inline);
   border-radius: var(--ds-component-button-border-radius);
   border: var(--ds-component-button-border-width) solid transparent;
 

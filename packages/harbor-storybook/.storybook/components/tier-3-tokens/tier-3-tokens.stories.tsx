@@ -13,11 +13,11 @@ export default meta;
 
 // tokens.json also contains non-string tokens elsewhere in the tree, so it can't be
 // cast directly to Record<string, string> — bridge through `unknown`.
-const buttonTokens = tokensJson as unknown as Record<string, string>;
+const resolvedTokens = tokensJson as unknown as Record<string, string>;
 
 const valueFor = (cssVar: string): string => {
   const name = cssVar.slice(2); // strip leading --
-  const value = buttonTokens[name];
+  const value = resolvedTokens[name];
   if (value === undefined) {
     throw new Error(`Missing token value for ${cssVar} in tokens.json`);
   }

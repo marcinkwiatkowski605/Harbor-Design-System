@@ -107,12 +107,14 @@ they have two independent axes that Button doesn't:
   invalid field can still be hovered or pressed). Modeled as a state, not a Tier 2-style
   variant, because a form field's only non-default color axis is whether it's valid —
   unlike Button, which has no such concept.
-- **Content** — `filled` / `placeholder` (TextField, TextArea: does the field have a
-  typed value, or is it showing placeholder text?) and `selected` / `placeholder`
-  (Select: has an option been chosen, or is the trigger showing its placeholder?). These
-  describe what the field currently displays, not a user interaction — they can combine
-  with `disabled` but not with `hover`/`pressed`/`error`, which sit on a separate part of
-  the component (the border/background) from the content color they don't affect.
+- **Content** — describes what the field currently displays, not a user interaction. It
+  can combine with `disabled` but not with `hover`/`pressed`/`error`, which sit on a
+  separate part of the component (the border/background) from the content color they
+  don't affect.
+  - TextField, TextArea: `filled` / `placeholder` — does the field have a typed value, or
+    is it showing placeholder text?
+  - Select: `selected` / `placeholder` — has an option been chosen, or is the trigger
+    showing its placeholder?
 
 ## One value, three tiers
 

@@ -59,6 +59,7 @@
   font-weight: var(--ds-semantic-typography-body-md-font-weight);
   line-height: var(--ds-semantic-typography-body-md-line-height);
   letter-spacing: var(--ds-semantic-typography-body-md-letter-spacing);
+  text-align: start; /* <button> centers text by default in the UA stylesheet */
   cursor: pointer;
   outline: none;
 }

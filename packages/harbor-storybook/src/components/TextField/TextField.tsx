@@ -26,7 +26,7 @@ export interface TextFieldProps extends Omit<AriaTextFieldProps, 'children'> {
 }
 
 /**
- * TextField — Harbor Design System (experimental React Aria Components build).
+ * TextField — Harbor Design System.
  *
  * Composed from `react-aria-components`' `TextField` + `Label` + `Input` +
  * `Text` (slot="description") + `FieldError`, following the same anatomy as
@@ -58,7 +58,7 @@ export const TextField = React.forwardRef<HTMLDivElement, TextFieldProps>(
             <>
               <AlertTriangleFilledIcon aria-hidden="true" className="harbor-textfield__error-icon" />
               <span className="harbor-textfield__error-text">
-                {(typeof errorMessage === 'function' ? errorMessage(validation) : errorMessage) ??
+                {(typeof errorMessage === 'function' ? errorMessage(validation) : errorMessage) ||
                   validation.defaultChildren}
               </span>
             </>

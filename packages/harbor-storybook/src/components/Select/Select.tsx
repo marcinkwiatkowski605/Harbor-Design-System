@@ -37,7 +37,7 @@ export interface SelectProps
 }
 
 /**
- * Select — Harbor Design System (experimental React Aria Components build).
+ * Select — Harbor Design System.
  *
  * Composed from `react-aria-components`' `Select` + `Label` + `Button` +
  * `SelectValue` + `Popover` + `ListBox`/`ListBoxItem` + `Text` (slot="description")
@@ -74,7 +74,7 @@ export const Select = React.forwardRef<HTMLDivElement, SelectProps>(
             <>
               <AlertTriangleFilledIcon aria-hidden="true" className="harbor-select__error-icon" />
               <span className="harbor-select__error-text">
-                {(typeof errorMessage === 'function' ? errorMessage(validation) : errorMessage) ??
+                {(typeof errorMessage === 'function' ? errorMessage(validation) : errorMessage) ||
                   validation.defaultChildren}
               </span>
             </>

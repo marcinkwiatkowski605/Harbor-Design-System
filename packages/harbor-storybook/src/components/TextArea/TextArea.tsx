@@ -27,7 +27,7 @@ export interface TextAreaProps extends Omit<AriaTextFieldProps, 'children'> {
 }
 
 /**
- * TextArea — Harbor Design System (experimental React Aria Components build).
+ * TextArea — Harbor Design System.
  *
  * Like TextField, RAC's `TextArea` is a drop-in swap for `Input` inside the same
  * `TextField` container — Harbor's TextField and TextArea share the exact same
@@ -65,7 +65,7 @@ export const TextArea = React.forwardRef<HTMLDivElement, TextAreaProps>(
             <>
               <AlertTriangleFilledIcon aria-hidden="true" className="harbor-textarea__error-icon" />
               <span className="harbor-textarea__error-text">
-                {(typeof errorMessage === 'function' ? errorMessage(validation) : errorMessage) ??
+                {(typeof errorMessage === 'function' ? errorMessage(validation) : errorMessage) ||
                   validation.defaultChildren}
               </span>
             </>

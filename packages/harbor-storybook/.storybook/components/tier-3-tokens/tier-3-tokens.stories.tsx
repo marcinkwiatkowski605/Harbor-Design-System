@@ -207,11 +207,11 @@ const TokenTable = ({ tokens, showPreview = true }: { tokens: TableToken[]; show
 type ButtonVariant = 'primary' | 'secondary' | 'outline';
 
 const variants: ButtonVariant[] = ['primary', 'secondary', 'outline'];
-const states = ['enabled', 'hover', 'selected', 'focus', 'disabled'] as const;
+const states = ['enabled', 'hover', 'pressed', 'focus', 'disabled'] as const;
 type ButtonState = typeof states[number];
 // `focus` isn't a real token — it reuses `enabled`'s value (see ButtonPreview below),
 // so the reference tables list only the states that resolve to distinct tokens.
-const tokenTableStates = ['enabled', 'hover', 'selected', 'disabled'] as const;
+const tokenTableStates = ['enabled', 'hover', 'pressed', 'disabled'] as const;
 
 const variantLabel: Record<ButtonVariant, string> = {
   primary: 'Primary',
@@ -250,7 +250,7 @@ const ButtonPreview = ({ variant, state }: { variant: ButtonVariant; state: Butt
         alignItems: 'center',
         justifyContent: 'center',
         blockSize: 'var(--ds-component-button-height)',
-        paddingInline: 'var(--ds-component-button-padding)',
+        paddingInline: 'var(--ds-component-button-padding-inline)',
         background: bgVar,
         color: contentVar,
         border: `var(--ds-component-button-border-width) solid ${borderVar}`,
@@ -310,7 +310,7 @@ export const Button: StoryObj = {
           { name: 'border-radius', cssVar: '--ds-component-button-border-radius', path: ['component-modes', 'button', 'border', 'radius'] },
           { name: 'border-width', cssVar: '--ds-component-button-border-width', path: ['component-modes', 'button', 'border', 'width'] },
           { name: 'height', cssVar: '--ds-component-button-height', path: ['component-modes', 'button', 'height'] },
-          { name: 'padding', cssVar: '--ds-component-button-padding', path: ['component-modes', 'button', 'padding'] },
+          { name: 'padding-inline', cssVar: '--ds-component-button-padding-inline', path: ['component-modes', 'button', 'padding-inline'] },
         ]} />
       </Section>
 
@@ -339,6 +339,140 @@ export const Button: StoryObj = {
           </Section>
         );
       })}
+    </div>
+  ),
+};
+
+// ─── Form fields (TextField, TextArea, Select, Field-label, Helper-text, Error-text) ──
+
+// Builds the `color-{role}-{state}` token set for a form-field component. A
+// compound state like `error-hover` splits into two path segments
+// (`color.border.error.hover`), matching how the DTCG actually nests validity
+// under its own state, rather than flattening it to one dashed segment.
+const buildColorTokens = (component: string, roleStates: Record<string, string[]>): TableToken[] =>
+  Object.entries(roleStates).flatMap(([role, roleStateList]) =>
+    roleStateList.map(state => ({
+      name: `${role} · ${state}`,
+      cssVar: `--ds-component-${component}-color-${role}-${state}`,
+      path: ['component-modes', component, 'color', role, ...state.split('-')],
+    }))
+  );
+
+export const TextField: StoryObj = {
+  render: () => (
+    <div style={{ padding: 24, ...baseStyle }}>
+      <Section title="Shared text-field tokens">
+        <TokenTable showPreview={false} tokens={[
+          { name: 'height', cssVar: '--ds-component-text-field-height', path: ['component-modes', 'text-field', 'height'] },
+          { name: 'padding-inline', cssVar: '--ds-component-text-field-padding-inline', path: ['component-modes', 'text-field', 'padding-inline'] },
+          { name: 'gap', cssVar: '--ds-component-text-field-gap', path: ['component-modes', 'text-field', 'gap'] },
+          { name: 'border-radius', cssVar: '--ds-component-text-field-border-radius', path: ['component-modes', 'text-field', 'border', 'radius'] },
+          { name: 'border-width', cssVar: '--ds-component-text-field-border-width', path: ['component-modes', 'text-field', 'border', 'width'] },
+        ]} />
+      </Section>
+
+      <Section title="Color tokens">
+        <TokenTable tokens={buildColorTokens('text-field', {
+          background: ['default', 'hover', 'disabled'],
+          border: ['default', 'hover', 'disabled', 'error', 'error-hover'],
+          content: ['filled', 'placeholder', 'disabled'],
+        })} />
+      </Section>
+    </div>
+  ),
+};
+
+export const TextArea: StoryObj = {
+  render: () => (
+    <div style={{ padding: 24, ...baseStyle }}>
+      <Section title="Shared text-area tokens">
+        <TokenTable showPreview={false} tokens={[
+          { name: 'height', cssVar: '--ds-component-text-area-height', path: ['component-modes', 'text-area', 'height'] },
+          { name: 'padding-inline', cssVar: '--ds-component-text-area-padding-inline', path: ['component-modes', 'text-area', 'padding', 'inline'] },
+          { name: 'padding-block', cssVar: '--ds-component-text-area-padding-block', path: ['component-modes', 'text-area', 'padding', 'block'] },
+          { name: 'gap', cssVar: '--ds-component-text-area-gap', path: ['component-modes', 'text-area', 'gap'] },
+          { name: 'border-radius', cssVar: '--ds-component-text-area-border-radius', path: ['component-modes', 'text-area', 'border', 'radius'] },
+          { name: 'border-width', cssVar: '--ds-component-text-area-border-width', path: ['component-modes', 'text-area', 'border', 'width'] },
+        ]} />
+      </Section>
+
+      <Section title="Color tokens">
+        <TokenTable tokens={buildColorTokens('text-area', {
+          background: ['default', 'hover', 'disabled'],
+          border: ['default', 'hover', 'disabled', 'error', 'error-hover'],
+          content: ['filled', 'placeholder', 'disabled'],
+        })} />
+      </Section>
+    </div>
+  ),
+};
+
+export const Select: StoryObj = {
+  render: () => (
+    <div style={{ padding: 24, ...baseStyle }}>
+      <Section title="Shared select tokens">
+        <TokenTable showPreview={false} tokens={[
+          { name: 'height', cssVar: '--ds-component-select-height', path: ['component-modes', 'select', 'height'] },
+          { name: 'padding-inline-start', cssVar: '--ds-component-select-padding-inline-start', path: ['component-modes', 'select', 'padding', 'inline', 'start'] },
+          { name: 'padding-inline-end', cssVar: '--ds-component-select-padding-inline-end', path: ['component-modes', 'select', 'padding', 'inline', 'end'] },
+          { name: 'gap', cssVar: '--ds-component-select-gap', path: ['component-modes', 'select', 'gap'] },
+          { name: 'gap-inline', cssVar: '--ds-component-select-gap-inline', path: ['component-modes', 'select', 'gap-inline'] },
+          { name: 'icon-size', cssVar: '--ds-component-select-icon-size', path: ['component-modes', 'select', 'icon-size'] },
+          { name: 'border-radius', cssVar: '--ds-component-select-border-radius', path: ['component-modes', 'select', 'border', 'radius'] },
+          { name: 'border-width', cssVar: '--ds-component-select-border-width', path: ['component-modes', 'select', 'border', 'width'] },
+        ]} />
+      </Section>
+
+      <Section title="Color tokens">
+        <TokenTable tokens={buildColorTokens('select', {
+          background: ['default', 'hover', 'pressed', 'disabled'],
+          border: ['default', 'hover', 'pressed', 'disabled', 'error', 'error-hover', 'error-pressed'],
+          content: ['placeholder', 'selected', 'disabled'],
+          icon: ['enabled', 'disabled'],
+        })} />
+      </Section>
+    </div>
+  ),
+};
+
+export const FieldLabel: StoryObj = {
+  render: () => (
+    <div style={{ padding: 24, ...baseStyle }}>
+      <Section title="Field-label tokens">
+        <TokenTable tokens={[
+          { name: 'gap', cssVar: '--ds-component-field-label-gap', path: ['component-modes', 'field-label', 'gap'] },
+          { name: 'color-content', cssVar: '--ds-component-field-label-color-content', path: ['component-modes', 'field-label', 'color', 'content'] },
+          { name: 'color-content-error', cssVar: '--ds-component-field-label-color-content-error', path: ['component-modes', 'field-label', 'color', 'content', 'error'] },
+        ]} />
+      </Section>
+    </div>
+  ),
+};
+
+export const HelperText: StoryObj = {
+  render: () => (
+    <div style={{ padding: 24, ...baseStyle }}>
+      <Section title="Helper-text tokens">
+        <TokenTable tokens={[
+          { name: 'gap', cssVar: '--ds-component-helper-text-gap', path: ['component-modes', 'helper-text', 'gap'] },
+          { name: 'icon-size', cssVar: '--ds-component-helper-text-icon-size', path: ['component-modes', 'helper-text', 'icon-size'] },
+          { name: 'color-content', cssVar: '--ds-component-helper-text-color-content', path: ['component-modes', 'helper-text', 'color', 'content'] },
+        ]} />
+      </Section>
+    </div>
+  ),
+};
+
+export const ErrorText: StoryObj = {
+  render: () => (
+    <div style={{ padding: 24, ...baseStyle }}>
+      <Section title="Error-text tokens">
+        <TokenTable tokens={[
+          { name: 'gap', cssVar: '--ds-component-error-text-gap', path: ['component-modes', 'error-text', 'gap'] },
+          { name: 'icon-size', cssVar: '--ds-component-error-text-icon-size', path: ['component-modes', 'error-text', 'icon-size'] },
+          { name: 'color-content', cssVar: '--ds-component-error-text-color-content', path: ['component-modes', 'error-text', 'color', 'content'] },
+        ]} />
+      </Section>
     </div>
   ),
 };

@@ -38,14 +38,14 @@ for the full anatomy).
 
 | Property | Covers |
 |---|---|
-| `background` | default/subtle/hover/selected/disabled + `brand`, `accent`, `error`, `warning`, `info`, `success` variants (each with their own `hover`/`selected`) |
-| `border` | default/hover/selected/disabled/`focus` + `brand`, `accent`, `error`, `warning`, `info`, `success` |
+| `background` | default/subtle/hover/pressed/disabled + `brand`, `accent`, `error`, `warning`, `info`, `success` variants (each with their own `hover`/`pressed`) |
+| `border` | default/hover/pressed/disabled/`focus` + `brand`, `accent`, `error`, `warning`, `info`, `success` |
 | `content` | default/secondary/disabled + `brand`, `accent`, `error`, `warning`, `info`, `success`, and their `on-*` counterparts (text/icon color drawn *on top of* that variant's background) |
 
 A few naming notes worth remembering when picking a token:
 
 - There's no `-enabled` or `-default` suffix — the bare variant name (`background-brand`)
-  **is** the enabled state. Only interactive states (`hover`, `selected`) get a suffix.
+  **is** the enabled state. Only interactive states (`hover`, `pressed`) get a suffix.
 - `disabled` is one token per property (`background-disabled`, `content-disabled`),
   shared across every variant — not duplicated per variant.
 - `content` is a single merged category for both text and icon color — there's no

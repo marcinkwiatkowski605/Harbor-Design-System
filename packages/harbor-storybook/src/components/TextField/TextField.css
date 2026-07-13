@@ -60,6 +60,7 @@
 }
 
 .harbor-textfield__input[data-hovered] {
+  background: var(--ds-component-text-field-color-background-hover);
   border-color: var(--ds-component-text-field-color-border-hover);
 }
 
@@ -83,6 +84,10 @@
 
 .harbor-textfield[data-invalid] .harbor-textfield__input {
   border-color: var(--ds-component-text-field-color-border-error);
+}
+
+.harbor-textfield[data-invalid] .harbor-textfield__input[data-hovered] {
+  border-color: var(--ds-component-text-field-color-border-error-hover);
 }
 
 .harbor-textfield[data-invalid] .harbor-textfield__input[data-focus-visible] {

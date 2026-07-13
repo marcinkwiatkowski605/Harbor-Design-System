@@ -84,7 +84,10 @@
   resize: none;
 }
 
-.harbor-textarea[data-invalid] .harbor-textarea__input {
+.harbor-textarea[data-invalid] .harbor-textarea__input:not([data-disabled]) {
+  /* :not([data-disabled]) excludes this rule entirely when both invalid and disabled
+     are set, since it otherwise outranks the disabled rule's lower specificity and
+     would paint an error border on a disabled field. */
   border-color: var(--ds-component-text-area-color-border-error);
 }
 

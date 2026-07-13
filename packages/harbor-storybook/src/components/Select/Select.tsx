@@ -65,16 +65,17 @@ export const Select = React.forwardRef<HTMLDivElement, SelectProps>(
         </Button>
         {description && (
           <Text slot="description" className="harbor-select__description">
-            <InfoCircleFilledIcon className="harbor-select__description-icon" />
+            <InfoCircleFilledIcon aria-hidden="true" className="harbor-select__description-icon" />
             <span className="harbor-select__description-text">{description}</span>
           </Text>
         )}
         <FieldError className="harbor-select__error">
           {(validation) => (
             <>
-              <AlertTriangleFilledIcon className="harbor-select__error-icon" />
+              <AlertTriangleFilledIcon aria-hidden="true" className="harbor-select__error-icon" />
               <span className="harbor-select__error-text">
-                {typeof errorMessage === 'function' ? errorMessage(validation) : errorMessage}
+                {(typeof errorMessage === 'function' ? errorMessage(validation) : errorMessage) ??
+                  validation.defaultChildren}
               </span>
             </>
           )}

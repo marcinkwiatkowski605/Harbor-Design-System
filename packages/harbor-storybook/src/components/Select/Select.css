@@ -108,7 +108,10 @@
   color: var(--ds-component-select-color-content-disabled);
 }
 
-.harbor-select[data-invalid] .harbor-select__trigger {
+.harbor-select[data-invalid] .harbor-select__trigger:not([data-disabled]) {
+  /* :not([data-disabled]) excludes this rule entirely when both invalid and disabled
+     are set, since it otherwise outranks the disabled rule's lower specificity and
+     would paint an error border on a disabled trigger. */
   border-color: var(--ds-component-select-color-border-error);
 }
 

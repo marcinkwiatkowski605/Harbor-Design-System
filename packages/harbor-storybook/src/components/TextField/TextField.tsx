@@ -8,6 +8,7 @@ import {
   type TextFieldProps as AriaTextFieldProps,
   type ValidationResult,
 } from 'react-aria-components';
+import { InfoCircleFilledIcon, AlertTriangleFilledIcon } from '../../icons';
 import './TextField.css';
 
 export interface TextFieldProps extends Omit<AriaTextFieldProps, 'children'> {
@@ -49,10 +50,20 @@ export const TextField = React.forwardRef<HTMLDivElement, TextFieldProps>(
         <Input ref={inputRef} placeholder={placeholder} className="harbor-textfield__input" />
         {description && (
           <Text slot="description" className="harbor-textfield__description">
-            {description}
+            <InfoCircleFilledIcon className="harbor-textfield__description-icon" />
+            <span className="harbor-textfield__description-text">{description}</span>
           </Text>
         )}
-        <FieldError className="harbor-textfield__error">{errorMessage}</FieldError>
+        <FieldError className="harbor-textfield__error">
+          {(validation) => (
+            <>
+              <AlertTriangleFilledIcon className="harbor-textfield__error-icon" />
+              <span className="harbor-textfield__error-text">
+                {typeof errorMessage === 'function' ? errorMessage(validation) : errorMessage}
+              </span>
+            </>
+          )}
+        </FieldError>
       </AriaTextField>
     );
   }

@@ -3,11 +3,11 @@
 A text field lets people enter a single line of plain text with a keyboard —
 a name, email address, or search query.
 
-> **Note:** this is a new component, built from scratch on
-> [`react-aria-components`](https://react-aria.adobe.com/)' `TextField` primitive.
-> There's no Figma spec yet (the "🚧 Text Field" page is still empty), so this
-> exposes React Aria's full field surface rather than a Harbor-specific subset.
-> Colors and sizes below are **placeholder values**, not final component tokens.
+> **Note:** built from scratch on
+> [`react-aria-components`](https://react-aria.adobe.com/)' `TextField` primitive,
+> against Figma's "✅ Text-Field" component spec — so this exposes React Aria's
+> full field surface rather than a Harbor-specific subset. Colors and sizes below
+> are real component tokens, synced from Figma.
 
 > _Live, interactive example — see this component in Storybook._
 
@@ -19,18 +19,20 @@ TextField composes four parts, each a separate `react-aria-components` primitive
 <TextField>
   <Label>{label}</Label>
   <Input />
-  <Text slot="description">{description}</Text>
-  <FieldError>{errorMessage}</FieldError>
+  <Text slot="description"><InfoCircleFilledIcon />{description}</Text>
+  <FieldError><AlertTriangleFilledIcon />{errorMessage}</FieldError>
 </TextField>
 ```
 
 - **Label** — describes what belongs in the field. Always visible, sits above the input.
 - **Input** — the editable text box.
 - **Description** (helper text) — optional guidance shown below the input while the
-  field is valid.
+  field is valid. Rendered with a leading info icon, matching Figma's Helper-text
+  building block.
 - **Error message** — shown below the input instead of the description when the field
   is invalid (`isInvalid`). React Aria only renders `FieldError`'s content when the
   field is actually invalid, so no conditional is needed in the component itself.
+  Rendered with a leading warning icon, matching Figma's Error-text building block.
 
 ## States
 
@@ -41,7 +43,8 @@ TextField composes four parts, each a separate `react-aria-components` primitive
   not every pointer click.
 - **Disabled** — `isDisabled`; removes the field from the tab order (`data-disabled`).
 - **Read-only** — `isReadOnly`; field is focusable and its value is selectable/copyable,
-  but not editable (`data-readonly`).
+  but not editable (`data-readonly`). Visually identical to Enabled — Figma has no
+  dedicated read-only variant, since the difference is behavior only, not appearance.
 - **Required** — `isRequired`; adds a visual marker after the label (`data-required`).
 - **Invalid** — `isInvalid`; border turns to the error color and the error message
   appears below the input, in addition to (not instead of) the description
@@ -49,15 +52,35 @@ TextField composes four parts, each a separate `react-aria-components` primitive
 
 ## Color reference
 
-**Pending** — this branch uses placeholder hardcoded colors (see `TextField.css`),
-not component tokens. This section will be filled in with the real value/token
-table once component tokens for TextField are prepared and wired in.
+| Token | Value | Used for |
+|---|---|---|
+| `--ds-component-text-field-color-background-default` | `#FFFFFF` | Input background, enabled |
+| `--ds-component-text-field-color-background-hover` | `#F2F4F5` | Input background, hovered |
+| `--ds-component-text-field-color-background-disabled` | `#CFD5DA` | Input background, disabled |
+| `--ds-component-text-field-color-border-default` | `#909AA1` | Input border, enabled |
+| `--ds-component-text-field-color-border-hover` | `#747D84` | Input border, hovered |
+| `--ds-component-text-field-color-border-disabled` | `#B0B9BF` | Input border, disabled |
+| `--ds-component-text-field-color-border-error` | `#FC5855` | Input border, invalid |
+| `--ds-component-text-field-color-border-error-hover` | `#D53C3D` | Input border, invalid + hovered |
+| `--ds-component-text-field-color-content-filled` | `#484E53` | Typed value text |
+| `--ds-component-text-field-color-content-placeholder` | `#B0B9BF` | Placeholder text |
+| `--ds-component-text-field-color-content-disabled` | `#909AA1` | Typed value text, disabled |
+| `--ds-component-field-label-color-content` | `#484E53` | Label text |
+| `--ds-component-field-label-color-content-error` | `#D53C3D` | Required marker (`*`) |
+| `--ds-component-helper-text-color-content` | `#484E53` | Description text and icon |
+| `--ds-component-error-text-color-content` | `#D53C3D` | Error message text and icon |
 
 ## Specs
 
-**Pending** — sizing (height, padding, radius, border width) is currently
-hardcoded as placeholder values in `TextField.css`. This section will list the
-final value/token table once component tokens exist.
+| Token | Value | Used for |
+|---|---|---|
+| `--ds-component-text-field-height` | `2.5rem` (40px) | Input height |
+| `--ds-component-text-field-padding-inline` | `1rem` (16px) | Input left/right padding |
+| `--ds-component-text-field-border-radius` | `0.25rem` (4px) | Input corner radius |
+| `--ds-component-text-field-border-width` | `0.0625rem` (1px) | Input border thickness |
+| `--ds-component-text-field-gap` | `0.5rem` (8px) | Vertical gap between label, input, and helper/error text |
+| `--ds-component-helper-text-gap` / `--ds-component-error-text-gap` | `0.25rem` (4px) | Gap between icon and text in helper/error message |
+| `--ds-component-helper-text-icon-size` / `--ds-component-error-text-icon-size` | `1rem` (16px) | Icon size in helper/error message |
 
 ## Usage guidelines
 

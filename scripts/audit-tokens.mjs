@@ -6,8 +6,11 @@
  * script recursively scans every .css file under
  * packages/harbor-storybook/src/components/ for hex colors,
  * rgb()/rgba()/hsl()/hsla() functions, and px/rem/em/pt lengths that
- * aren't routed through a token. A line with a trailing `PLACEHOLDER` comment
- * is intentional (the token doesn't exist yet) and is skipped.
+ * aren't routed through a token. Two trailing-comment markers silence a line:
+ *   - `PLACEHOLDER` — no Figma token exists *yet*; this value is temporary
+ *     and should eventually be replaced by one.
+ *   - `NOT-A-TOKEN` — this value will never be a token (e.g. a demo-only
+ *     canvas size), so it's a permanent, deliberate exception.
  *
  * Known limitation: a hardcoded fallback inside var(--x, 4px) is stripped
  * along with the whole var(...) call and won't be caught. No var() call in
@@ -61,7 +64,7 @@ for (const file of files) {
   const lines = readFileSync(file, 'utf8').split('\n');
   lines.forEach((line, index) => {
     const stripped = line.replace(VAR_CALL, '');
-    if (stripped.includes('PLACEHOLDER')) return;
+    if (stripped.includes('PLACEHOLDER') || stripped.includes('NOT-A-TOKEN')) return;
     const category = classify(stripped);
     if (category) {
       violations.push({ file: relative(repoRoot, file), line: index + 1, text: line.trim(), category });

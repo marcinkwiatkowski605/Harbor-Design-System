@@ -17,7 +17,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--ds-component-text-field-gap);
-  width: 320px; /* no Figma token — canvas demo size, not a design decision */
+  width: 320px; /* NOT-A-TOKEN — canvas demo size, not a design decision */
 }
 
 .harbor-textfield__label {

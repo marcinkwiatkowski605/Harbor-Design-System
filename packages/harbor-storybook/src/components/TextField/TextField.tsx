@@ -8,6 +8,7 @@ import {
   type TextFieldProps as AriaTextFieldProps,
   type ValidationResult,
 } from 'react-aria-components';
+import { InfoCircleFilledIcon, AlertTriangleFilledIcon } from '../../icons';
 import './TextField.css';
 
 export interface TextFieldProps extends Omit<AriaTextFieldProps, 'children'> {
@@ -25,14 +26,13 @@ export interface TextFieldProps extends Omit<AriaTextFieldProps, 'children'> {
 }
 
 /**
- * TextField — Harbor Design System (experimental React Aria Components build).
+ * TextField — Harbor Design System.
  *
  * Composed from `react-aria-components`' `TextField` + `Label` + `Input` +
  * `Text` (slot="description") + `FieldError`, following the same anatomy as
  * Adobe's React Aria docs and Workleap Hopper's TextField. Exposes the full
  * React Aria surface (validation, disabled/read-only/required, controlled or
- * uncontrolled value). Colors and sizes are PLACEHOLDER values on this
- * branch, pending component tokens.
+ * uncontrolled value).
  *
  * Note on prop naming: unlike Button (which keeps `disabled` for backward
  * compatibility with its pre-RAC API), this is a net-new component, so it
@@ -49,10 +49,21 @@ export const TextField = React.forwardRef<HTMLDivElement, TextFieldProps>(
         <Input ref={inputRef} placeholder={placeholder} className="harbor-textfield__input" />
         {description && (
           <Text slot="description" className="harbor-textfield__description">
-            {description}
+            <InfoCircleFilledIcon aria-hidden="true" className="harbor-textfield__description-icon" />
+            <span className="harbor-textfield__description-text">{description}</span>
           </Text>
         )}
-        <FieldError className="harbor-textfield__error">{errorMessage}</FieldError>
+        <FieldError className="harbor-textfield__error">
+          {(validation) => (
+            <>
+              <AlertTriangleFilledIcon aria-hidden="true" className="harbor-textfield__error-icon" />
+              <span className="harbor-textfield__error-text">
+                {(typeof errorMessage === 'function' ? errorMessage(validation) : errorMessage) ||
+                  validation.defaultChildren}
+              </span>
+            </>
+          )}
+        </FieldError>
       </AriaTextField>
     );
   }

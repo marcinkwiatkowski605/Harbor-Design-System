@@ -1,10 +1,12 @@
 /*
- * TextField styles — Harbor Design System (experimental React Aria Components build).
+ * TextField styles — Harbor Design System.
  *
- * PLACEHOLDER VALUES — component tokens for TextField don't exist yet (Figma's
- * "🚧 Text Field" page is still empty). Once component tokens are prepared, every
- * literal value below gets swapped for the matching var(--ds-component-text-field-*)
- * reference, mirroring how Button.css is token-driven on main.
+ * Token-driven — every value below comes from Figma's "✅ Text-Field" component
+ * tokens, synced through design_tokens.json. `width` on the root is the one
+ * exception: Figma's canvas size is a demo artifact, not a design decision, so it
+ * stays a literal. Read-only is visually identical to the default state by design
+ * (no dedicated Figma variant), so it needs no override here — [data-readonly]
+ * only changes behavior (still focusable, not editable), not appearance.
  *
  * State selectors use the data-attributes react-aria-components exposes on the
  * TextField container and Input (data-hovered / data-focused / data-focus-visible /
@@ -14,37 +16,52 @@
 .harbor-textfield {
   display: flex;
   flex-direction: column;
-  gap: 4px; /* PLACEHOLDER */
-  width: 320px; /* PLACEHOLDER */
-  font-family: Helvetica, Arial, sans-serif; /* PLACEHOLDER */
+  gap: var(--ds-component-text-field-gap);
+  width: 320px; /* NOT-A-TOKEN — canvas demo size, not a design decision */
 }
 
 .harbor-textfield__label {
-  font-size: 14px; /* PLACEHOLDER */
-  font-weight: 600; /* PLACEHOLDER */
-  color: #18181b; /* PLACEHOLDER */
+  min-width: 0; /* let long unbroken text shrink instead of forcing the flex column wider */
+  overflow-wrap: break-word;
+  font-family: var(--ds-semantic-typography-label-sm-font-family);
+  font-size: var(--ds-semantic-typography-label-sm-font-size);
+  font-weight: var(--ds-semantic-typography-label-sm-font-weight);
+  line-height: var(--ds-semantic-typography-label-sm-line-height);
+  letter-spacing: var(--ds-semantic-typography-label-sm-letter-spacing);
+  color: var(--ds-component-field-label-color-content);
 }
 
 .harbor-textfield[data-required] .harbor-textfield__label::after {
   content: ' *';
-  color: #dc2626; /* PLACEHOLDER */
+  color: var(--ds-component-field-label-color-content-error);
 }
 
 .harbor-textfield__input {
   box-sizing: border-box;
-  block-size: 40px; /* PLACEHOLDER */
-  padding-inline: 12px; /* PLACEHOLDER */
-  border-radius: 6px; /* PLACEHOLDER */
-  border: 1px solid #a1a1aa; /* PLACEHOLDER */
-  background: #ffffff; /* PLACEHOLDER */
-  color: #18181b; /* PLACEHOLDER */
-  font-size: 14px; /* PLACEHOLDER */
-  line-height: 20px; /* PLACEHOLDER */
+  block-size: var(--ds-component-text-field-height);
+  padding-inline: var(--ds-component-text-field-padding-inline);
+  border-radius: var(--ds-component-text-field-border-radius);
+  border: var(--ds-component-text-field-border-width) solid var(--ds-component-text-field-color-border-default);
+  background: var(--ds-component-text-field-color-background-default);
+  color: var(--ds-component-text-field-color-content-filled);
+  font-family: var(--ds-semantic-typography-body-md-font-family);
+  font-size: var(--ds-semantic-typography-body-md-font-size);
+  font-weight: var(--ds-semantic-typography-body-md-font-weight);
+  line-height: var(--ds-semantic-typography-body-md-line-height);
+  letter-spacing: var(--ds-semantic-typography-body-md-letter-spacing);
   outline: none;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis; /* truncate value/placeholder text that doesn't fit the box */
+}
+
+.harbor-textfield__input::placeholder {
+  color: var(--ds-component-text-field-color-content-placeholder);
 }
 
 .harbor-textfield__input[data-hovered] {
-  border-color: #71717a; /* PLACEHOLDER */
+  background: var(--ds-component-text-field-color-background-hover);
+  border-color: var(--ds-component-text-field-color-border-hover);
 }
 
 .harbor-textfield__input[data-focus-visible] {
@@ -59,36 +76,57 @@
 }
 
 .harbor-textfield__input[data-disabled] {
-  background: #f4f4f5; /* PLACEHOLDER */
-  border-color: #d4d4d8; /* PLACEHOLDER */
-  color: #a1a1aa; /* PLACEHOLDER */
+  background: var(--ds-component-text-field-color-background-disabled);
+  border-color: var(--ds-component-text-field-color-border-disabled);
+  color: var(--ds-component-text-field-color-content-disabled);
   cursor: not-allowed;
 }
 
-.harbor-textfield[data-readonly] .harbor-textfield__input {
-  background: #f4f4f5; /* PLACEHOLDER */
-  border-style: dashed; /* PLACEHOLDER */
+.harbor-textfield[data-invalid] .harbor-textfield__input:not([data-disabled]) {
+  /* :not([data-disabled]) excludes this rule entirely when both invalid and disabled
+     are set, since it otherwise outranks the disabled rule's lower specificity and
+     would paint an error border on a disabled field. */
+  border-color: var(--ds-component-text-field-color-border-error);
 }
 
-.harbor-textfield[data-invalid] .harbor-textfield__input {
-  border-color: #dc2626; /* PLACEHOLDER */
+.harbor-textfield[data-invalid] .harbor-textfield__input[data-hovered] {
+  border-color: var(--ds-component-text-field-color-border-error-hover);
 }
 
 .harbor-textfield[data-invalid] .harbor-textfield__input[data-focus-visible] {
-  /* Same shared gap/ring geometry as the default focus ring — only the ring
-     color overrides to the error color (no dedicated error-ring-color token
-     exists yet, so #dc2626 stays a PLACEHOLDER). */
+  /* Same shared gap/ring geometry as the default focus ring — only the ring color
+     overrides to the error border color (no dedicated error-ring-color token exists,
+     so this reuses the error border token rather than a literal). */
   box-shadow:
     var(--ds-semantic-focus-ring-gap-x) var(--ds-semantic-focus-ring-gap-y) var(--ds-semantic-focus-ring-gap-blur)
       var(--ds-semantic-focus-ring-gap-spread) var(--ds-semantic-focus-ring-gap-color),
     var(--ds-semantic-focus-ring-ring-x) var(--ds-semantic-focus-ring-ring-y) var(--ds-semantic-focus-ring-ring-blur)
       var(--ds-semantic-focus-ring-ring-spread)
-      #dc2626; /* PLACEHOLDER — error ring color */
+      var(--ds-component-text-field-color-border-error);
 }
 
 .harbor-textfield__description {
-  font-size: 12px; /* PLACEHOLDER */
-  color: #71717a; /* PLACEHOLDER */
+  display: flex;
+  align-items: flex-start; /* icon stays pinned to the first line when text wraps */
+  gap: var(--ds-component-helper-text-gap);
+  font-family: var(--ds-semantic-typography-body-sm-font-family);
+  font-size: var(--ds-semantic-typography-body-sm-font-size);
+  font-weight: var(--ds-semantic-typography-body-sm-font-weight);
+  line-height: var(--ds-semantic-typography-body-sm-line-height);
+  letter-spacing: var(--ds-semantic-typography-body-sm-letter-spacing);
+  color: var(--ds-component-helper-text-color-content);
+}
+
+.harbor-textfield__description-icon {
+  flex-shrink: 0;
+  inline-size: var(--ds-component-helper-text-icon-size);
+  block-size: var(--ds-component-helper-text-icon-size);
+}
+
+.harbor-textfield__description-text {
+  flex: 1 1 auto;
+  min-width: 0; /* flex items default to min-width:auto, which blocks wrapping/shrinking */
+  overflow-wrap: break-word;
 }
 
 .harbor-textfield[data-invalid] .harbor-textfield__description {
@@ -100,6 +138,25 @@
 }
 
 .harbor-textfield__error {
-  font-size: 12px; /* PLACEHOLDER */
-  color: #dc2626; /* PLACEHOLDER */
+  display: flex;
+  align-items: flex-start; /* icon stays pinned to the first line when text wraps */
+  gap: var(--ds-component-error-text-gap);
+  font-family: var(--ds-semantic-typography-body-sm-font-family);
+  font-size: var(--ds-semantic-typography-body-sm-font-size);
+  font-weight: var(--ds-semantic-typography-body-sm-font-weight);
+  line-height: var(--ds-semantic-typography-body-sm-line-height);
+  letter-spacing: var(--ds-semantic-typography-body-sm-letter-spacing);
+  color: var(--ds-component-error-text-color-content);
+}
+
+.harbor-textfield__error-text {
+  flex: 1 1 auto;
+  min-width: 0; /* flex items default to min-width:auto, which blocks wrapping/shrinking */
+  overflow-wrap: break-word;
+}
+
+.harbor-textfield__error-icon {
+  flex-shrink: 0;
+  inline-size: var(--ds-component-error-text-icon-size);
+  block-size: var(--ds-component-error-text-icon-size);
 }

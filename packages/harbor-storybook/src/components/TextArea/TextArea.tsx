@@ -8,6 +8,7 @@ import {
   type TextFieldProps as AriaTextFieldProps,
   type ValidationResult,
 } from 'react-aria-components';
+import { InfoCircleFilledIcon, AlertTriangleFilledIcon } from '../../icons';
 import './TextArea.css';
 
 export interface TextAreaProps extends Omit<AriaTextFieldProps, 'children'> {
@@ -26,12 +27,11 @@ export interface TextAreaProps extends Omit<AriaTextFieldProps, 'children'> {
 }
 
 /**
- * TextArea — Harbor Design System (experimental React Aria Components build).
+ * TextArea — Harbor Design System.
  *
  * Like TextField, RAC's `TextArea` is a drop-in swap for `Input` inside the same
  * `TextField` container — Harbor's TextField and TextArea share the exact same
- * Label/description/error wiring, just a different editable element. Colors and
- * sizes are PLACEHOLDER values on this branch, pending component tokens.
+ * Label/description/error wiring, just a different editable element.
  *
  * Note on prop naming: unlike Button (which keeps `disabled` for backward
  * compatibility with its pre-RAC API), this is a net-new component, so it
@@ -56,10 +56,21 @@ export const TextArea = React.forwardRef<HTMLDivElement, TextAreaProps>(
         />
         {description && (
           <Text slot="description" className="harbor-textarea__description">
-            {description}
+            <InfoCircleFilledIcon aria-hidden="true" className="harbor-textarea__description-icon" />
+            <span className="harbor-textarea__description-text">{description}</span>
           </Text>
         )}
-        <FieldError className="harbor-textarea__error">{errorMessage}</FieldError>
+        <FieldError className="harbor-textarea__error">
+          {(validation) => (
+            <>
+              <AlertTriangleFilledIcon aria-hidden="true" className="harbor-textarea__error-icon" />
+              <span className="harbor-textarea__error-text">
+                {(typeof errorMessage === 'function' ? errorMessage(validation) : errorMessage) ||
+                  validation.defaultChildren}
+              </span>
+            </>
+          )}
+        </FieldError>
       </AriaTextField>
     );
   }

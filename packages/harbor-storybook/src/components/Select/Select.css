@@ -1,57 +1,90 @@
 /*
- * Select styles — Harbor Design System (experimental React Aria Components build).
+ * Select styles — Harbor Design System.
  *
- * PLACEHOLDER VALUES — component tokens for Select don't exist yet. Once component
- * tokens are prepared, every literal value below gets swapped for the matching
- * var(--ds-component-select-*) reference, mirroring how Button.css is
- * token-driven on main.
+ * Token-driven — every value below comes from Figma's Select component tokens,
+ * synced through design_tokens.json. Three things are not sourced from Figma:
+ * - `width` on the root — Figma's canvas size is a demo artifact, not a token.
+ * - Popover/ListBox/option styling — no component tokens exist for these yet
+ *   (Figma work so far only covers the trigger + shared Field-label/Helper-text/
+ *   Error-text), so they stay hand-picked placeholders below.
+ * - Read-only is not modeled — Select has no read-only concept (there's nothing
+ *   to make "read-only", unlike a text input).
  *
  * State selectors use the data-attributes react-aria-components exposes:
  * on the Select container (data-open / data-disabled / data-invalid /
  * data-required / data-focus-visible), on the trigger Button
- * (data-hovered / data-pressed / data-focus-visible / data-disabled), on
- * SelectValue (data-placeholder), and on each ListBoxItem
+ * (data-hovered / data-pressed / data-focus-visible / data-disabled) — Button,
+ * unlike Input/TextArea, natively tracks data-pressed — on SelectValue
+ * (data-placeholder), and on each ListBoxItem
  * (data-hovered / data-selected / data-focused / data-focus-visible / data-disabled).
  */
 
 .harbor-select {
   display: flex;
   flex-direction: column;
-  gap: 4px; /* PLACEHOLDER */
-  width: 320px; /* PLACEHOLDER */
-  font-family: Helvetica, Arial, sans-serif; /* PLACEHOLDER */
+  gap: var(--ds-component-select-gap);
+  width: 320px; /* NOT-A-TOKEN — canvas demo size, not a design decision */
 }
 
 .harbor-select__label {
-  font-size: 14px; /* PLACEHOLDER */
-  font-weight: 600; /* PLACEHOLDER */
-  color: #18181b; /* PLACEHOLDER */
+  min-width: 0; /* let long unbroken text shrink instead of forcing the flex column wider */
+  overflow-wrap: break-word;
+  font-family: var(--ds-semantic-typography-label-sm-font-family);
+  font-size: var(--ds-semantic-typography-label-sm-font-size);
+  font-weight: var(--ds-semantic-typography-label-sm-font-weight);
+  line-height: var(--ds-semantic-typography-label-sm-line-height);
+  letter-spacing: var(--ds-semantic-typography-label-sm-letter-spacing);
+  color: var(--ds-component-field-label-color-content);
 }
 
 .harbor-select[data-required] .harbor-select__label::after {
   content: ' *';
-  color: #dc2626; /* PLACEHOLDER */
+  color: var(--ds-component-field-label-color-content-error);
 }
 
 .harbor-select__trigger {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px; /* PLACEHOLDER */
+  gap: var(--ds-component-select-gap-inline);
   box-sizing: border-box;
-  block-size: 40px; /* PLACEHOLDER */
-  padding-inline: 12px; /* PLACEHOLDER */
-  border-radius: 6px; /* PLACEHOLDER */
-  border: 1px solid #a1a1aa; /* PLACEHOLDER */
-  background: #ffffff; /* PLACEHOLDER */
-  color: #18181b; /* PLACEHOLDER */
-  font-size: 14px; /* PLACEHOLDER */
+  block-size: var(--ds-component-select-height);
+  padding-inline-start: var(--ds-component-select-padding-inline-start);
+  padding-inline-end: var(--ds-component-select-padding-inline-end);
+  border-radius: var(--ds-component-select-border-radius);
+  border: var(--ds-component-select-border-width) solid var(--ds-component-select-color-border-default);
+  background: var(--ds-component-select-color-background-default);
+  font-family: var(--ds-semantic-typography-body-md-font-family);
+  font-size: var(--ds-semantic-typography-body-md-font-size);
+  font-weight: var(--ds-semantic-typography-body-md-font-weight);
+  line-height: var(--ds-semantic-typography-body-md-line-height);
+  letter-spacing: var(--ds-semantic-typography-body-md-letter-spacing);
+  text-align: start; /* <button> centers text by default in the UA stylesheet */
   cursor: pointer;
   outline: none;
 }
 
+.harbor-select__value {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis; /* truncate a selected option label that doesn't fit */
+  color: var(--ds-component-select-color-content-selected);
+}
+
+.harbor-select__value[data-placeholder] {
+  color: var(--ds-component-select-color-content-placeholder);
+}
+
 .harbor-select__trigger[data-hovered] {
-  border-color: #71717a; /* PLACEHOLDER */
+  background: var(--ds-component-select-color-background-hover);
+  border-color: var(--ds-component-select-color-border-hover);
+}
+
+.harbor-select__trigger[data-pressed] {
+  background: var(--ds-component-select-color-background-pressed);
+  border-color: var(--ds-component-select-color-border-pressed);
 }
 
 .harbor-select__trigger[data-focus-visible] {
@@ -66,45 +99,115 @@
 }
 
 .harbor-select__trigger[data-disabled] {
-  background: #f4f4f5; /* PLACEHOLDER */
-  border-color: #d4d4d8; /* PLACEHOLDER */
-  color: #a1a1aa; /* PLACEHOLDER */
+  background: var(--ds-component-select-color-background-disabled);
+  border-color: var(--ds-component-select-color-border-disabled);
   cursor: not-allowed;
 }
 
-.harbor-select[data-invalid] .harbor-select__trigger {
-  border-color: #dc2626; /* PLACEHOLDER */
+.harbor-select__trigger[data-disabled] .harbor-select__value {
+  color: var(--ds-component-select-color-content-disabled);
 }
 
-.harbor-select__value[data-placeholder] {
-  color: #71717a; /* PLACEHOLDER */
+.harbor-select[data-invalid] .harbor-select__trigger:not([data-disabled]) {
+  /* :not([data-disabled]) excludes this rule entirely when both invalid and disabled
+     are set, since it otherwise outranks the disabled rule's lower specificity and
+     would paint an error border on a disabled trigger. */
+  border-color: var(--ds-component-select-color-border-error);
+}
+
+.harbor-select[data-invalid] .harbor-select__trigger[data-hovered] {
+  border-color: var(--ds-component-select-color-border-error-hover);
+}
+
+.harbor-select[data-invalid] .harbor-select__trigger[data-pressed] {
+  border-color: var(--ds-component-select-color-border-error-pressed);
+}
+
+.harbor-select[data-invalid] .harbor-select__trigger[data-focus-visible] {
+  /* Same shared gap/ring geometry as the default focus ring — only the ring color
+     overrides to the error border color (no dedicated error-ring-color token exists,
+     so this reuses the error border token rather than a literal). */
+  box-shadow:
+    var(--ds-semantic-focus-ring-gap-x) var(--ds-semantic-focus-ring-gap-y) var(--ds-semantic-focus-ring-gap-blur)
+      var(--ds-semantic-focus-ring-gap-spread) var(--ds-semantic-focus-ring-gap-color),
+    var(--ds-semantic-focus-ring-ring-x) var(--ds-semantic-focus-ring-ring-y) var(--ds-semantic-focus-ring-ring-blur)
+      var(--ds-semantic-focus-ring-ring-spread)
+      var(--ds-component-select-color-border-error);
 }
 
 .harbor-select__chevron {
   flex-shrink: 0;
-  width: 8px; /* PLACEHOLDER */
-  height: 8px; /* PLACEHOLDER */
-  border-right: 2px solid #71717a; /* PLACEHOLDER */
-  border-bottom: 2px solid #71717a; /* PLACEHOLDER */
-  transform: rotate(45deg);
+  inline-size: var(--ds-component-select-icon-size);
+  block-size: var(--ds-component-select-icon-size);
+  color: var(--ds-component-select-color-icon-enabled);
   transition: transform 0.15s ease;
-  margin-block-start: -4px; /* PLACEHOLDER — optical centering for the rotated corner */
+}
+
+.harbor-select__trigger[data-disabled] .harbor-select__chevron {
+  color: var(--ds-component-select-color-icon-disabled);
 }
 
 .harbor-select[data-open] .harbor-select__chevron {
-  transform: rotate(225deg);
-  margin-block-start: 4px; /* PLACEHOLDER */
+  transform: rotate(180deg);
 }
 
 .harbor-select__description {
-  font-size: 12px; /* PLACEHOLDER */
-  color: #71717a; /* PLACEHOLDER */
+  display: flex;
+  align-items: flex-start; /* icon stays pinned to the first line when text wraps */
+  gap: var(--ds-component-helper-text-gap);
+  font-family: var(--ds-semantic-typography-body-sm-font-family);
+  font-size: var(--ds-semantic-typography-body-sm-font-size);
+  font-weight: var(--ds-semantic-typography-body-sm-font-weight);
+  line-height: var(--ds-semantic-typography-body-sm-line-height);
+  letter-spacing: var(--ds-semantic-typography-body-sm-letter-spacing);
+  color: var(--ds-component-helper-text-color-content);
+}
+
+.harbor-select__description-icon {
+  flex-shrink: 0;
+  inline-size: var(--ds-component-helper-text-icon-size);
+  block-size: var(--ds-component-helper-text-icon-size);
+}
+
+.harbor-select__description-text {
+  flex: 1 1 auto;
+  min-width: 0; /* flex items default to min-width:auto, which blocks wrapping/shrinking */
+  overflow-wrap: break-word;
+}
+
+.harbor-select[data-invalid] .harbor-select__description {
+  /* FieldError already hides itself when the field is valid (react-aria-components
+     only renders it while isInvalid). Description has no such built-in behavior, so
+     it must be hidden here to keep the two mutually exclusive, matching RAC's
+     documented help-text pattern. */
+  display: none;
 }
 
 .harbor-select__error {
-  font-size: 12px; /* PLACEHOLDER */
-  color: #dc2626; /* PLACEHOLDER */
+  display: flex;
+  align-items: flex-start; /* icon stays pinned to the first line when text wraps */
+  gap: var(--ds-component-error-text-gap);
+  font-family: var(--ds-semantic-typography-body-sm-font-family);
+  font-size: var(--ds-semantic-typography-body-sm-font-size);
+  font-weight: var(--ds-semantic-typography-body-sm-font-weight);
+  line-height: var(--ds-semantic-typography-body-sm-line-height);
+  letter-spacing: var(--ds-semantic-typography-body-sm-letter-spacing);
+  color: var(--ds-component-error-text-color-content);
 }
+
+.harbor-select__error-icon {
+  flex-shrink: 0;
+  inline-size: var(--ds-component-error-text-icon-size);
+  block-size: var(--ds-component-error-text-icon-size);
+}
+
+.harbor-select__error-text {
+  flex: 1 1 auto;
+  min-width: 0; /* flex items default to min-width:auto, which blocks wrapping/shrinking */
+  overflow-wrap: break-word;
+}
+
+/* ── Popover / ListBox / option — no Figma component tokens yet, placeholders ── */
 
 .harbor-select__popover {
   box-sizing: border-box;

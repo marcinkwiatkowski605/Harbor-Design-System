@@ -35,9 +35,13 @@ property to state.
 
 ### Tier 1: Primitive
 
-Categories currently built in Harbor: `color`, `typography`, `spacing`, `border`,
+Categories currently built in Harbor: `color`, `typography`, `dimension`, `border`,
 `shadow`. (The model also supports `animation`, `viewport`, and `z-index` categories —
 Harbor hasn't populated those yet.)
+
+`dimension` is the shared raw-number ramp — Tier 2 gives it meaning through separate
+semantic roles like `spacing` (gaps and padding) and `sizing` (icon and control
+dimensions), each mapping the same primitive steps to a different purpose.
 
 A primitive name is just the category plus the value's position in its scale:
 `--ds-primitive-color-brand-lavender-500`. It carries no information about where the
@@ -47,13 +51,16 @@ color is used — that's Tier 2's job.
 
 Anatomy: `category` → `property` → `variant` → `state`.
 
-- **Category** — `color`, `typography`, `spacing`, `border`, `shadow`, or (in Harbor)
-  `focus-ring`.
+- **Category** — `color`, `typography`, `spacing`, `sizing`, `border`, `shadow`, or (in
+  Harbor) `focus-ring`. `spacing` and `sizing` both alias the same Tier 1 `dimension`
+  ramp under two different roles — `spacing` for gaps/padding, `sizing` for icon and
+  control dimensions — see this same folder's **Tier 1: Primitive Tokens** and
+  **Tier 2: Semantic Tokens** pages for the full value tables.
 - **Property** — the surface a color applies to: `background`, `content`, `border`.
 - **Variant** — the role: `brand`, `accent`, `error`, `warning`, `info`, `success`, or the
   default (unnamed) surface. `subtle` and `secondary` are their own muted/low-emphasis
   roles, not a tonal modifier of another variant.
-- **State** — `hover`, `selected` (interaction only, and only on variants that are
+- **State** — `hover`, `pressed` (interaction only, and only on variants that are
   actually interactive); the base state is omitted rather than named (there is no
   `-enabled` or `-default` suffix at Tier 2 — the bare variant name **is** that state).
   `disabled` is modeled as its own token (`--ds-semantic-color-background-disabled`)
@@ -66,6 +73,13 @@ on hover, only its container does. Where a variant's color needs to sit both as 
 and as text-drawn-on-top-of-that-variant's-background, the second case gets an `on-` prefix
 (`content-brand` vs. `content-on-brand`) rather than a new segment.
 
+`pressed` is the only interaction-state word at Tier 2 — it used to be called `selected`
+(Button's mousedown state), but that collided with a different, unrelated meaning: at
+Tier 3, form fields use `selected` for "a value has been chosen" (Select's
+`content-selected`, as opposed to `content-placeholder`), which is a content state, not
+an interaction state. Renaming Tier 2's interaction state to `pressed` keeps the two
+meanings from sharing a word.
+
 ### Tier 3: Component
 
 Anatomy: `component` → `componentVariant` → `property` → `state`.
@@ -75,12 +89,28 @@ Anatomy: `component` → `componentVariant` → `property` → `state`.
   (Button: `primary`, `secondary`, `outline`).
 - **Property** — `color-background`, `color-content`, `color-border`, or any other CSS
   property the component needs to override (`padding`, `height`, `border-radius`).
-- **State** — `enabled`, `hover`, `selected`, `disabled`. Tier 3 states are named
+- **State** — `enabled`, `hover`, `pressed`, `disabled`. Tier 3 states are named
   explicitly (including `enabled`) because a component variant's base value can collide
   with its own nested states in the token tree otherwise. Only add a state that doesn't
   exist at Tier 2 when it needs its own color values. If a state renders identically to
   an existing one — Button's `focus`, for example, reuses the `enabled` fill and only adds
   the shared focus ring — handle it in CSS without a dedicated token.
+
+Form fields (TextField, TextArea, Select) extend this state vocabulary further, since
+they have two independent axes that Button doesn't:
+
+- **Validity** — `error` (plus the compound `error-hover` / `error-pressed`, since an
+  invalid field can still be hovered or pressed). Modeled as a state, not a Tier 2-style
+  variant, because a form field's only non-default color axis is whether it's valid —
+  unlike Button, which has no such concept.
+- **Content** — describes what the field currently displays, not a user interaction. It
+  can combine with `disabled` but not with `hover`/`pressed`/`error`, which sit on a
+  separate part of the component (the border/background) from the content color they
+  don't affect.
+  - TextField, TextArea: `filled` / `placeholder` — does the field have a typed value, or
+    is it showing placeholder text?
+  - Select: `selected` / `placeholder` — has an option been chosen, or is the trigger
+    showing its placeholder?
 
 ## One value, three tiers
 

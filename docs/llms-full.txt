@@ -42,9 +42,13 @@ property to state.
 
 ### Tier 1: Primitive
 
-Categories currently built in Harbor: `color`, `typography`, `spacing`, `border`,
+Categories currently built in Harbor: `color`, `typography`, `dimension`, `border`,
 `shadow`. (The model also supports `animation`, `viewport`, and `z-index` categories —
 Harbor hasn't populated those yet.)
+
+`dimension` is the shared raw-number ramp — Tier 2 gives it meaning through separate
+semantic roles like `spacing` (gaps and padding) and `sizing` (icon and control
+dimensions), each mapping the same primitive steps to a different purpose.
 
 A primitive name is just the category plus the value's position in its scale:
 `--ds-primitive-color-brand-lavender-500`. It carries no information about where the
@@ -54,13 +58,15 @@ color is used — that's Tier 2's job.
 
 Anatomy: `category` → `property` → `variant` → `state`.
 
-- **Category** — `color`, `typography`, `spacing`, `border`, `shadow`, or (in Harbor)
-  `focus-ring`.
+- **Category** — `color`, `typography`, `spacing`, `sizing`, `border`, `shadow`, or (in
+  Harbor) `focus-ring`. `spacing` and `sizing` both alias the same Tier 1 `dimension`
+  ramp under two different roles — `spacing` for gaps/padding, `sizing` for icon and
+  control dimensions — see [Dimensions](./dimensions.md) for the full breakdown.
 - **Property** — the surface a color applies to: `background`, `content`, `border`.
 - **Variant** — the role: `brand`, `accent`, `error`, `warning`, `info`, `success`, or the
   default (unnamed) surface. `subtle` and `secondary` are their own muted/low-emphasis
   roles, not a tonal modifier of another variant.
-- **State** — `hover`, `selected` (interaction only, and only on variants that are
+- **State** — `hover`, `pressed` (interaction only, and only on variants that are
   actually interactive); the base state is omitted rather than named (there is no
   `-enabled` or `-default` suffix at Tier 2 — the bare variant name **is** that state).
   `disabled` is modeled as its own token (`--ds-semantic-color-background-disabled`)
@@ -73,6 +79,13 @@ on hover, only its container does. Where a variant's color needs to sit both as
 text-on-its-own and as text-drawn-on-top-of-that-variant's-background, the second case
 gets an `on-` prefix (`content-brand` vs. `content-on-brand`) rather than a new segment.
 
+`pressed` is the only interaction-state word at Tier 2 — it used to be called `selected`
+(Button's mousedown state), but that collided with a different, unrelated meaning: at
+Tier 3, form fields use `selected` for "a value has been chosen" (Select's
+`content-selected`, as opposed to `content-placeholder`), which is a content state, not
+an interaction state. Renaming Tier 2's interaction state to `pressed` keeps the two
+meanings from sharing a word.
+
 ### Tier 3: Component
 
 Anatomy: `component` → `componentVariant` → `property` → `state`.
@@ -82,12 +95,28 @@ Anatomy: `component` → `componentVariant` → `property` → `state`.
   (Button: `primary`, `secondary`, `outline`).
 - **Property** — `color-background`, `color-content`, `color-border`, or any other CSS
   property the component needs to override (`padding`, `height`, `border-radius`).
-- **State** — `enabled`, `hover`, `selected`, `disabled`. Tier 3 states are named
+- **State** — `enabled`, `hover`, `pressed`, `disabled`. Tier 3 states are named
   explicitly (including `enabled`) because a component variant's base value can collide
   with its own nested states in the token tree otherwise. Only add a state that doesn't
   exist at Tier 2 when it needs its own color values. If a state renders identically to
   an existing one — Button's `focus`, for example, reuses the `enabled` fill and only adds
   the shared focus ring — handle it in CSS without a dedicated token.
+
+Form fields (TextField, TextArea, Select) extend this state vocabulary further, since
+they have two independent axes that Button doesn't:
+
+- **Validity** — `error` (plus the compound `error-hover` / `error-pressed`, since an
+  invalid field can still be hovered or pressed). Modeled as a state, not a Tier 2-style
+  variant, because a form field's only non-default color axis is whether it's valid —
+  unlike Button, which has no such concept.
+- **Content** — describes what the field currently displays, not a user interaction. It
+  can combine with `disabled` but not with `hover`/`pressed`/`error`, which sit on a
+  separate part of the component (the border/background) from the content color they
+  don't affect.
+  - TextField, TextArea: `filled` / `placeholder` — does the field have a typed value, or
+    is it showing placeholder text?
+  - Select: `selected` / `placeholder` — has an option been chosen, or is the trigger
+    showing its placeholder?
 
 ## One value, three tiers
 
@@ -192,14 +221,14 @@ for the full anatomy).
 
 | Property | Covers |
 |---|---|
-| `background` | default/subtle/hover/selected/disabled + `brand`, `accent`, `error`, `warning`, `info`, `success` variants (each with their own `hover`/`selected`) |
-| `border` | default/hover/selected/disabled/`focus` + `brand`, `accent`, `error`, `warning`, `info`, `success` |
+| `background` | default/subtle/hover/pressed/disabled + `brand`, `accent`, `error`, `warning`, `info`, `success` variants (each with their own `hover`/`pressed`) |
+| `border` | default/hover/pressed/disabled/`focus` + `brand`, `accent`, `error`, `warning`, `info`, `success` |
 | `content` | default/secondary/disabled + `brand`, `accent`, `error`, `warning`, `info`, `success`, and their `on-*` counterparts (text/icon color drawn *on top of* that variant's background) |
 
 A few naming notes worth remembering when picking a token:
 
 - There's no `-enabled` or `-default` suffix — the bare variant name (`background-brand`)
-  **is** the enabled state. Only interactive states (`hover`, `selected`) get a suffix.
+  **is** the enabled state. Only interactive states (`hover`, `pressed`) get a suffix.
 - `disabled` is one token per property (`background-disabled`, `content-disabled`),
   shared across every variant — not duplicated per variant.
 - `content` is a single merged category for both text and icon color — there's no
@@ -253,19 +282,27 @@ that "Button's label" stays traceable to a named role rather than a bare pixel v
 # Dimensions
 
 See [Token architecture](./overview.md) for how the tier system works. This page
-summarizes Harbor's spacing, border, and shadow tokens. For the full per-token value
+summarizes Harbor's dimension, border, and shadow tokens. For the full per-token value
 table and current counts, see **Foundations › Design Tokens › Tier 1 / Tier 2** in
 Storybook, or `packages/harbor-tokens/light/build/json/tokens.json` directly.
 
-## Spacing
+## Dimension
 
 **Primitive scale, 4px base:** `4, 8, 12, 16, 24, 32, 40, 48, 64, 80, 96, 128` (px). Steps
 go up by 4px to 16px, then 8px to 48px, then 16px from there — more precision where it's
 actually needed, fewer meaningless in-between options past 48px. Naming:
-`--ds-primitive-spacing-{value}`.
+`--ds-primitive-dimension-{value}`.
 
-**Semantic spacing** has three roles (`inset`, `inline`, `stack`), each with the same
-sizes (`xs`, `sm`, `md`, `lg`, `xl`) mapping to a primitive step:
+This is a single, purpose-agnostic ramp — Tier 1 carries no meaning about what a value is
+*for*. Two separate Tier 2 roles give it meaning: `spacing` (gaps and padding) and
+`sizing` (icon and control dimensions). Both map to the same primitive steps, so a
+component's internal padding and an icon sitting inside it can share a value without
+duplicating the number in two places.
+
+### Spacing
+
+Three roles (`inset`, `inline`, `stack`), each with the same sizes (`xs`, `sm`, `md`,
+`lg`, `xl`) mapping to a primitive step:
 
 | Size | `xs` | `sm` | `md` | `lg` | `xl` |
 |---|---|---|---|---|---|
@@ -276,6 +313,24 @@ sizes (`xs`, `sm`, `md`, `lg`, `xl`) mapping to a primitive step:
 - `stack` — vertical gaps between elements stacked on top of each other.
 
 Naming: `--ds-semantic-spacing-{role}-{size}`, e.g. `--ds-semantic-spacing-inset-md`.
+
+### Sizing
+
+Two roles, each with its own size steps:
+
+| Size | `xs` | `sm` | `md` | `lg` | `xl` |
+|---|---|---|---|---|---|
+| `icon` (px) | 12 | 16 | 24 | 32 | 40 |
+| `control` (px) | — | 40 | 48 | 80 | — |
+
+- `icon` — the width/height of an icon glyph (e.g. the info icon in a helper message, or
+  a select's chevron).
+- `control` — the height of an interactive form control (Button, TextField, Select).
+  TextArea's own height is a multi-line default rather than a fixed control height, so it
+  intentionally uses `control-lg` rather than sharing `sm`/`md` with the single-line
+  controls.
+
+Naming: `--ds-semantic-sizing-{role}-{size}`, e.g. `--ds-semantic-sizing-icon-sm`.
 
 ## Border
 
@@ -341,17 +396,17 @@ flow needs rethinking before the button hierarchy does.
 
 ## States
 
-All three types share the same five states: Enabled, Hover, Selected, Focus, Disabled.
+All three types share the same five states: Enabled, Hover, Pressed, Focus, Disabled.
 
-- **Hover / Selected** darken the fill (or border, for Outline) to confirm interactivity.
-  Outline gives Hover and Selected two distinct border shades, so the states read differently
+- **Hover / Pressed** darken the fill (or border, for Outline) to confirm interactivity.
+  Outline gives Hover and Pressed two distinct border shades, so the states read differently
   instead of looking identical.
 - **Focus** adds a two-layer ring — a white gap plus a colored outer ring — shared across all
   three types via one token pair, so focus looks the same regardless of button type.
 - **Disabled** flattens background and text to neutral gray on every type, including
   Outline — background, border, and label all drop to their disabled tokens.
 
-In code, Hover/Selected/Focus are driven by the `data-hovered` / `data-pressed` /
+In code, Hover/Pressed/Focus are driven by the `data-hovered` / `data-pressed` /
 `data-focus-visible` attributes `react-aria-components`' `Button` exposes, and
 Disabled by `data-disabled` (set via the `isDisabled` prop).
 
@@ -370,7 +425,7 @@ adds the shared ring (`--ds-semantic-focus-ring-ring-*` / `--ds-semantic-focus-r
 |----------|-----------------------------------|-------------------------------|
 | Enabled  | `#9050E9` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
 | Hover    | `#7526E3` · `background-hover`    | `#FFFFFF` · `content-hover`    |
-| Selected | `#5A1BA9` · `background-selected` | `#FFFFFF` · `content-selected` |
+| Pressed  | `#5A1BA9` · `background-pressed`  | `#FFFFFF` · `content-pressed`  |
 | Focus    | `#9050E9` · `background-enabled`  | `#FFFFFF` · `content-enabled`  |
 | Disabled | `#CFD5DA` · `background-disabled` | `#909AA1` · `content-disabled` |
 
@@ -380,7 +435,7 @@ adds the shared ring (`--ds-semantic-focus-ring-ring-*` / `--ds-semantic-focus-r
 |----------|------------------------------------|--------------------------------|
 | Enabled  | `#D83A00` · `background-enabled`   | `#FFFFFF` · `content-enabled`   |
 | Hover    | `#AA3001` · `background-hover`     | `#FFFFFF` · `content-hover`     |
-| Selected | `#7E2600` · `background-selected`  | `#FFFFFF` · `content-selected`  |
+| Pressed  | `#7E2600` · `background-pressed`   | `#FFFFFF` · `content-pressed`   |
 | Focus    | `#D83A00` · `background-enabled`   | `#FFFFFF` · `content-enabled`   |
 | Disabled | `#CFD5DA` · `background-disabled`  | `#909AA1` · `content-disabled` |
 
@@ -390,7 +445,7 @@ adds the shared ring (`--ds-semantic-focus-ring-ring-*` / `--ds-semantic-focus-r
 |----------|------------------------------------|---------------------------------|--------------------------------|
 | Enabled  | `#FFFFFF` · `background-enabled`   | `#484E53` · `content-enabled`   | `#909AA1` · `border-enabled`   |
 | Hover    | `#F2F4F5` · `background-hover`     | `#484E53` · `content-hover`     | `#747D84` · `border-hover`     |
-| Selected | `#E3E7E9` · `background-selected`  | `#484E53` · `content-selected`  | `#5D646A` · `border-selected`  |
+| Pressed  | `#E3E7E9` · `background-pressed`   | `#484E53` · `content-pressed`   | `#5D646A` · `border-pressed`   |
 | Focus    | `#FFFFFF` · `background-enabled`   | `#484E53` · `content-enabled`   | `#909AA1` · `border-enabled`   |
 | Disabled | `#CFD5DA` · `background-disabled`  | `#909AA1` · `content-disabled` | `#B0B9BF` · `border-disabled`  |
 
@@ -399,7 +454,7 @@ adds the shared ring (`--ds-semantic-focus-ring-ring-*` / `--ds-semantic-focus-r
 | Property        | Value | Token |
 |-----------------|-------|-------|
 | Height               | 48px | `--ds-component-button-height` |
-| Padding (horizontal) | 24px | `--ds-component-button-padding` |
+| Padding (horizontal) | 24px | `--ds-component-button-padding-inline` |
 | Corner radius        | 8px  | `--ds-component-button-border-radius` |
 | Border width         | 1px  | `--ds-component-button-border-width` |
 
@@ -509,9 +564,11 @@ a fully expanded set of choices (like radio buttons) would need.
 > [`react-aria-components`](https://react-aria.adobe.com/)' `Select` primitive,
 > using its explicit anatomy (`Label` + `Button` + `SelectValue` + `Popover` +
 > `ListBox`/`ListBoxItem`) instead of the compact all-in-one API, for full control
-> over styling each part. There's no Figma spec yet, so this exposes React Aria's
-> single-selection surface rather than a Harbor-specific subset. Colors and sizes
-> below are **placeholder values**, not final component tokens.
+> over styling each part, so this exposes React Aria's single-selection surface
+> rather than a Harbor-specific subset. The trigger's colors and sizes are real
+> component tokens, synced from Figma. The Popover/ListBox/option colors below
+> the trigger are still **placeholder values** — Figma's token work so far only
+> covers the trigger and the shared Field-label/Helper-text/Error-text blocks.
 
 > _Live, interactive example — see this component in Storybook._
 
@@ -524,10 +581,10 @@ Select composes six parts, each a separate `react-aria-components` primitive:
   <Label>{label}</Label>
   <Button>
     <SelectValue />
-    <span aria-hidden="true" /> {/* chevron */}
+    <ChevronDownIcon aria-hidden="true" />
   </Button>
-  <Text slot="description">{description}</Text>
-  <FieldError>{errorMessage}</FieldError>
+  <Text slot="description"><InfoCircleFilledIcon />{description}</Text>
+  <FieldError><AlertTriangleFilledIcon />{errorMessage}</FieldError>
   <Popover>
     <ListBox items={items}>
       {(item) => <ListBoxItem id={item.id}>{item.label}</ListBoxItem>}
@@ -539,14 +596,21 @@ Select composes six parts, each a separate `react-aria-components` primitive:
 - **Label** — describes what's being chosen. Always visible, sits above the trigger.
 - **Trigger (Button + SelectValue)** — a button showing the current selection (or
   `placeholder` when nothing is chosen yet) and a chevron that flips to indicate
-  open/closed.
+  open/closed. The chevron's color stays constant regardless of whether a value is
+  selected or the trigger shows a placeholder — it's an affordance icon, not content,
+  so it only changes for `isDisabled`.
 - **Popover + ListBox** — the list of options, only mounted in the DOM while open.
-- **Description** / **Error message** — same helper-text/validation pattern as TextField.
+- **Description** / **Error message** — same helper-text/validation pattern as
+  TextField, with the same leading icon on each.
 
 ## States
 
 - **Enabled** — default resting state.
 - **Hover** — trigger border darkens (`data-hovered` on the trigger button).
+- **Pressed** — trigger background/border darken further while the mouse button is
+  down (`data-pressed`). Unlike TextField/TextArea's `<Input>`, RAC's `<Button>`
+  natively tracks a pressed state, so this one uses the real react-aria-components
+  attribute rather than a plain CSS `:active`.
 - **Open** — popover is visible, chevron flips (`data-open` on the Select container).
 - **Focus** — same two-layer ring as Button/TextField, on the trigger
   (`data-focus-visible`).
@@ -562,15 +626,50 @@ via that option's `isDisabled`) — see `data-hovered` / `data-focus-visible` /
 
 ## Color reference
 
-**Pending** — this branch uses placeholder hardcoded colors (see `Select.css`),
-not component tokens. This section will be filled in with the real value/token
-table once component tokens for Select are prepared and wired in.
+Trigger, label, description, and error colors below are real component tokens.
+Popover/ListBox/option colors aren't in this table yet — see the note at the top
+of this page.
+
+| Token | Value | Used for |
+|---|---|---|
+| `--ds-component-select-color-background-default` | `#FFFFFF` | Trigger background, enabled |
+| `--ds-component-select-color-background-hover` | `#F2F4F5` | Trigger background, hovered |
+| `--ds-component-select-color-background-pressed` | `#FFFFFF` | Trigger background, pressed |
+| `--ds-component-select-color-background-disabled` | `#CFD5DA` | Trigger background, disabled |
+| `--ds-component-select-color-border-default` | `#909AA1` | Trigger border, enabled |
+| `--ds-component-select-color-border-hover` | `#747D84` | Trigger border, hovered |
+| `--ds-component-select-color-border-pressed` | `#5D646A` | Trigger border, pressed |
+| `--ds-component-select-color-border-disabled` | `#B0B9BF` | Trigger border, disabled |
+| `--ds-component-select-color-border-error` | `#FC5855` | Trigger border, invalid |
+| `--ds-component-select-color-border-error-hover` | `#D53C3D` | Trigger border, invalid + hovered |
+| `--ds-component-select-color-border-error-pressed` | `#B02A2D` | Trigger border, invalid + pressed |
+| `--ds-component-select-color-content-selected` | `#484E53` | Selected value text |
+| `--ds-component-select-color-content-placeholder` | `#B0B9BF` | Placeholder text |
+| `--ds-component-select-color-content-disabled` | `#909AA1` | Value text, disabled |
+| `--ds-component-select-color-icon-enabled` | `#484E53` | Chevron, enabled (constant regardless of selected/placeholder) |
+| `--ds-component-select-color-icon-disabled` | `#909AA1` | Chevron, disabled |
+| `--ds-component-field-label-color-content` | `#484E53` | Label text |
+| `--ds-component-field-label-color-content-error` | `#D53C3D` | Required marker (`*`) |
+| `--ds-component-helper-text-color-content` | `#484E53` | Description text and icon |
+| `--ds-component-error-text-color-content` | `#D53C3D` | Error message text and icon |
 
 ## Specs
 
-**Pending** — sizing (trigger height/padding, popover max height, option padding)
-is currently hardcoded as placeholder values in `Select.css`. This section will
-list the final value/token table once component tokens exist.
+Trigger, gap, and icon sizing below are real component tokens. Popover max-height
+and option padding aren't in this table yet — no Figma tokens exist for those yet.
+
+| Token | Value | Used for |
+|---|---|---|
+| `--ds-component-select-height` | `2.5rem` (40px) | Trigger height |
+| `--ds-component-select-padding-inline-start` | `1rem` (16px) | Trigger left padding |
+| `--ds-component-select-padding-inline-end` | `0.75rem` (12px) | Trigger right padding (tighter, next to the chevron) |
+| `--ds-component-select-border-radius` | `0.25rem` (4px) | Trigger corner radius |
+| `--ds-component-select-border-width` | `0.0625rem` (1px) | Trigger border thickness |
+| `--ds-component-select-gap` | `0.5rem` (8px) | Vertical gap between label, trigger, and helper/error text |
+| `--ds-component-select-gap-inline` | `0.5rem` (8px) | Gap between value text and chevron inside the trigger |
+| `--ds-component-select-icon-size` | `1.5rem` (24px) | Chevron size |
+| `--ds-component-helper-text-gap` / `--ds-component-error-text-gap` | `0.25rem` (4px) | Gap between icon and text in helper/error message |
+| `--ds-component-helper-text-icon-size` / `--ds-component-error-text-icon-size` | `1rem` (16px) | Icon size in helper/error message |
 
 ## Usage guidelines
 
@@ -664,7 +763,7 @@ description, free-form feedback.
 > a drop-in swap for `Input` inside the same `TextField` container — TextArea
 > shares the exact same `Label`/description/error wiring as our TextField
 > component, just renders a `<textarea>` instead of an `<input>`. Colors and
-> sizes below are **placeholder values**, not final component tokens.
+> sizes below are real component tokens, synced from Figma.
 
 > _Live, interactive example — see this component in Storybook._
 
@@ -676,13 +775,15 @@ Same four parts as TextField, with `TextArea` swapped in for `Input`:
 <TextField>
   <Label>{label}</Label>
   <TextArea />
-  <Text slot="description">{description}</Text>
-  <FieldError>{errorMessage}</FieldError>
+  <Text slot="description"><InfoCircleFilledIcon />{description}</Text>
+  <FieldError><AlertTriangleFilledIcon />{errorMessage}</FieldError>
 </TextField>
 ```
 
 The `rows` prop sets the visible height (native `<textarea rows>`); people can
 resize it further by dragging the bottom-right corner (`resize: vertical`).
+Description and error message render with a leading icon, matching Figma's
+Helper-text/Error-text building blocks — same as TextField.
 
 ## States
 
@@ -690,19 +791,41 @@ Identical state set to TextField — Enabled, Hover, Focus, Disabled, Read-only,
 Required, Invalid — driven by the same `data-hovered` / `data-focus-visible` /
 `data-disabled` / `data-readonly` / `data-required` / `data-invalid` attributes.
 See TextField's docs for the full breakdown; nothing about the state model
-changes for multi-line input.
+changes for multi-line input. Read-only is likewise visually identical to
+Enabled — no dedicated Figma variant, behavior-only difference.
 
 ## Color reference
 
-**Pending** — this branch uses placeholder hardcoded colors (see `TextArea.css`),
-not component tokens. This section will be filled in with the real value/token
-table once component tokens for TextArea are prepared and wired in.
+| Token | Value | Used for |
+|---|---|---|
+| `--ds-component-text-area-color-background-default` | `#FFFFFF` | Textarea background, enabled |
+| `--ds-component-text-area-color-background-hover` | `#F2F4F5` | Textarea background, hovered |
+| `--ds-component-text-area-color-background-disabled` | `#CFD5DA` | Textarea background, disabled |
+| `--ds-component-text-area-color-border-default` | `#909AA1` | Textarea border, enabled |
+| `--ds-component-text-area-color-border-hover` | `#747D84` | Textarea border, hovered |
+| `--ds-component-text-area-color-border-disabled` | `#B0B9BF` | Textarea border, disabled |
+| `--ds-component-text-area-color-border-error` | `#FC5855` | Textarea border, invalid |
+| `--ds-component-text-area-color-border-error-hover` | `#D53C3D` | Textarea border, invalid + hovered |
+| `--ds-component-text-area-color-content-filled` | `#484E53` | Typed value text |
+| `--ds-component-text-area-color-content-placeholder` | `#B0B9BF` | Placeholder text |
+| `--ds-component-text-area-color-content-disabled` | `#909AA1` | Typed value text, disabled |
+| `--ds-component-field-label-color-content` | `#484E53` | Label text |
+| `--ds-component-field-label-color-content-error` | `#D53C3D` | Required marker (`*`) |
+| `--ds-component-helper-text-color-content` | `#484E53` | Description text and icon |
+| `--ds-component-error-text-color-content` | `#D53C3D` | Error message text and icon |
 
 ## Specs
 
-**Pending** — sizing (min height, padding, radius, border width) is currently
-hardcoded as placeholder values in `TextArea.css`. This section will list the
-final value/token table once component tokens exist.
+| Token | Value | Used for |
+|---|---|---|
+| `--ds-component-text-area-height` | `5rem` (80px) | Textarea minimum height |
+| `--ds-component-text-area-padding-inline` | `1rem` (16px) | Textarea left/right padding |
+| `--ds-component-text-area-padding-block` | `0.75rem` (12px) | Textarea top/bottom padding |
+| `--ds-component-text-area-border-radius` | `0.25rem` (4px) | Textarea corner radius |
+| `--ds-component-text-area-border-width` | `0.0625rem` (1px) | Textarea border thickness |
+| `--ds-component-text-area-gap` | `0.5rem` (8px) | Vertical gap between label, textarea, and helper/error text |
+| `--ds-component-helper-text-gap` / `--ds-component-error-text-gap` | `0.25rem` (4px) | Gap between icon and text in helper/error message |
+| `--ds-component-helper-text-icon-size` / `--ds-component-error-text-icon-size` | `1rem` (16px) | Icon size in helper/error message |
 
 ## Usage guidelines
 
@@ -774,11 +897,11 @@ Same shared two-layer focus ring as Button, TextField, and Select.
 A text field lets people enter a single line of plain text with a keyboard —
 a name, email address, or search query.
 
-> **Note:** this is a new component, built from scratch on
-> [`react-aria-components`](https://react-aria.adobe.com/)' `TextField` primitive.
-> There's no Figma spec yet (the "🚧 Text Field" page is still empty), so this
-> exposes React Aria's full field surface rather than a Harbor-specific subset.
-> Colors and sizes below are **placeholder values**, not final component tokens.
+> **Note:** built from scratch on
+> [`react-aria-components`](https://react-aria.adobe.com/)' `TextField` primitive,
+> against Figma's "✅ Text-Field" component spec — so this exposes React Aria's
+> full field surface rather than a Harbor-specific subset. Colors and sizes below
+> are real component tokens, synced from Figma.
 
 > _Live, interactive example — see this component in Storybook._
 
@@ -790,18 +913,20 @@ TextField composes four parts, each a separate `react-aria-components` primitive
 <TextField>
   <Label>{label}</Label>
   <Input />
-  <Text slot="description">{description}</Text>
-  <FieldError>{errorMessage}</FieldError>
+  <Text slot="description"><InfoCircleFilledIcon />{description}</Text>
+  <FieldError><AlertTriangleFilledIcon />{errorMessage}</FieldError>
 </TextField>
 ```
 
 - **Label** — describes what belongs in the field. Always visible, sits above the input.
 - **Input** — the editable text box.
 - **Description** (helper text) — optional guidance shown below the input while the
-  field is valid.
+  field is valid. Rendered with a leading info icon, matching Figma's Helper-text
+  building block.
 - **Error message** — shown below the input instead of the description when the field
   is invalid (`isInvalid`). React Aria only renders `FieldError`'s content when the
   field is actually invalid, so no conditional is needed in the component itself.
+  Rendered with a leading warning icon, matching Figma's Error-text building block.
 
 ## States
 
@@ -812,7 +937,8 @@ TextField composes four parts, each a separate `react-aria-components` primitive
   not every pointer click.
 - **Disabled** — `isDisabled`; removes the field from the tab order (`data-disabled`).
 - **Read-only** — `isReadOnly`; field is focusable and its value is selectable/copyable,
-  but not editable (`data-readonly`).
+  but not editable (`data-readonly`). Visually identical to Enabled — Figma has no
+  dedicated read-only variant, since the difference is behavior only, not appearance.
 - **Required** — `isRequired`; adds a visual marker after the label (`data-required`).
 - **Invalid** — `isInvalid`; border turns to the error color and the error message
   appears below the input, in addition to (not instead of) the description
@@ -820,15 +946,35 @@ TextField composes four parts, each a separate `react-aria-components` primitive
 
 ## Color reference
 
-**Pending** — this branch uses placeholder hardcoded colors (see `TextField.css`),
-not component tokens. This section will be filled in with the real value/token
-table once component tokens for TextField are prepared and wired in.
+| Token | Value | Used for |
+|---|---|---|
+| `--ds-component-text-field-color-background-default` | `#FFFFFF` | Input background, enabled |
+| `--ds-component-text-field-color-background-hover` | `#F2F4F5` | Input background, hovered |
+| `--ds-component-text-field-color-background-disabled` | `#CFD5DA` | Input background, disabled |
+| `--ds-component-text-field-color-border-default` | `#909AA1` | Input border, enabled |
+| `--ds-component-text-field-color-border-hover` | `#747D84` | Input border, hovered |
+| `--ds-component-text-field-color-border-disabled` | `#B0B9BF` | Input border, disabled |
+| `--ds-component-text-field-color-border-error` | `#FC5855` | Input border, invalid |
+| `--ds-component-text-field-color-border-error-hover` | `#D53C3D` | Input border, invalid + hovered |
+| `--ds-component-text-field-color-content-filled` | `#484E53` | Typed value text |
+| `--ds-component-text-field-color-content-placeholder` | `#B0B9BF` | Placeholder text |
+| `--ds-component-text-field-color-content-disabled` | `#909AA1` | Typed value text, disabled |
+| `--ds-component-field-label-color-content` | `#484E53` | Label text |
+| `--ds-component-field-label-color-content-error` | `#D53C3D` | Required marker (`*`) |
+| `--ds-component-helper-text-color-content` | `#484E53` | Description text and icon |
+| `--ds-component-error-text-color-content` | `#D53C3D` | Error message text and icon |
 
 ## Specs
 
-**Pending** — sizing (height, padding, radius, border width) is currently
-hardcoded as placeholder values in `TextField.css`. This section will list the
-final value/token table once component tokens exist.
+| Token | Value | Used for |
+|---|---|---|
+| `--ds-component-text-field-height` | `2.5rem` (40px) | Input height |
+| `--ds-component-text-field-padding-inline` | `1rem` (16px) | Input left/right padding |
+| `--ds-component-text-field-border-radius` | `0.25rem` (4px) | Input corner radius |
+| `--ds-component-text-field-border-width` | `0.0625rem` (1px) | Input border thickness |
+| `--ds-component-text-field-gap` | `0.5rem` (8px) | Vertical gap between label, input, and helper/error text |
+| `--ds-component-helper-text-gap` / `--ds-component-error-text-gap` | `0.25rem` (4px) | Gap between icon and text in helper/error message |
+| `--ds-component-helper-text-icon-size` / `--ds-component-error-text-icon-size` | `1rem` (16px) | Icon size in helper/error message |
 
 ## Usage guidelines
 
@@ -938,9 +1084,13 @@ property to state.
 
 ### Tier 1: Primitive
 
-Categories currently built in Harbor: `color`, `typography`, `spacing`, `border`,
+Categories currently built in Harbor: `color`, `typography`, `dimension`, `border`,
 `shadow`. (The model also supports `animation`, `viewport`, and `z-index` categories —
 Harbor hasn't populated those yet.)
+
+`dimension` is the shared raw-number ramp — Tier 2 gives it meaning through separate
+semantic roles like `spacing` (gaps and padding) and `sizing` (icon and control
+dimensions), each mapping the same primitive steps to a different purpose.
 
 A primitive name is just the category plus the value's position in its scale:
 `--ds-primitive-color-brand-lavender-500`. It carries no information about where the
@@ -950,13 +1100,16 @@ color is used — that's Tier 2's job.
 
 Anatomy: `category` → `property` → `variant` → `state`.
 
-- **Category** — `color`, `typography`, `spacing`, `border`, `shadow`, or (in Harbor)
-  `focus-ring`.
+- **Category** — `color`, `typography`, `spacing`, `sizing`, `border`, `shadow`, or (in
+  Harbor) `focus-ring`. `spacing` and `sizing` both alias the same Tier 1 `dimension`
+  ramp under two different roles — `spacing` for gaps/padding, `sizing` for icon and
+  control dimensions — see this same folder's **Tier 1: Primitive Tokens** and
+  **Tier 2: Semantic Tokens** pages for the full value tables.
 - **Property** — the surface a color applies to: `background`, `content`, `border`.
 - **Variant** — the role: `brand`, `accent`, `error`, `warning`, `info`, `success`, or the
   default (unnamed) surface. `subtle` and `secondary` are their own muted/low-emphasis
   roles, not a tonal modifier of another variant.
-- **State** — `hover`, `selected` (interaction only, and only on variants that are
+- **State** — `hover`, `pressed` (interaction only, and only on variants that are
   actually interactive); the base state is omitted rather than named (there is no
   `-enabled` or `-default` suffix at Tier 2 — the bare variant name **is** that state).
   `disabled` is modeled as its own token (`--ds-semantic-color-background-disabled`)
@@ -969,6 +1122,13 @@ on hover, only its container does. Where a variant's color needs to sit both as 
 and as text-drawn-on-top-of-that-variant's-background, the second case gets an `on-` prefix
 (`content-brand` vs. `content-on-brand`) rather than a new segment.
 
+`pressed` is the only interaction-state word at Tier 2 — it used to be called `selected`
+(Button's mousedown state), but that collided with a different, unrelated meaning: at
+Tier 3, form fields use `selected` for "a value has been chosen" (Select's
+`content-selected`, as opposed to `content-placeholder`), which is a content state, not
+an interaction state. Renaming Tier 2's interaction state to `pressed` keeps the two
+meanings from sharing a word.
+
 ### Tier 3: Component
 
 Anatomy: `component` → `componentVariant` → `property` → `state`.
@@ -978,12 +1138,28 @@ Anatomy: `component` → `componentVariant` → `property` → `state`.
   (Button: `primary`, `secondary`, `outline`).
 - **Property** — `color-background`, `color-content`, `color-border`, or any other CSS
   property the component needs to override (`padding`, `height`, `border-radius`).
-- **State** — `enabled`, `hover`, `selected`, `disabled`. Tier 3 states are named
+- **State** — `enabled`, `hover`, `pressed`, `disabled`. Tier 3 states are named
   explicitly (including `enabled`) because a component variant's base value can collide
   with its own nested states in the token tree otherwise. Only add a state that doesn't
   exist at Tier 2 when it needs its own color values. If a state renders identically to
   an existing one — Button's `focus`, for example, reuses the `enabled` fill and only adds
   the shared focus ring — handle it in CSS without a dedicated token.
+
+Form fields (TextField, TextArea, Select) extend this state vocabulary further, since
+they have two independent axes that Button doesn't:
+
+- **Validity** — `error` (plus the compound `error-hover` / `error-pressed`, since an
+  invalid field can still be hovered or pressed). Modeled as a state, not a Tier 2-style
+  variant, because a form field's only non-default color axis is whether it's valid —
+  unlike Button, which has no such concept.
+- **Content** — describes what the field currently displays, not a user interaction. It
+  can combine with `disabled` but not with `hover`/`pressed`/`error`, which sit on a
+  separate part of the component (the border/background) from the content color they
+  don't affect.
+  - TextField, TextArea: `filled` / `placeholder` — does the field have a typed value, or
+    is it showing placeholder text?
+  - Select: `selected` / `placeholder` — has an option been chosen, or is the trigger
+    showing its placeholder?
 
 ## One value, three tiers
 

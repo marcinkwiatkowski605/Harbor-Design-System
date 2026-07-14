@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { TextArea } from './TextArea';
 
 const meta: Meta<typeof TextArea> = {
-  title: 'Components/🚧 TextArea',
+  title: 'Components/TextArea',
   component: TextArea,
   parameters: {
     layout: 'centered',

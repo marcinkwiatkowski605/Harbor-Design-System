@@ -1,11 +1,12 @@
 /*
- * TextArea styles — Harbor Design System (experimental React Aria Components build).
+ * TextArea styles — Harbor Design System.
  *
- * PLACEHOLDER VALUES — component tokens for TextArea don't exist yet (same as
- * TextField/Select). Once component tokens are prepared, every literal value
- * below gets swapped for the matching var(--ds-component-text-area-*) reference.
- * The shared focus-ring already uses real tokens (var(--ds-semantic-focus-ring-*)),
- * same as Button/TextField/Select.
+ * Token-driven — every value below comes from Figma's Text-area component tokens,
+ * synced through design_tokens.json. `width` on the root is the one exception:
+ * Figma's canvas size is a demo artifact, not a design decision, so it stays a
+ * literal. Read-only is visually identical to the default state by design (no
+ * dedicated Figma variant, same as TextField), so [data-readonly] only changes
+ * behavior (still focusable, not editable), not appearance.
  *
  * State selectors use the data-attributes react-aria-components exposes on the
  * TextField container (data-required / data-invalid) and directly on the
@@ -17,39 +18,51 @@
 .harbor-textarea {
   display: flex;
   flex-direction: column;
-  gap: 4px; /* PLACEHOLDER */
-  width: 320px; /* PLACEHOLDER */
-  font-family: Helvetica, Arial, sans-serif; /* PLACEHOLDER */
+  gap: var(--ds-component-text-area-gap);
+  width: 320px; /* NOT-A-TOKEN — canvas demo size, not a design decision */
 }
 
 .harbor-textarea__label {
-  font-size: 14px; /* PLACEHOLDER */
-  font-weight: 600; /* PLACEHOLDER */
-  color: #18181b; /* PLACEHOLDER */
+  min-width: 0; /* let long unbroken text shrink instead of forcing the flex column wider */
+  overflow-wrap: break-word;
+  font-family: var(--ds-semantic-typography-label-sm-font-family);
+  font-size: var(--ds-semantic-typography-label-sm-font-size);
+  font-weight: var(--ds-semantic-typography-label-sm-font-weight);
+  line-height: var(--ds-semantic-typography-label-sm-line-height);
+  letter-spacing: var(--ds-semantic-typography-label-sm-letter-spacing);
+  color: var(--ds-component-field-label-color-content);
 }
 
 .harbor-textarea[data-required] .harbor-textarea__label::after {
   content: ' *';
-  color: #dc2626; /* PLACEHOLDER */
+  color: var(--ds-component-field-label-color-content-error);
 }
 
 .harbor-textarea__input {
   box-sizing: border-box;
-  min-block-size: 80px; /* PLACEHOLDER — roughly 3 lines */
-  padding: 8px 12px; /* PLACEHOLDER */
-  border-radius: 6px; /* PLACEHOLDER */
-  border: 1px solid #a1a1aa; /* PLACEHOLDER */
-  background: #ffffff; /* PLACEHOLDER */
-  color: #18181b; /* PLACEHOLDER */
-  font-family: inherit;
-  font-size: 14px; /* PLACEHOLDER */
-  line-height: 20px; /* PLACEHOLDER */
+  min-block-size: var(--ds-component-text-area-height);
+  padding-block: var(--ds-component-text-area-padding-block);
+  padding-inline: var(--ds-component-text-area-padding-inline);
+  border-radius: var(--ds-component-text-area-border-radius);
+  border: var(--ds-component-text-area-border-width) solid var(--ds-component-text-area-color-border-default);
+  background: var(--ds-component-text-area-color-background-default);
+  color: var(--ds-component-text-area-color-content-filled);
+  font-family: var(--ds-semantic-typography-body-md-font-family);
+  font-size: var(--ds-semantic-typography-body-md-font-size);
+  font-weight: var(--ds-semantic-typography-body-md-font-weight);
+  line-height: var(--ds-semantic-typography-body-md-line-height);
+  letter-spacing: var(--ds-semantic-typography-body-md-letter-spacing);
   resize: vertical;
   outline: none;
 }
 
+.harbor-textarea__input::placeholder {
+  color: var(--ds-component-text-area-color-content-placeholder);
+}
+
 .harbor-textarea__input[data-hovered] {
-  border-color: #71717a; /* PLACEHOLDER */
+  background: var(--ds-component-text-area-color-background-hover);
+  border-color: var(--ds-component-text-area-color-border-hover);
 }
 
 .harbor-textarea__input[data-focus-visible] {
@@ -64,37 +77,88 @@
 }
 
 .harbor-textarea__input[data-disabled] {
-  background: #f4f4f5; /* PLACEHOLDER */
-  border-color: #d4d4d8; /* PLACEHOLDER */
-  color: #a1a1aa; /* PLACEHOLDER */
+  background: var(--ds-component-text-area-color-background-disabled);
+  border-color: var(--ds-component-text-area-color-border-disabled);
+  color: var(--ds-component-text-area-color-content-disabled);
   cursor: not-allowed;
   resize: none;
 }
 
-.harbor-textarea[data-readonly] .harbor-textarea__input {
-  background: #f4f4f5; /* PLACEHOLDER */
-  border-style: dashed; /* PLACEHOLDER */
+.harbor-textarea[data-invalid] .harbor-textarea__input:not([data-disabled]) {
+  /* :not([data-disabled]) excludes this rule entirely when both invalid and disabled
+     are set, since it otherwise outranks the disabled rule's lower specificity and
+     would paint an error border on a disabled field. */
+  border-color: var(--ds-component-text-area-color-border-error);
 }
 
-.harbor-textarea[data-invalid] .harbor-textarea__input {
-  border-color: #dc2626; /* PLACEHOLDER */
+.harbor-textarea[data-invalid] .harbor-textarea__input[data-hovered] {
+  border-color: var(--ds-component-text-area-color-border-error-hover);
 }
 
 .harbor-textarea[data-invalid] .harbor-textarea__input[data-focus-visible] {
+  /* Same shared gap/ring geometry as the default focus ring — only the ring color
+     overrides to the error border color (no dedicated error-ring-color token exists,
+     so this reuses the error border token rather than a literal). */
   box-shadow:
     var(--ds-semantic-focus-ring-gap-x) var(--ds-semantic-focus-ring-gap-y) var(--ds-semantic-focus-ring-gap-blur)
       var(--ds-semantic-focus-ring-gap-spread) var(--ds-semantic-focus-ring-gap-color),
     var(--ds-semantic-focus-ring-ring-x) var(--ds-semantic-focus-ring-ring-y) var(--ds-semantic-focus-ring-ring-blur)
       var(--ds-semantic-focus-ring-ring-spread)
-      #dc2626; /* PLACEHOLDER — error ring color */
+      var(--ds-component-text-area-color-border-error);
 }
 
 .harbor-textarea__description {
-  font-size: 12px; /* PLACEHOLDER */
-  color: #71717a; /* PLACEHOLDER */
+  display: flex;
+  align-items: flex-start; /* icon stays pinned to the first line when text wraps */
+  gap: var(--ds-component-helper-text-gap);
+  font-family: var(--ds-semantic-typography-body-sm-font-family);
+  font-size: var(--ds-semantic-typography-body-sm-font-size);
+  font-weight: var(--ds-semantic-typography-body-sm-font-weight);
+  line-height: var(--ds-semantic-typography-body-sm-line-height);
+  letter-spacing: var(--ds-semantic-typography-body-sm-letter-spacing);
+  color: var(--ds-component-helper-text-color-content);
+}
+
+.harbor-textarea__description-icon {
+  flex-shrink: 0;
+  inline-size: var(--ds-component-helper-text-icon-size);
+  block-size: var(--ds-component-helper-text-icon-size);
+}
+
+.harbor-textarea__description-text {
+  flex: 1 1 auto;
+  min-width: 0; /* flex items default to min-width:auto, which blocks wrapping/shrinking */
+  overflow-wrap: break-word;
+}
+
+.harbor-textarea[data-invalid] .harbor-textarea__description {
+  /* FieldError already hides itself when the field is valid (react-aria-components
+     only renders it while isInvalid). Description has no such built-in behavior, so
+     it must be hidden here to keep the two mutually exclusive, matching RAC's
+     documented help-text pattern. */
+  display: none;
 }
 
 .harbor-textarea__error {
-  font-size: 12px; /* PLACEHOLDER */
-  color: #dc2626; /* PLACEHOLDER */
+  display: flex;
+  align-items: flex-start; /* icon stays pinned to the first line when text wraps */
+  gap: var(--ds-component-error-text-gap);
+  font-family: var(--ds-semantic-typography-body-sm-font-family);
+  font-size: var(--ds-semantic-typography-body-sm-font-size);
+  font-weight: var(--ds-semantic-typography-body-sm-font-weight);
+  line-height: var(--ds-semantic-typography-body-sm-line-height);
+  letter-spacing: var(--ds-semantic-typography-body-sm-letter-spacing);
+  color: var(--ds-component-error-text-color-content);
+}
+
+.harbor-textarea__error-icon {
+  flex-shrink: 0;
+  inline-size: var(--ds-component-error-text-icon-size);
+  block-size: var(--ds-component-error-text-icon-size);
+}
+
+.harbor-textarea__error-text {
+  flex: 1 1 auto;
+  min-width: 0; /* flex items default to min-width:auto, which blocks wrapping/shrinking */
+  overflow-wrap: break-word;
 }

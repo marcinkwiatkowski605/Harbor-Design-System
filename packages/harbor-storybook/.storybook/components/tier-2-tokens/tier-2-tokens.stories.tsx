@@ -147,27 +147,27 @@ const colorGroups: ColorGroup[] = [
     contexts: [
       { key: '', useCase: 'Default background for pages, cards, and containers' },
       { key: 'hover', useCase: 'Hover color for the default background' },
-      { key: 'selected', useCase: 'Selected color for the default background' },
+      { key: 'pressed', useCase: 'Pressed color for the default background' },
       { key: 'disabled', useCase: 'Background for disabled controls and containers' },
       { key: 'subtle', useCase: 'Recessed, low-emphasis background' },
       { key: 'accent', useCase: 'Background for accent-emphasis elements' },
       { key: 'accent-hover', useCase: 'Hover color for `background-accent`' },
-      { key: 'accent-selected', useCase: 'Selected color for `background-accent`' },
+      { key: 'accent-pressed', useCase: 'Pressed color for `background-accent`' },
       { key: 'brand', useCase: 'Background for primary, brand-emphasis controls' },
       { key: 'brand-hover', useCase: 'Hover color for `background-brand`' },
-      { key: 'brand-selected', useCase: 'Selected color for `background-brand`' },
+      { key: 'brand-pressed', useCase: 'Pressed color for `background-brand`' },
       { key: 'error', useCase: 'Background for error or destructive states' },
       { key: 'error-hover', useCase: 'Hover color for `background-error`' },
-      { key: 'error-selected', useCase: 'Selected color for `background-error`' },
+      { key: 'error-pressed', useCase: 'Pressed color for `background-error`' },
       { key: 'info', useCase: 'Background for informational content' },
       { key: 'info-hover', useCase: 'Hover color for `background-info`' },
-      { key: 'info-selected', useCase: 'Selected color for `background-info`' },
+      { key: 'info-pressed', useCase: 'Pressed color for `background-info`' },
       { key: 'success', useCase: 'Background for success states' },
       { key: 'success-hover', useCase: 'Hover color for `background-success`' },
-      { key: 'success-selected', useCase: 'Selected color for `background-success`' },
+      { key: 'success-pressed', useCase: 'Pressed color for `background-success`' },
       { key: 'warning', useCase: 'Background for warnings' },
       { key: 'warning-hover', useCase: 'Hover color for `background-warning`' },
-      { key: 'warning-selected', useCase: 'Selected color for `background-warning`' },
+      { key: 'warning-pressed', useCase: 'Pressed color for `background-warning`' },
     ],
   },
   {
@@ -175,11 +175,13 @@ const colorGroups: ColorGroup[] = [
     contexts: [
       { key: '', useCase: 'Default border for containers and controls' },
       { key: 'hover', useCase: 'Hover color for the default border' },
-      { key: 'selected', useCase: 'Selected color for the default border' },
+      { key: 'pressed', useCase: 'Pressed color for the default border' },
       { key: 'disabled', useCase: 'Border for disabled controls' },
       { key: 'accent', useCase: 'Border for accent-emphasis elements' },
       { key: 'brand', useCase: 'Border for brand-emphasis or selected controls' },
       { key: 'error', useCase: 'Border communicating an error or destructive state' },
+      { key: 'error-hover', useCase: 'Hover color for `border-error`' },
+      { key: 'error-pressed', useCase: 'Pressed color for `border-error`' },
       { key: 'info', useCase: 'Border communicating informational content' },
       { key: 'success', useCase: 'Border communicating a success state' },
       { key: 'warning', useCase: 'Border communicating a warning' },
@@ -212,12 +214,12 @@ const colorGroups: ColorGroup[] = [
 // Splits a flattened context key back into design_tokens.json path segments.
 // Covers every key shape actually used in colorGroups below: '' is the base value
 // (segments live directly under the role), 'on-*' names are one literal segment
-// (never split), and '*-hover' / '*-selected' are the only two-segment shapes.
+// (never split), and '*-hover' / '*-pressed' are the only two-segment shapes.
 const splitContextKey = (key: string): string[] => {
   if (key === '') return [];
   if (key.startsWith('on-')) return [key];
   if (key.endsWith('-hover')) return [key.slice(0, -'-hover'.length), 'hover'];
-  if (key.endsWith('-selected')) return [key.slice(0, -'-selected'.length), 'selected'];
+  if (key.endsWith('-pressed')) return [key.slice(0, -'-pressed'.length), 'pressed'];
   return [key];
 };
 
@@ -380,6 +382,64 @@ export const Spacing: StoryObj = {
               </div>
               <TokenLabel>{size}</TokenLabel>
               <TokenLabel>--ds-semantic-spacing-stack-{size}</TokenLabel>
+            </div>
+          ))}
+        </div>
+      </Section>
+    </div>
+  ),
+};
+
+// ─── Sizing ──────────────────────────────────────────────────────────────────
+// Shares the same Tier 1 `dimension` ramp as Spacing above, under a different
+// Tier 2 role: the width/height of a thing (icon glyphs, control heights) rather
+// than a gap between things. `control` only goes up to `lg` today — no component
+// has needed an `xs`/`xl` control height yet, so those steps don't exist.
+
+const iconSizes = ['xs', 'sm', 'md', 'lg', 'xl'];
+const controlSizes = ['sm', 'md', 'lg'];
+
+export const Sizing: StoryObj = {
+  render: () => (
+    <div style={{ padding: 24, ...baseStyle }}>
+      <Section title="Sizing · icon (icon glyph width/height)">
+        <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+          {iconSizes.map(size => (
+            <div key={size} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' as const }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                inlineSize: `var(--ds-semantic-sizing-icon-${size})`,
+                blockSize: `var(--ds-semantic-sizing-icon-${size})`,
+                background: 'var(--ds-primitive-color-brand-lavender-500)',
+                borderRadius: 4,
+                marginBottom: 6,
+              }} />
+              <TokenLabel>{size}</TokenLabel>
+              <TokenLabel>--ds-semantic-sizing-icon-{size}</TokenLabel>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Sizing · control (form control / button height)">
+        <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+          {controlSizes.map(size => (
+            <div key={size} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' as const }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                inlineSize: 96,
+                blockSize: `var(--ds-semantic-sizing-control-${size})`,
+                background: 'var(--ds-primitive-color-neutral-50)',
+                border: '1px solid var(--ds-primitive-color-neutral-300)',
+                borderRadius: 4,
+                marginBottom: 6,
+              }} />
+              <TokenLabel>{size}</TokenLabel>
+              <TokenLabel>--ds-semantic-sizing-control-{size}</TokenLabel>
             </div>
           ))}
         </div>

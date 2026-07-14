@@ -17,7 +17,7 @@
   justify-content: center;
   box-sizing: border-box;
   block-size: var(--ds-component-button-height);
-  padding-inline: var(--ds-component-button-padding);
+  padding-inline: var(--ds-component-button-padding-inline);
   border-radius: var(--ds-component-button-border-radius);
   border: var(--ds-component-button-border-width) solid transparent;
 
@@ -57,8 +57,8 @@
   color: var(--ds-component-button-primary-color-content-hover);
 }
 .harbor-button[data-variant='primary'][data-pressed] {
-  background: var(--ds-component-button-primary-color-background-selected);
-  color: var(--ds-component-button-primary-color-content-selected);
+  background: var(--ds-component-button-primary-color-background-pressed);
+  color: var(--ds-component-button-primary-color-content-pressed);
 }
 .harbor-button[data-variant='primary'][data-disabled] {
   background: var(--ds-component-button-primary-color-background-disabled);
@@ -76,8 +76,8 @@
   color: var(--ds-component-button-secondary-color-content-hover);
 }
 .harbor-button[data-variant='secondary'][data-pressed] {
-  background: var(--ds-component-button-secondary-color-background-selected);
-  color: var(--ds-component-button-secondary-color-content-selected);
+  background: var(--ds-component-button-secondary-color-background-pressed);
+  color: var(--ds-component-button-secondary-color-content-pressed);
 }
 .harbor-button[data-variant='secondary'][data-disabled] {
   background: var(--ds-component-button-secondary-color-background-disabled);
@@ -97,9 +97,9 @@
   border-color: var(--ds-component-button-outline-color-border-hover);
 }
 .harbor-button[data-variant='outline'][data-pressed] {
-  background: var(--ds-component-button-outline-color-background-selected);
-  color: var(--ds-component-button-outline-color-content-selected);
-  border-color: var(--ds-component-button-outline-color-border-selected);
+  background: var(--ds-component-button-outline-color-background-pressed);
+  color: var(--ds-component-button-outline-color-content-pressed);
+  border-color: var(--ds-component-button-outline-color-border-pressed);
 }
 .harbor-button[data-variant='outline'][data-disabled] {
   background: var(--ds-component-button-outline-color-background-disabled);

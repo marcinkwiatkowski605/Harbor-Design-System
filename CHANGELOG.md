@@ -1,3 +1,17 @@
+# [2.0.0](https://github.com/marcinkwiatkowski605/Harbor-Design-System/compare/v1.3.0...v2.0.0) (2026-07-14)
+
+
+* feat!: wire form components to real tokens and rename Button pressed state ([68d2565](https://github.com/marcinkwiatkowski605/Harbor-Design-System/commit/68d256560b1d6e5ef55f8248e7a8af4f17c25e1c)), closes [#2](https://github.com/marcinkwiatkowski605/Harbor-Design-System/issues/2)
+
+
+### BREAKING CHANGES
+
+* Button's Selected state tokens are renamed to Pressed
+across primary/secondary/outline (background/content/border) in
+design_tokens.json / @harbords/tokens. Six unused TextField/TextArea
+Pressed-state tokens were removed. Consumers referencing the old
+*-selected-* token names must update to *-pressed-*.
+
 # [1.3.0](https://github.com/marcinkwiatkowski605/Harbor-Design-System/compare/v1.2.0...v1.3.0) (2026-07-09)
 
 

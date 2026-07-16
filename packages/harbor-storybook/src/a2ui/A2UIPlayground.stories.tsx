@@ -13,7 +13,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { MessageProcessor, type A2uiMessage, type SurfaceModel } from '@a2ui/web_core/v0_9';
 import { A2uiSurface, type ReactComponentImplementation } from '@a2ui/react/v0_9';
 import { harborCatalog } from './catalog';
-import { buildMessages, type GeneratedUI } from './schema';
+import { buildMessages, SURFACE_ID, type GeneratedUI } from './schema';
 
 function Playground() {
   const [prompt, setPrompt] = useState('a contact form with a name field and a submit button');
@@ -42,8 +42,25 @@ function Playground() {
         body: JSON.stringify({ prompt }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? 'Generation failed');
+      if (!res.ok) {
+        // The middleware's `detail` carries the actual `claude` CLI stderr or
+        // parse exception — the most useful debugging info for a PoC. Surface
+        // it instead of discarding it.
+        throw new Error(data.detail ? `${data.error}: ${data.detail}` : (data.error ?? 'Generation failed'));
+      }
       const generated = data.generated as GeneratedUI;
+      // buildMessages() always emits a createSurface for the fixed SURFACE_ID.
+      // MessageProcessor.processCreateSurfaceMessage throws
+      // A2uiStateError(`Surface ${SURFACE_ID} already exists.`) if that surface
+      // is still registered (see
+      // node_modules/@a2ui/web_core/src/v0_9/processing/message-processor.js),
+      // and processMessages() processes messages in order and stops at the
+      // first throw — so every generation after the first would fail before
+      // its updateComponents/updateDataModel ever ran. Delete the previous
+      // surface (if any) first so createSurface can succeed again.
+      if (processor.model.getSurface(SURFACE_ID)) {
+        processor.processMessages([{ version: 'v0.9', deleteSurface: { surfaceId: SURFACE_ID } }]);
+      }
       // schema.ts's `A2UIMessage` is a deliberately loose builder-side type (all
       // three message-kind fields optional, so `buildMessages` can return a
       // uniform array); the library's `A2uiMessage` is the exact zod-inferred
@@ -83,6 +100,7 @@ function Playground() {
         onChange={(e) => setPrompt(e.target.value)}
         rows={3}
         placeholder="Describe the UI you want…"
+        aria-label="Describe the UI you want"
         style={{ padding: 8, fontFamily: 'inherit' }}
       />
       <button onClick={generate} disabled={loading} style={{ alignSelf: 'flex-start', padding: '8px 16px' }}>

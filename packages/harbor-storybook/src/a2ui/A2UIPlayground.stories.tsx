@@ -114,12 +114,16 @@ function Playground() {
         ))}
       </div>
 
+      {/* TextArea.css's `width: 320px` is explicitly a demo-canvas default, not a
+          token/design decision (see the NOT-A-TOKEN comment there) — override it so
+          the field matches the generated-UI box above instead of floating narrower. */}
       <TextArea
         label="Prompt"
         value={prompt}
         onChange={setPrompt}
         rows={3}
         placeholder="Describe the UI you want…"
+        style={{ width: '100%' }}
       />
       <Button variant="primary" onPress={generate} disabled={loading} style={{ alignSelf: 'flex-start' }}>
         {loading ? 'Generating… (~3s)' : 'Generate UI'}

@@ -1,5 +1,6 @@
 import type { StorybookConfig } from '@storybook/react-vite';
 import remarkGfm from 'remark-gfm';
+import { a2uiMiddleware } from './a2ui-middleware';
 
 const config: StorybookConfig = {
   stories: [
@@ -39,6 +40,7 @@ const config: StorybookConfig = {
         interval: 1000
       }
     };
+    viteConfig.plugins = [...(viteConfig.plugins ?? []), a2uiMiddleware()];
     return viteConfig;
   }
 };

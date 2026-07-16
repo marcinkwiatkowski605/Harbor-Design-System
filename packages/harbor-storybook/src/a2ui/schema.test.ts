@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildMessages, CATALOG_ID, SURFACE_ID } from './schema.ts';
+import { buildMessages, CATALOG_ID, SURFACE_ID, type GeneratedUI } from './schema.ts';
 
 test('buildMessages wraps generated UI into three A2UI v0.9 messages', () => {
-  const generated = {
+  const generated: GeneratedUI = {
     components: [
       { id: 'root', component: 'Stack', children: ['title', 'submit'] },
       { id: 'title', component: 'Text', text: { path: '/title' } },
@@ -31,5 +31,5 @@ test('buildMessages wraps generated UI into three A2UI v0.9 messages', () => {
 
 test('buildMessages defaults an empty data model', () => {
   const msgs = buildMessages({ components: [] });
-  assert.deepEqual(msgs[2].updateDataModel.value, {});
+  assert.deepEqual(msgs[2].updateDataModel?.value, {});
 });

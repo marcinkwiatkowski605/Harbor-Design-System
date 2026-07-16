@@ -4,6 +4,16 @@ Ground-truth reference for the A2UI proof-of-concept. Every signature below was
 copied verbatim from the installed `.d.ts` files, not from the README. Later
 code (catalog wrappers, the Playground story) should match these exactly.
 
+**Contents:** [Package layout](#package-layout-differs-from-what-the-plan-assumed) ·
+[1. `createComponentImplementation`](#1-createcomponentimplementationapi-rendercomponent) ·
+[2. `Catalog`](#2-catalog-constructor) ·
+[3. `MessageProcessor`](#3-messageprocessor--surface-listeners) ·
+[4. `A2uiSurface`](#4-a2uisurface--required-props) ·
+[5. `CommonSchemas`](#5-commonschemas) ·
+[6. Message shapes](#6-message-object-shapes-server--client) ·
+[End-to-end example](#end-to-end-example) ·
+[Concerns](#concerns--things-needing-runtime-verification)
+
 ## Package layout (differs from what the plan assumed)
 
 - Installed versions: `@a2ui/react@0.10.0`, and it resolves `@a2ui/web_core@0.10.4`
@@ -123,6 +133,13 @@ in its schema, then in render map over `props.children`, and for each item call
 `buildChild(id, basePath)` (handling both the string and `{id, basePath}` forms), and
 place the returned nodes inside the Harbor layout component.
 
+To confirm the per-item runtime shape once a real container renders, drop this in its
+render function:
+
+```ts
+console.log('children shape:', JSON.stringify(props.children));
+```
+
 ---
 
 ## 2. `Catalog` constructor
@@ -151,8 +168,39 @@ plain array of component impls (each a `ReactComponentImplementation`, which ext
 `id` is a catalog URL string. The bundled `basicCatalog.id` is
 `"https://a2ui.org/specification/v0_9/basic_catalog.json"`.
 
-Custom functions use `createFunctionImplementation(api, execute)` where
-`api = { name, returnType: 'string'|'number'|'boolean'|'array'|'object'|'any'|'void', schema: ZodTypeAny }`.
+Custom functions (for `Catalog`'s `functions?` arg) are built with
+`createFunctionImplementation`, from `@a2ui/web_core/v0_9` `catalog/types.d.ts`:
+
+```ts
+type A2uiReturnType = 'string' | 'number' | 'boolean' | 'array' | 'object' | 'any' | 'void';
+
+interface FunctionApi {
+    readonly name: string;
+    readonly returnType: A2uiReturnType;
+    readonly schema: z.ZodTypeAny;
+}
+
+interface FunctionImplementation extends FunctionApi {
+    execute(args: Record<string, any>, context: DataContext, abortSignal?: AbortSignal): unknown | Signal<unknown>;
+}
+
+declare function createFunctionImplementation<Schema extends z.ZodTypeAny, TReturn extends A2uiReturnType>(
+    api: {
+        name: string;
+        returnType: TReturn;
+        schema: Schema;
+    },
+    execute: (
+        args: z.infer<Schema>,
+        context: DataContext,
+        abortSignal?: AbortSignal,
+    ) => InferA2uiReturnType<TReturn> | Signal<InferA2uiReturnType<TReturn>>,
+): FunctionImplementation;
+```
+
+`execute` receives the parsed args (typed from `schema`), a `DataContext`, and an
+optional `AbortSignal`, and returns either the plain result or a reactive `Signal`
+wrapping it.
 
 ---
 
@@ -328,6 +376,60 @@ Field-name notes (easy to get wrong):
 
 There is also a raw JSON-schema mirror exported as `Schemas.A2uiMessageSchemaRaw` from
 `@a2ui/web_core/v0_9`, useful if you want to hand Claude a JSON schema for the payload.
+
+---
+
+## End-to-end example
+
+Composes sections 1–4 into one wiring: a component impl built from `CommonSchemas`,
+placed in a `Catalog`, driving a `MessageProcessor`, rendered via `A2uiSurface`. This is
+the shape Task 5 (catalog wrappers) and Task 8 (Playground story) should adapt directly.
+
+```tsx
+import { z } from 'zod';
+import { Catalog, CommonSchemas, MessageProcessor } from '@a2ui/web_core/v0_9';
+import { A2uiSurface, createComponentImplementation } from '@a2ui/react/v0_9';
+
+// 1. Component API + impl (section 1, 5)
+const ButtonApi = {
+  name: 'Button',
+  schema: z.object({
+    label: CommonSchemas.DynamicString,
+    onClick: CommonSchemas.Action,
+  }),
+};
+const Button = createComponentImplementation(ButtonApi, ({ props }) => (
+  <button onClick={props.onClick}>{props.label}</button>
+));
+
+// 2. Catalog (section 2)
+const harborCatalog = new Catalog('https://example.com/catalogs/harbor-poc.json', [Button]);
+
+// 3. Processor + a hardcoded message sequence (section 3, 6)
+const processor = new MessageProcessor([harborCatalog]);
+processor.processMessages([
+  { version: 'v0.9', createSurface: { surfaceId: 'main', catalogId: harborCatalog.id } },
+  {
+    version: 'v0.9',
+    updateComponents: {
+      surfaceId: 'main',
+      components: [
+        { id: 'root', component: 'Button', label: 'Click me', onClick: { event: { name: 'clicked' } } },
+      ],
+    },
+  },
+]);
+
+// 4. Render — one <A2uiSurface> per entry in processor.model.surfacesMap (section 4)
+function App() {
+  const surface = processor.model.surfacesMap.get('main');
+  return surface ? <A2uiSurface surface={surface} /> : null;
+}
+```
+
+A real Playground would replace the hardcoded `processMessages` call with messages
+streamed from Claude, and re-render on `processor.onSurfaceCreated`/`onSurfaceDeleted`
+(see the "Canonical wiring" snippet in section 3) instead of reading `surfacesMap` once.
 
 ---
 

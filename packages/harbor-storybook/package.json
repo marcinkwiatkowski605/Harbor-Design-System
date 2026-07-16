@@ -10,9 +10,12 @@
     "test-storybook": "test-storybook"
   },
   "dependencies": {
+    "@a2ui/react": "0.10.0",
+    "@a2ui/web_core": "^0.10.4",
     "react": "^18.3.0",
     "react-aria-components": "^1.19.0",
-    "react-dom": "^18.3.0"
+    "react-dom": "^18.3.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@storybook/addon-a11y": "^8.4.5",

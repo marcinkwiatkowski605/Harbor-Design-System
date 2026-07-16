@@ -32,8 +32,17 @@ const StackApi = {
   name: 'Stack',
   schema: z.object({ children: CommonSchemas.ChildList }),
 };
+// Vertical gap uses the real `stack` spacing role (docs/foundations/dimensions.md) —
+// `--ds-semantic-spacing-stack-lg` resolves to 1rem/16px, matching the value this used
+// to hardcode, so the visual result is unchanged but now traces back to a named token.
 const Stack = createComponentImplementation(StackApi, ({ props, buildChild }) => (
-  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 'var(--ds-semantic-spacing-stack-lg)',
+    }}
+  >
     {(props.children as StackChildItem[]).map((item, index) => {
       if (item && typeof item === 'object' && 'id' in item) {
         return (

@@ -76,20 +76,36 @@ function Playground() {
     }
   }, [prompt, processor]);
 
+  // This chrome sits around the generated surface (which itself renders through real
+  // tokened Harbor components via harborCatalog) — per docs/foundations/dimensions.md
+  // and color.md, its spacing/border/text values below reference the same real
+  // `--ds-semantic-*` tokens rather than hardcoded placeholders, even though the box
+  // itself isn't a cataloged Harbor component.
   return (
-    <div style={{ maxWidth: 640, display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div
+      style={{
+        maxWidth: 640,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 'var(--ds-semantic-spacing-stack-lg)',
+      }}
+    >
       <div
         style={{
           minHeight: 120,
-          padding: 24,
-          border: '1px dashed #ccc',
-          borderRadius: 8,
+          padding: 'var(--ds-semantic-spacing-inset-xl)',
+          border: 'var(--ds-semantic-border-width-sm) dashed var(--ds-semantic-color-border)',
+          borderRadius: 'var(--ds-semantic-border-radius-md)',
           display: 'flex',
           flexDirection: 'column',
-          gap: 16,
+          gap: 'var(--ds-semantic-spacing-stack-lg)',
         }}
       >
-        {surfaces.length === 0 && <em style={{ color: '#888' }}>Generated UI will appear here.</em>}
+        {surfaces.length === 0 && (
+          <em style={{ color: 'var(--ds-semantic-color-content-secondary)' }}>
+            Generated UI will appear here.
+          </em>
+        )}
         {surfaces.map((s) => (
           <A2uiSurface key={s.id} surface={s} />
         ))}
@@ -101,13 +117,27 @@ function Playground() {
         rows={3}
         placeholder="Describe the UI you want…"
         aria-label="Describe the UI you want"
-        style={{ padding: 8, fontFamily: 'inherit' }}
+        style={{ padding: 'var(--ds-semantic-spacing-inset-sm)', fontFamily: 'inherit' }}
       />
-      <button onClick={generate} disabled={loading} style={{ alignSelf: 'flex-start', padding: '8px 16px' }}>
+      <button
+        onClick={generate}
+        disabled={loading}
+        style={{
+          alignSelf: 'flex-start',
+          padding: 'var(--ds-semantic-spacing-inset-sm) var(--ds-semantic-spacing-inset-lg)',
+        }}
+      >
         {loading ? 'Generating… (~3s)' : 'Generate UI'}
       </button>
-      {error && <div style={{ color: 'crimson' }}>Error: {error}</div>}
-      <p style={{ fontSize: 12, color: '#888' }}>
+      {error && <div style={{ color: 'var(--ds-semantic-color-content-error)' }}>Error: {error}</div>}
+      <p
+        style={{
+          fontFamily: 'var(--ds-semantic-typography-body-sm-font-family)',
+          fontSize: 'var(--ds-semantic-typography-body-sm-font-size)',
+          lineHeight: 'var(--ds-semantic-typography-body-sm-line-height)',
+          color: 'var(--ds-semantic-color-content-secondary)',
+        }}
+      >
         Dev-only: requires <code>npm run storybook</code> (calls the local <code>claude</code> CLI).
         Does not work in the published static Storybook.
       </p>

@@ -14,6 +14,8 @@ import { MessageProcessor, type A2uiMessage, type SurfaceModel } from '@a2ui/web
 import { A2uiSurface, type ReactComponentImplementation } from '@a2ui/react/v0_9';
 import { harborCatalog } from './catalog';
 import { buildMessages, SURFACE_ID, type GeneratedUI } from './schema';
+import { Button } from '../components/Button';
+import { TextArea } from '../components/TextArea';
 
 function Playground() {
   const [prompt, setPrompt] = useState('a contact form with a name field and a submit button');
@@ -85,6 +87,7 @@ function Playground() {
     <div
       style={{
         maxWidth: 640,
+        margin: '0 auto',
         display: 'flex',
         flexDirection: 'column',
         gap: 'var(--ds-semantic-spacing-stack-lg)',
@@ -111,24 +114,16 @@ function Playground() {
         ))}
       </div>
 
-      <textarea
+      <TextArea
         value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
+        onChange={setPrompt}
         rows={3}
         placeholder="Describe the UI you want…"
         aria-label="Describe the UI you want"
-        style={{ padding: 'var(--ds-semantic-spacing-inset-sm)', fontFamily: 'inherit' }}
       />
-      <button
-        onClick={generate}
-        disabled={loading}
-        style={{
-          alignSelf: 'flex-start',
-          padding: 'var(--ds-semantic-spacing-inset-sm) var(--ds-semantic-spacing-inset-lg)',
-        }}
-      >
+      <Button variant="primary" onPress={generate} disabled={loading} style={{ alignSelf: 'flex-start' }}>
         {loading ? 'Generating… (~3s)' : 'Generate UI'}
-      </button>
+      </Button>
       {error && <div style={{ color: 'var(--ds-semantic-color-content-error)' }}>Error: {error}</div>}
       <p
         style={{

@@ -18,7 +18,12 @@ Rules:
 
 Available components (use ONLY these; never invent components or props):
 - Stack: vertical layout container. Props: children (ids).
-- Text: displays text. Props: text ({path} binding).
+- Text: displays text. Props: text ({path} binding), style (optional, default
+  "body-md"). style values, per Harbor's typography foundations doc:
+  "display-default" (hero/marketing-scale, the single largest style),
+  "heading-2xl".."heading-xs" (page/section headings, largest to smallest),
+  "body-lg"/"md"/"sm" (paragraph and UI copy), "label-lg"/"md"/"sm" (form
+  labels, button labels, other short UI text).
 - Button: Harbor button. Props: label (string), variant ("primary" |
   "secondary" | "outline", default "primary").
 - TextField: Harbor labelled input. Props: label (string), placeholder

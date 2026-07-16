@@ -10,6 +10,28 @@ export const SURFACE_ID = 'a2ui-playground';
 /** The four component names the agent may use. Keep in sync with catalog.tsx. */
 export const CATALOG_COMPONENTS = ['Stack', 'Text', 'Button', 'TextField'] as const;
 
+/**
+ * Flat `{group}-{tier}` style values the `Text` component accepts, one per
+ * real Harbor typography token group (`display`, `heading`, `label`, `body`)
+ * confirmed against `--ds-semantic-typography-*` in the built tokens CSS.
+ * Keep in sync with catalog.tsx (imports this constant for its Zod enum).
+ */
+export const TEXT_STYLES = [
+  'display-default',
+  'heading-2xl',
+  'heading-xl',
+  'heading-lg',
+  'heading-md',
+  'heading-sm',
+  'heading-xs',
+  'label-lg',
+  'label-md',
+  'label-sm',
+  'body-lg',
+  'body-md',
+  'body-sm',
+] as const;
+
 export interface ComponentNode {
   id: string;
   component: (typeof CATALOG_COMPONENTS)[number];
@@ -77,6 +99,7 @@ export const GENERATION_JSON_SCHEMA = {
             type: 'object',
             properties: { path: { type: 'string' } },
           },
+          style: { type: 'string', enum: [...TEXT_STYLES] },
         },
         additionalProperties: true,
       },

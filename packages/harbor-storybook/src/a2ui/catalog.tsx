@@ -11,7 +11,7 @@ import { createComponentImplementation } from '@a2ui/react/v0_9';
 import { Catalog, CommonSchemas } from '@a2ui/web_core/v0_9';
 import { Button } from '../components/Button';
 import { TextField } from '../components/TextField';
-import { CATALOG_ID } from './schema';
+import { CATALOG_ID, TEXT_STYLES } from './schema';
 
 // --- Stack: vertical layout container ---------------------------------------
 // Per API-NOTES.md §1 ("How a container renders its children"), a container
@@ -48,11 +48,43 @@ const Stack = createComponentImplementation(StackApi, ({ props, buildChild }) =>
 ));
 
 // --- Text ---------------------------------------------------------------------
+// `style` selects a real Harbor typography token group+tier (see TEXT_STYLES
+// in schema.ts) so generated text can express hierarchy instead of rendering
+// as an unstyled <span>. Every value is exactly one `{group}-{tier}` hyphen
+// pair (verified: all 13 TEXT_STYLES entries contain a single "-"), so a
+// plain two-part split is precise here — no need for a "first hyphen only"
+// split even though `heading-2xl`-style tiers could in principle contain one.
+function splitTextStyle(style: (typeof TEXT_STYLES)[number]): { group: string; tier: string } {
+  const [group, tier] = style.split('-');
+  return { group, tier };
+}
+
 const TextApi = {
   name: 'Text',
-  schema: z.object({ text: CommonSchemas.DynamicString }),
+  schema: z.object({
+    text: CommonSchemas.DynamicString,
+    style: z.enum(TEXT_STYLES).optional(),
+  }),
 };
-const Text = createComponentImplementation(TextApi, ({ props }) => <span>{props.text}</span>);
+const Text = createComponentImplementation(TextApi, ({ props }) => {
+  // Default to body-md: the same tier Harbor's own TextField/TextArea use for
+  // body text, so unstyled generated text still looks intentional.
+  const { group, tier } = splitTextStyle(props.style ?? 'body-md');
+  const cssVar = (property: string) => `var(--ds-semantic-typography-${group}-${tier}-${property})`;
+  return (
+    <span
+      style={{
+        fontFamily: cssVar('font-family'),
+        fontSize: cssVar('font-size'),
+        fontWeight: cssVar('font-weight'),
+        lineHeight: cssVar('line-height'),
+        letterSpacing: cssVar('letter-spacing'),
+      }}
+    >
+      {props.text}
+    </span>
+  );
+});
 
 // --- Button (real Harbor component) --------------------------------------------
 // Per API-NOTES.md §5 ("CommonSchemas"), `Action` is a `{ event } | { functionCall }`

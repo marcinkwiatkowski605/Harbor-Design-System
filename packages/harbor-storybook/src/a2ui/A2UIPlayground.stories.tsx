@@ -115,11 +115,11 @@ function Playground() {
       </div>
 
       <TextArea
+        label="Prompt"
         value={prompt}
         onChange={setPrompt}
         rows={3}
         placeholder="Describe the UI you want…"
-        aria-label="Describe the UI you want"
       />
       <Button variant="primary" onPress={generate} disabled={loading} style={{ alignSelf: 'flex-start' }}>
         {loading ? 'Generating… (~3s)' : 'Generate UI'}

@@ -101,13 +101,21 @@ export const GENERATION_JSON_SCHEMA = {
           },
           style: { type: 'string', enum: [...TEXT_STYLES] },
           rows: { type: 'number' },
+          // `additionalProperties: true` on the option object matches this
+          // file's general looseness philosophy (see the doc-comment above
+          // GENERATION_JSON_SCHEMA): `false` here would let one unexpected
+          // option field (e.g. the real `isDisabled` on SelectOption, which
+          // this flat schema doesn't enumerate) fail the *entire*
+          // structured-output call instead of degrading gracefully like every
+          // other prop does. Zod remains the enforcement layer for
+          // HarborSelect's actual `items` shape at render time.
           items: {
             type: 'array',
             items: {
               type: 'object',
               required: ['id', 'label'],
               properties: { id: { type: 'string' }, label: { type: 'string' } },
-              additionalProperties: false,
+              additionalProperties: true,
             },
           },
         },

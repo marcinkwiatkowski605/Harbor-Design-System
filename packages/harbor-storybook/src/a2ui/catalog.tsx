@@ -177,12 +177,18 @@ const SelectApi = {
     items: z.array(z.object({ id: z.string(), label: z.string() })).optional(),
   }),
 };
+// This is dev-only PoC tooling meant to surface generation problems, not hide
+// them — a silently empty dropdown just makes a bad generation harder to spot
+// (a developer has to open the popover and notice there's nothing in it). So a
+// missing/empty `items` renders one visible, disabled placeholder option
+// instead of an empty-but-functional-looking Select.
+const MISSING_ITEMS_PLACEHOLDER = [{ id: '_missing', label: '⚠ No options generated', isDisabled: true }];
 const HarborSelect = createComponentImplementation(SelectApi, ({ props }) => (
   <Select
     label={props.label}
     placeholder={props.placeholder}
     description={props.description}
-    items={props.items ?? []}
+    items={props.items?.length ? props.items : MISSING_ITEMS_PLACEHOLDER}
   />
 ));
 

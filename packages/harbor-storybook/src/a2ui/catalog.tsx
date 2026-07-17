@@ -130,8 +130,17 @@ const TextFieldApi = {
     description: CommonSchemas.DynamicString.optional(),
   }),
 };
+// TextField.css hardcodes `width: 320px` as a documented demo-canvas default
+// (NOT-A-TOKEN, not a design decision) — override it so generated fields fill
+// the Stack's width instead of floating narrower than Button, which has no
+// such fixed width and stretches naturally via the Stack's flex column.
 const HarborTextField = createComponentImplementation(TextFieldApi, ({ props }) => (
-  <TextField label={props.label} placeholder={props.placeholder} description={props.description} />
+  <TextField
+    label={props.label}
+    placeholder={props.placeholder}
+    description={props.description}
+    style={{ width: '100%' }}
+  />
 ));
 
 // --- TextArea (real Harbor component) --------------------------------------------
@@ -147,12 +156,15 @@ const TextAreaApi = {
     rows: z.number().optional(),
   }),
 };
+// Same width override as HarborTextField — TextArea.css's `width: 320px` is
+// the same documented demo-canvas default, not a design decision.
 const HarborTextArea = createComponentImplementation(TextAreaApi, ({ props }) => (
   <TextArea
     label={props.label}
     placeholder={props.placeholder}
     description={props.description}
     rows={props.rows}
+    style={{ width: '100%' }}
   />
 ));
 
@@ -183,12 +195,15 @@ const SelectApi = {
 // missing/empty `items` renders one visible, disabled placeholder option
 // instead of an empty-but-functional-looking Select.
 const MISSING_ITEMS_PLACEHOLDER = [{ id: '_missing', label: '⚠ No options generated', isDisabled: true }];
+// Same width override as HarborTextField — Select.css's `width: 320px` is the
+// same documented demo-canvas default, not a design decision.
 const HarborSelect = createComponentImplementation(SelectApi, ({ props }) => (
   <Select
     label={props.label}
     placeholder={props.placeholder}
     description={props.description}
     items={props.items?.length ? props.items : MISSING_ITEMS_PLACEHOLDER}
+    style={{ width: '100%' }}
   />
 ));
 

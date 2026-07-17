@@ -7,8 +7,8 @@
 export const CATALOG_ID = 'https://harbor.design/a2ui/catalog/v1.json';
 export const SURFACE_ID = 'a2ui-playground';
 
-/** The four component names the agent may use. Keep in sync with catalog.tsx. */
-export const CATALOG_COMPONENTS = ['Stack', 'Text', 'Button', 'TextField'] as const;
+/** The six component names the agent may use. Keep in sync with catalog.tsx. */
+export const CATALOG_COMPONENTS = ['Stack', 'Text', 'Button', 'TextField', 'TextArea', 'Select'] as const;
 
 /**
  * Flat `{group}-{tier}` style values the `Text` component accepts, one per
@@ -100,6 +100,16 @@ export const GENERATION_JSON_SCHEMA = {
             properties: { path: { type: 'string' } },
           },
           style: { type: 'string', enum: [...TEXT_STYLES] },
+          rows: { type: 'number' },
+          items: {
+            type: 'array',
+            items: {
+              type: 'object',
+              required: ['id', 'label'],
+              properties: { id: { type: 'string' }, label: { type: 'string' } },
+              additionalProperties: false,
+            },
+          },
         },
         additionalProperties: true,
       },

@@ -1,16 +1,19 @@
 // A2UI PoC — Harbor component catalog (Zod-schema'd wrappers).
 //
-// Wires real Harbor components (`Button`, `TextField`) plus two generic
-// layout/content primitives (`Stack`, `Text`) into the `@a2ui/react` v0.9
-// component-implementation API. See src/a2ui/API-NOTES.md for the verified
-// ground-truth signatures this file adapts to (installed @a2ui/react 0.10.0 /
-// @a2ui/web_core 0.10.4, imported from their `/v0_9` subpaths).
+// Wires real Harbor components (`Button`, `TextField`, `TextArea`, `Select`)
+// plus two generic layout/content primitives (`Stack`, `Text`) into the
+// `@a2ui/react` v0.9 component-implementation API. See src/a2ui/API-NOTES.md
+// for the verified ground-truth signatures this file adapts to (installed
+// @a2ui/react 0.10.0 / @a2ui/web_core 0.10.4, imported from their `/v0_9`
+// subpaths).
 import React from 'react';
 import { z } from 'zod';
 import { createComponentImplementation } from '@a2ui/react/v0_9';
 import { Catalog, CommonSchemas } from '@a2ui/web_core/v0_9';
 import { Button } from '../components/Button';
 import { TextField } from '../components/TextField';
+import { TextArea } from '../components/TextArea';
+import { Select } from '../components/Select';
 import { CATALOG_ID, TEXT_STYLES } from './schema';
 
 // --- Stack: vertical layout container ---------------------------------------
@@ -131,11 +134,63 @@ const HarborTextField = createComponentImplementation(TextFieldApi, ({ props }) 
   <TextField label={props.label} placeholder={props.placeholder} description={props.description} />
 ));
 
+// --- TextArea (real Harbor component) --------------------------------------------
+// Same label/placeholder/description pattern as TextField, plus `rows` (a plain
+// number, not a Dynamic* schema — it's a layout hint the model picks once per
+// field, not something bound to the data model).
+const TextAreaApi = {
+  name: 'TextArea',
+  schema: z.object({
+    label: CommonSchemas.DynamicString.optional(),
+    placeholder: CommonSchemas.DynamicString.optional(),
+    description: CommonSchemas.DynamicString.optional(),
+    rows: z.number().optional(),
+  }),
+};
+const HarborTextArea = createComponentImplementation(TextAreaApi, ({ props }) => (
+  <TextArea
+    label={props.label}
+    placeholder={props.placeholder}
+    description={props.description}
+    rows={props.rows}
+  />
+));
+
+// --- Select (real Harbor component) ------------------------------------------
+// `items` is literal option *content* (id+label pairs to render in the list),
+// not references to other nodes in the component tree — unlike Stack's
+// `children`, these ids are never looked up via `buildChild`. That means this
+// is NOT a CommonSchemas.ChildList situation: ChildList resolves (STRUCTURAL)
+// to `{ id, basePath }` pointers into the surface's own component tree, which
+// is the wrong shape for "here are the options" data the model invents inline.
+// None of CommonSchemas' Dynamic* helpers fit either (they're for a single
+// bound value, not a list of structured records). A plain Zod array-of-objects
+// is the closest match to what Select.tsx's `items: SelectOption[]` already
+// expects, so declare it directly rather than force-fitting a CommonSchemas
+// helper that doesn't model this shape.
+const SelectApi = {
+  name: 'Select',
+  schema: z.object({
+    label: CommonSchemas.DynamicString.optional(),
+    placeholder: CommonSchemas.DynamicString.optional(),
+    description: CommonSchemas.DynamicString.optional(),
+    items: z.array(z.object({ id: z.string(), label: z.string() })).optional(),
+  }),
+};
+const HarborSelect = createComponentImplementation(SelectApi, ({ props }) => (
+  <Select
+    label={props.label}
+    placeholder={props.placeholder}
+    description={props.description}
+    items={props.items ?? []}
+  />
+));
+
 // --- Assemble the catalog ---------------------------------------------------------
 // Catalog(id, components[], functions?) — API-NOTES.md §2. No custom logic
 // functions in this PoC, so the third arg is an empty array.
 export const harborCatalog = new Catalog(
   CATALOG_ID,
-  [Stack, Text, HarborButton, HarborTextField],
+  [Stack, Text, HarborButton, HarborTextField, HarborTextArea, HarborSelect],
   [],
 );

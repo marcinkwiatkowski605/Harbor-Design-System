@@ -25,10 +25,29 @@ Available components (use ONLY these; never invent components or props):
   "body-lg"/"md"/"sm" (paragraph and UI copy), "label-lg"/"md"/"sm" (form
   labels, button labels, other short UI text).
 - Button: Harbor button. Props: label (string), variant ("primary" |
-  "secondary" | "outline", default "primary").
-- TextField: Harbor labelled input. Props: label (string), placeholder
-  (string), description (string, optional helper text).
+  "secondary" | "outline", default "primary"). Choose variant by hierarchy,
+  not looks: one "primary" per interface, "outline"/"secondary" for the rest.
+  Keep labels short and verb-led ("Save changes", not "Changes will be saved").
+- TextField: Harbor labelled input, single line. Props: label (string),
+  placeholder (string), description (string, optional helper text shown
+  before the person types — format hints, why you're asking). Keep labels
+  short and specific ("Email address", not "Enter your email address here").
+  There is no error-message support in this catalog; don't imply validation
+  feedback.
+- TextArea: Harbor labelled multi-line input. Props: label (string),
+  placeholder (string), description (string, optional helper text), rows
+  (number, optional). Use for anything longer than a short phrase — comments,
+  descriptions, open-ended feedback; use TextField instead for a single line
+  (names, emails, search). Set rows to roughly the expected answer length —
+  too few and people scroll a tiny box, too many and a short answer looks lost.
+- Select: Harbor dropdown. Props: label (string), placeholder (string),
+  description (string, optional helper text), items (array of {id, label} —
+  required, the selectable options). This catalog has no radio-button
+  alternative, so Select is the tool for any single-choice list here; it's
+  the clear fit once there are more than ~5 options. Keep option labels short
+  and parallel in structure (all nouns, or all sentence-case phrases).
 
 Keep interfaces small and sensible. Prefer a single "root" Stack containing the
-fields and actions the user asked for.
+fields and actions the user asked for. Just like a single Button should be
+"primary" per interface, don't generate multiple competing calls to action.
 `.trim();

@@ -23,10 +23,10 @@ The project includes:
 
 ## Project status
 
-**Button** is finished: fully tokenized, documented against real values, and
-design-verified. **Select**, **TextField**, and **TextArea** are functional and
-accessible but still run on placeholder colors and sizes — flagged 🚧 in the Storybook
-sidebar — pending a token pass once their Figma specs exist; see
+**Button**, **TextField**, and **TextArea** are fully token-driven and accessible;
+**Button** is additionally design-verified against Figma and documented with a WCAG 2.2
+audit. **Select**'s field and trigger are token-driven, but its dropdown menu still runs
+on clearly-marked placeholder values pending its Figma tokens; see
 [Token coverage](#token-coverage) for what "placeholder" means in the CSS.
 
 ## Prerequisites
@@ -103,12 +103,12 @@ handling.
 
 ### Token coverage
 
-**Button** is fully token-driven (`--ds-component-button-*`). **Select**, **TextField**,
-and **TextArea** are new and don't have component tokens yet, so their CSS uses
-clearly-marked placeholder values (see each component's `.css` file) pending a token pass
-— their Storybook sidebar entries are flagged 🚧 until then. The shared focus ring
-(`--ds-semantic-focus-ring-*`) is already token-driven everywhere, since it doesn't depend
-on any per-component token.
+**Button**, **TextField**, and **TextArea** are fully token-driven (`--ds-component-*`);
+their only non-token values are `NOT-A-TOKEN`-marked demo canvas widths. **Select**'s
+field and trigger are token-driven, but its dropdown surface (popover, list box, options)
+still uses clearly-marked `PLACEHOLDER` values (see `Select.css`), because Figma has no
+tokens for that surface yet. The shared focus ring (`--ds-semantic-focus-ring-*`) is
+token-driven everywhere, since it doesn't depend on any per-component token.
 
 ### CI audit
 

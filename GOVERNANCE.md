@@ -122,17 +122,22 @@ the others report but do not yet block.
 
 ## Component readiness
 
-A component's Storybook sidebar entry advertises its state. The maintainer promotes
-a component from placeholder to done only after real tokens back every value.
+A component is token-driven once real `--ds-component-*` tokens back every value that
+carries a design decision. The maintainer wires a component to tokens only after its
+Figma spec exists, so readiness tracks the Figma work rather than the React code.
 
-- **Done** — fully token-driven and design-verified against Figma. **Button** is the
-  only component at this level.
-- **🚧 Placeholder** — functional and accessible, but the CSS uses clearly marked
-  placeholder colors and sizes pending a token pass. **Select**, **TextField**, and
-  **TextArea** are here, awaiting their Figma specs.
+- **Fully token-driven** — **Button**, **TextField**, and **TextArea**. Every color,
+  dimension, and state maps to a `--ds-component-*` token. The only non-token values
+  are `NOT-A-TOKEN`-marked demo canvas widths, which are not design decisions.
+- **Partially token-driven** — **Select**. Its trigger and field are fully tokenized,
+  but the dropdown surface (popover, list box, and options) still uses clearly marked
+  `PLACEHOLDER` values, because Figma has no component tokens for that surface yet.
+
+Button carries an additional layer the others do not: it is design-verified against
+Figma and documented with a WCAG 2.2 contrast and target-size audit.
 
 The shared focus ring (`--ds-semantic-focus-ring-*`) is token-driven on every
-component regardless of readiness, because it depends on no per-component token.
+component, because it depends on no per-component token.
 
 ## Documentation pipeline
 
@@ -197,8 +202,9 @@ design-to-code workflow. It deliberately does not do the following:
   encode provenance, not switchable modes.
 - **No multi-brand delivery.** The Figma file defines a Brand A primitive
   collection, but the build ships a single brand.
-- **A partial component set.** Four components exist. Only Button is fully
-  tokenized; the other three run on placeholders until their Figma specs land.
+- **A small component set.** Four components exist — Button, TextField, TextArea,
+  and Select. Button, TextField, and TextArea are fully token-driven; Select's
+  dropdown surface still runs on placeholders until its Figma tokens land.
 - **No blocking visual or interaction test suite.** The Storybook smoke test is
   non-blocking by design; there is no visual-regression gate.
 - **A single-maintainer process.** There is no formal contributor onboarding, RFC

@@ -178,6 +178,12 @@ No manual version bumps or changelog edits.
 npm install @harbords/tokens   # Consume the published design tokens package
 ```
 
+## Governance
+
+How Harbor is maintained — roles, the source of truth for tokens and docs, change
+classification and versioning, and the CI quality gates — is documented in
+[GOVERNANCE.md](./GOVERNANCE.md).
+
 ## License
 
 [MIT](./LICENSE)

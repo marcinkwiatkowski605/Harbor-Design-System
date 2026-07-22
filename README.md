@@ -42,7 +42,11 @@ npm start               # Start Storybook at http://localhost:6006
 npm run build:storybook # Build the static Storybook site
 npm run build:llms      # Regenerate docs/ from the component/foundations MDX
 npm run audit:tokens    # Fail if component CSS has an unmarked hardcoded value
+npm run lint            # Run ESLint
 ```
+
+A pre-push hook (`.husky/pre-push`) runs `npm run build` and `npm run lint` before every push,
+so a build or lint failure is caught locally rather than in CI.
 
 ## Monorepo layout (npm workspaces)
 

@@ -19,12 +19,18 @@ export default tseslint.config(
   {
     files: ["packages/*/**/*.{ts,tsx}"],
     extends: [
-      ...tseslint.configs.recommended,
+      ...tseslint.configs.recommendedTypeChecked,
       react.configs.flat.recommended,
       react.configs.flat["jsx-runtime"],
     ],
     languageOptions: {
       globals: globals.browser,
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: ["packages/harbor-tokens/index.ts"],
+        },
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
     plugins: {
       "react-hooks": reactHooks,

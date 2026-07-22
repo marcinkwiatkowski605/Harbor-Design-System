@@ -53,7 +53,7 @@ const buildTierIndex = (raw: Record<string, unknown>): Map<string, string> => {
   return index;
 };
 
-const tierIndex = buildTierIndex(designTokens as unknown as Record<string, unknown>);
+const tierIndex = buildTierIndex(designTokens);
 
 // Walks `segments` from the design_tokens.json root; if the final node has no
 // $value of its own but has an "@" child, descends into that instead (same remap).

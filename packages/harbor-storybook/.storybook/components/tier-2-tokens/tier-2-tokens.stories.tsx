@@ -53,7 +53,7 @@ const buildTierIndex = (raw: Record<string, unknown>): Map<string, string> => {
   return index;
 };
 
-const tierIndex = buildTierIndex(designTokens as unknown as Record<string, unknown>);
+const tierIndex = buildTierIndex(designTokens);
 
 // Walks `segments` from the design_tokens.json root; if the final node has no
 // $value of its own but has an "@" child, descends into that instead (same remap).
@@ -482,11 +482,11 @@ export const Typography: StoryObj = {
               <span style={{
                 fontFamily: `var(${prefix}-font-family)`,
                 fontSize: `var(${prefix}-font-size)`,
-                fontWeight: `var(${prefix}-font-weight)` as any,
-                fontStyle: `var(${prefix}-font-style)` as any,
+                fontWeight: `var(${prefix}-font-weight)`,
+                fontStyle: `var(${prefix}-font-style)`,
                 letterSpacing: `var(${prefix}-letter-spacing)`,
                 lineHeight: `var(${prefix}-line-height)`,
-                textTransform: `var(${prefix}-text-transform)` as any,
+                textTransform: `var(${prefix}-text-transform)`,
                 color: '#111',
                 overflow: 'hidden',
                 whiteSpace: 'nowrap',

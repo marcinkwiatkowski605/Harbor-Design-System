@@ -66,7 +66,7 @@ const buildTierIndex = (raw: Record<string, unknown>): Map<string, string> => {
   return index;
 };
 
-const tierIndex = buildTierIndex(designTokens as unknown as Record<string, unknown>);
+const tierIndex = buildTierIndex(designTokens);
 
 // Walks `segments` from the design_tokens.json root; if the final node has no
 // $value of its own but has an "@" child, descends into that instead (same remap).
@@ -260,7 +260,7 @@ const ButtonPreview = ({ variant, state }: { variant: ButtonVariant; state: Butt
         fontSize: 'var(--ds-semantic-typography-label-lg-font-size)',
         lineHeight: 'var(--ds-semantic-typography-label-lg-line-height)',
         letterSpacing: 'var(--ds-semantic-typography-label-lg-letter-spacing)',
-        fontWeight: 'var(--ds-semantic-typography-label-lg-font-weight)' as any,
+        fontWeight: 'var(--ds-semantic-typography-label-lg-font-weight)',
         cursor: state === 'disabled' ? 'not-allowed' : 'default',
         minWidth: 80,
         userSelect: 'none' as const,

@@ -154,7 +154,7 @@ export const Typography: StoryObj = {
         {fontStyleSteps.map(s => (
           <div key={s} style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginBottom: 12 }}>
             <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#666', width: 70, flexShrink: 0 }}>{s}</span>
-            <span style={{ fontSize: 24, fontStyle: `var(--ds-primitive-typography-font-style-${s})` as any, color: '#111' }}>
+            <span style={{ fontSize: 24, fontStyle: `var(--ds-primitive-typography-font-style-${s})`, color: '#111' }}>
               Harbor Design System
             </span>
             <Label>--ds-primitive-typography-font-style-{s}</Label>
@@ -166,7 +166,7 @@ export const Typography: StoryObj = {
         {textDecorationSteps.map(s => (
           <div key={s} style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginBottom: 12 }}>
             <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#666', width: 70, flexShrink: 0 }}>{s}</span>
-            <span style={{ fontSize: 24, textDecoration: `var(--ds-primitive-typography-text-decoration-${s})` as any, color: '#111' }}>
+            <span style={{ fontSize: 24, textDecoration: `var(--ds-primitive-typography-text-decoration-${s})`, color: '#111' }}>
               Harbor Design System
             </span>
             <Label>--ds-primitive-typography-text-decoration-{s}</Label>
@@ -178,7 +178,7 @@ export const Typography: StoryObj = {
         {textTransformSteps.map(s => (
           <div key={s} style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginBottom: 12 }}>
             <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#666', width: 70, flexShrink: 0 }}>{s}</span>
-            <span style={{ fontSize: 24, textTransform: `var(--ds-primitive-typography-text-transform-${s})` as any, color: '#111' }}>
+            <span style={{ fontSize: 24, textTransform: `var(--ds-primitive-typography-text-transform-${s})`, color: '#111' }}>
               Harbor Design System
             </span>
             <Label>--ds-primitive-typography-text-transform-{s}</Label>

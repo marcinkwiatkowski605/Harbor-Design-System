@@ -24,8 +24,7 @@ The project includes:
 ## Project status
 
 **Button**, **TextField**, and **TextArea** are fully token-driven and accessible;
-**Button** is additionally design-verified against Figma and documented with a WCAG 2.2
-audit. **Select**'s field and trigger are token-driven, but its dropdown menu still runs
+**Select**'s field and trigger are token-driven, but its dropdown menu still runs
 on clearly-marked placeholder values pending its Figma tokens; see
 [Token coverage](#token-coverage) for what "placeholder" means in the CSS.
 

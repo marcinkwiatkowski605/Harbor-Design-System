@@ -7,3 +7,4 @@ local_docs/
 CLAUDE.md
 .DS_Store
 ds-inspection/
+.eslintcache
